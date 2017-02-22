@@ -1,6 +1,8 @@
 # SquadMinus2Plus1 #
 _SYSC 4806 Project Repository_
 
+Heroku Link: https://socialwiki-4806.herokuapp.com/
+
 ## Team
 Chris Briglio 100890068 <br />
 Connor Matthews 100892794 <br />
