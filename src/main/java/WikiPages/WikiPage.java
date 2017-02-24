@@ -3,6 +3,8 @@ package WikiPages;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 /**
  * Created by Chris on 2/24/2017.
@@ -15,7 +17,7 @@ public class WikiPage {
     /**
      * ID used when creating a WikiPage to represent that it is an original and has no parent
      */
-    public static final Long isOriginalID = -1L;
+    public static final Long IS_ORIGINAL_ID = -1L;
 
     /**
      * The unique ID for a WikiPage
@@ -45,6 +47,13 @@ public class WikiPage {
     private Long authorID;
 
     /**
+     * Date the WikiPage was created. WikiPage is considered created when object is instantiated
+     */
+    @Temporal(TemporalType.TIMESTAMP)    //This tells JPA to save this as a SQL Timestamp, so it will include year, month, day, hour, minute, second
+    private Calendar creationDate;
+
+
+    /**
      * Default Constructor
      */
     public WikiPage() {
@@ -63,6 +72,7 @@ public class WikiPage {
         this.content = content;
         this.parentID = parentID;
         this.authorID = authorID;
+        this.creationDate = Calendar.getInstance();
     }
 
     /**
@@ -74,8 +84,9 @@ public class WikiPage {
     public WikiPage(String title, String content, Long authorID) {
         this.title = title;
         this.content = content;
-        this.parentID = isOriginalID;
+        this.parentID = IS_ORIGINAL_ID;
         this.authorID = authorID;
+        this.creationDate = Calendar.getInstance();
     }
 
     /**
@@ -118,6 +129,14 @@ public class WikiPage {
         return authorID;
     }
 
+    /**
+     * Get the date the WikiPage was created
+     * @return the date the WikiPage was created
+     */
+    public Calendar getCreationDate() {
+        return creationDate;
+    }
+
     @Override
     public String toString() {
         return "WikiPage{" +
@@ -126,6 +145,7 @@ public class WikiPage {
                 ", content='" + content + '\'' +
                 ", parentID=" + parentID +
                 ", authorID=" + authorID +
+                ", creationDate=" + new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(creationDate.getTime()) +
                 '}';
     }
 }

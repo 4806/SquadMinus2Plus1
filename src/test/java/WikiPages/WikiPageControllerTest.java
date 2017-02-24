@@ -1,5 +1,6 @@
 package WikiPages;
 
+import HelloWorld.BootApplication;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Created by Chris on 2/24/2017.
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest()
 @AutoConfigureMockMvc
 public class WikiPageControllerTest {
 
@@ -28,13 +29,11 @@ public class WikiPageControllerTest {
     @Test
     public void createWikiPage() throws Exception {
 
-        //Cannot use Id when checking return string as Id is randomly generated value
+        //Cannot use Id when checking return string as Id is randomly generated value. Cannot creation date as there is no way to know exact time of creation
         this.mockMvc.perform(post("/createWikiPage?title=testTitle&content=testContent&parentID=-1&authorID=1")).andDo(print()).andExpect(status().isOk())
                 .andExpect(content().string(containsString("{\"id\":")))
-                .andExpect(content().string(containsString(",\"title\":\"testTitle\",\"content\":\"testContent\",\"parentID\":-1,\"authorID\":1}")));
-
+                .andExpect(content().string(containsString(",\"title\":\"testTitle\",\"content\":\"testContent\",\"parentID\":-1,\"authorID\":1,\"creationDate\":")))
+                .andExpect(content().string(containsString("}")));
     }
-
-
 
 }

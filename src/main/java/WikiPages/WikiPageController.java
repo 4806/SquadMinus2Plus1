@@ -39,7 +39,7 @@ public class WikiPageController {
         WikiPage newPage;
 
         //If the WikiPage being created has no predecessor and is original then use specific constructor
-        if (parentID.compareTo(WikiPage.isOriginalID) == 0) {
+        if (parentID.compareTo(WikiPage.IS_ORIGINAL_ID) == 0) {
             newPage = new WikiPage(title,content,authorID);
         }
         else {
