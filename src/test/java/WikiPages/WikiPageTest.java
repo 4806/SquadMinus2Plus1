@@ -13,7 +13,6 @@ public class WikiPageTest {
     WikiPage testWikiPage1;
     WikiPage testWikiPage2;
 
-
     @Test
     public void getTitle() throws Exception {
         assertEquals("Failure - getTitle for testWikiPage1", testWikiPage1.getTitle(), "testTitle1");
@@ -28,20 +27,20 @@ public class WikiPageTest {
 
     @Test
     public void getParentID() throws Exception {
-        assertEquals("Failure - getParentID for testWikiPage1",testWikiPage1.getParentID(), new Long(1L));
-        assertEquals("Failure - getParentID for testWikiPage2",testWikiPage2.getParentID(), testWikiPage2.getId());
+        assertEquals("Failure - getParentID for testWikiPage1", testWikiPage1.getParentID(), WikiPage.isOriginalID);
+        assertEquals("Failure - getParentID for testWikiPage2", testWikiPage2.getParentID(), testWikiPage1.getId());
     }
 
     @Test
     public void getAuthorID() throws Exception {
-        assertEquals("Failure - getAuthorID for testWikiPage1",testWikiPage1.getAuthorID(), new Long(1L));
-        assertEquals("Failure - getAuthorID for testWikiPage2",testWikiPage2.getAuthorID(), new Long(2L));
+        assertEquals("Failure - getAuthorID for testWikiPage1", testWikiPage1.getAuthorID(), new Long(1L));
+        assertEquals("Failure - getAuthorID for testWikiPage2", testWikiPage2.getAuthorID(), new Long(2L));
     }
 
     @Before
     public void setUp() throws Exception {
-        testWikiPage1 = new WikiPage("testTitle1", "testContent1", 1L,1L);
-        testWikiPage2 = new WikiPage("testTitle2", "testContent2",2L);
+        testWikiPage1 = new WikiPage("testTitle1", "testContent1",1L);
+        testWikiPage2 = new WikiPage("testTitle2", "testContent2", testWikiPage1.getId(),2L);
 
     }
 }

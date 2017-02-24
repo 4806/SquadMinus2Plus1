@@ -35,7 +35,7 @@ public class WikiPage {
     private String content;
 
     /**
-     * The ID of the WikiPage that this version was altered from. If it is the first version of a WikiPage, the parent is itself
+     * The ID of the WikiPage that this version was altered from
      */
     private Long parentID;
 
@@ -43,6 +43,13 @@ public class WikiPage {
      * The ID of the authoring User of the WikiPage
      */
     private Long authorID;
+
+    /**
+     * Default Constructor
+     */
+    public WikiPage() {
+
+    }
 
     /**
      * Constructor that takes all attributes
@@ -67,7 +74,7 @@ public class WikiPage {
     public WikiPage(String title, String content, Long authorID) {
         this.title = title;
         this.content = content;
-        this.parentID = this.id;
+        this.parentID = isOriginalID;
         this.authorID = authorID;
     }
 
@@ -109,5 +116,16 @@ public class WikiPage {
      */
     public Long getAuthorID() {
         return authorID;
+    }
+
+    @Override
+    public String toString() {
+        return "WikiPage{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", content='" + content + '\'' +
+                ", parentID=" + parentID +
+                ", authorID=" + authorID +
+                '}';
     }
 }
