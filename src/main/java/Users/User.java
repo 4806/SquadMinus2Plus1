@@ -2,10 +2,7 @@ package Users;
 
 import org.springframework.stereotype.Component;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 /**
  * Created by connor on 2/23/17.
@@ -15,16 +12,17 @@ import javax.persistence.Id;
 @Component
 public class User {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     /**
      * The unique ID for the User
      */
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
     /**
-     * The name used for logging in and displaying to other Users
+     * The unique name used for logging in and displaying to other Users
      */
+    @Column(unique = true)
     private String userName;
 
     /**
@@ -38,8 +36,9 @@ public class User {
     private String lastName;
 
     /**
-     * The email address used for logging in and contacting the User outside of the application
+     * The unique email address used for logging in and contacting the User outside of the application
      */
+    @Column(unique = true)
     private String email;
 
     /**
@@ -67,6 +66,14 @@ public class User {
         this.lastName = lastName;
         this.email = email;
         this.password = password;
+    }
+
+    public User(Long id, String userName, String firstName, String lastName, String email) {
+        this.id = id;
+        this.userName = userName;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
     }
 
     /**
@@ -155,6 +162,32 @@ public class User {
      */
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    /**
+     * Get the string representation of the User
+     * @return the User as a string
+     */
+    @Override
+    public String toString() {
+        return "ID: " + this.id +
+                "\nUser Name: " + this.userName +
+                "\nFirst Name: " + this.firstName +
+                "\nLast Name: " + this.lastName +
+                "\nEmail: " + this.email +
+                "\nPassword: " + this.password;
+    }
+
+    /**
+     * Get a version of the User that does not have the password, to be used for a User's session
+     * @return the User without a password
+     */
+    public User asSessionUser() {
+        return new User(this.id,
+                this.userName,
+                this.firstName,
+                this.lastName,
+                this.email);
     }
 
 }
