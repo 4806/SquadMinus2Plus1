@@ -9,7 +9,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class BootApplication {
+
+    /*
+
+    ** comment out as only 1 main class should be within project
+
     public static void main(String[] args) {
         SpringApplication.run(BootApplication.class, args);
     }
+    */
 }
