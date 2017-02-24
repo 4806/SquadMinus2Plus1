@@ -1,5 +1,7 @@
 package Users;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
@@ -17,33 +19,39 @@ public class User {
      */
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Getter
     private long id;
 
     /**
      * The unique name used for logging in and displaying to other Users
      */
     @Column(unique = true)
+    @Getter @Setter
     private String userName;
 
     /**
      * The User's first name
      */
+    @Getter @Setter
     private String firstName;
 
     /**
      * The User's last name
      */
+    @Getter @Setter
     private String lastName;
 
     /**
      * The unique email address used for logging in and contacting the User outside of the application
      */
     @Column(unique = true)
+    @Getter @Setter
     private String email;
 
     /**
      * The password used for logging into the User's account
      */
+    @Getter @Setter
     private String password;
 
     /**
@@ -68,100 +76,20 @@ public class User {
         this.password = password;
     }
 
+    /**
+     * Constructor used for creating a session user
+     * @param id - the unique ID of the User
+     * @param userName - the user name of the User
+     * @param firstName - the first name of the User
+     * @param lastName - the last name of the User
+     * @param email - the email address of the User
+     */
     public User(Long id, String userName, String firstName, String lastName, String email) {
         this.id = id;
         this.userName = userName;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
-    }
-
-    /**
-     * Get the unique ID of the User
-     * @return the User's ID
-     */
-    public long getId() {
-        return id;
-    }
-
-    /**
-     * Get the user name for the User
-     * @return the name of the User
-     */
-    public String getUserName() {
-        return userName;
-    }
-
-    /**
-     * Set the user name of the User
-     * @param userName - the User's new user name
-     */
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    /**
-     * Get the first name of the User
-     * @return the User's first name
-     */
-    public String getFirstName() {
-        return firstName;
-    }
-
-    /**
-     * Set the first name of the User
-     * @param firstName - the User's new first name
-     */
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    /**
-     * Get the last name of the User
-     * @return the User's last name
-     */
-    public String getLastName() {
-        return lastName;
-    }
-
-    /**
-     * Set the last name of the User
-     * @param lastName - the User's new last name
-     */
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    /**
-     * Get the email address of the User
-     * @return the User's email address
-     */
-    public String getEmail() {
-        return email;
-    }
-
-    /**
-     * Set the email address of the User
-     * @param email - the User's new email address
-     */
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    /**
-     * Get the password for the User
-     * @return the User's password
-     */
-    public String getPassword() {
-        return password;
-    }
-
-    /**
-     * Set the password for the User
-     * @param password - the User's new password
-     */
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     /**
