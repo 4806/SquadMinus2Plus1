@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,11 +16,18 @@ import java.util.List;
 @RestController
 public class UserController {
 
+    /**
+     * Repository for all of the Users
+     */
     @Autowired
     private UserRepository userRepo;
 
+    /**
+     * Authenticate a User's login information and return a version of the User to be used in the session
+     * @param request - an HTTP request that contains the login information
+     * @return an HTTP response that contains the User for the session, or an error response
+     */
     @PostMapping("/login")
-    @ResponseBody
     public ResponseEntity<User> login(HttpServletRequest request) {
         // get the login parameters from the post request
         String login = request.getParameter("login");
