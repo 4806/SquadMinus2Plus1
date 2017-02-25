@@ -12,9 +12,17 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 public class WikiPageController {
 
+    /**
+     * Repository for all WikiPages.
+     */
     @Autowired
     private WikiPageRepository wikiPageRepo;
 
+    /**
+     * Method to handle the creation or editing of a WikiPage
+     * @param request - contains the title, content, parentID, and authorID of the WikiPage being created/altered
+     * @return the new WikiPage
+     */
     @PostMapping("/createWikiPage")
     public WikiPage createWikiPage(HttpServletRequest request) {
 

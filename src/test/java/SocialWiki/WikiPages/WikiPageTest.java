@@ -46,6 +46,8 @@ public class WikiPageTest {
         Calendar date1 = testWikiPage1.getCreationDate();
         Calendar date2 = testWikiPage2.getCreationDate();
         Calendar now = Calendar.getInstance();
+
+        //Only testing up to current day, possibility of failing if get any more specific
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
 
         assertEquals("Failure - getCreationDate for testWikiPage1", dateFormat.format(now.getTime()), dateFormat.format(date1.getTime()));
