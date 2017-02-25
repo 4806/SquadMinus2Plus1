@@ -1,5 +1,6 @@
 package SocialWiki.WikiPages;
 
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,14 @@ public class WikiPageControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private WikiPageRepository repo;
+
+    @After
+    public void tearDown() throws Exception {
+        repo.deleteAll();
+    }
 
     @Test
     public void createWikiPage() throws Exception {
