@@ -16,7 +16,7 @@ public class UserApplication {
         SpringApplication.run(UserApplication.class, args);
     }
 
-    @Bean
+    //@Bean
     public CommandLineRunner demo(UserRepository repo) {
         return (args) -> {
             repo.save(new User("testUserName", "testFirstName", "testLastName", "testEmail", "testPassword"));

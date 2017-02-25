@@ -107,6 +107,25 @@ public class User {
     }
 
     /**
+     * Determine if this User is equal to another object
+     * @param obj - the other object to be compared for equality
+     * @return the equality of this and obj
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof User)) {
+            return false;
+        }
+
+        User user = (User) obj;
+
+        if(this.id == user.getId() && this.userName.equals(user.getUserName()) && this.email.equals(user.getEmail())) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Get a version of the User that does not have the password, to be used for a User's session
      * @return the User without a password
      */
