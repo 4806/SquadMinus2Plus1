@@ -1,4 +1,4 @@
-package WikiPages;
+package SocialWiki.WikiPages;
 
 import org.springframework.stereotype.Component;
 
@@ -56,9 +56,7 @@ public class WikiPage {
     /**
      * Default Constructor
      */
-    public WikiPage() {
-
-    }
+    public WikiPage() {}
 
     /**
      * Constructor that takes all attributes

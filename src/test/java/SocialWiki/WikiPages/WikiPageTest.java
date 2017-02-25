@@ -1,4 +1,4 @@
-package WikiPages;
+package SocialWiki.WikiPages;
 
 import org.junit.Before;
 import org.junit.Test;

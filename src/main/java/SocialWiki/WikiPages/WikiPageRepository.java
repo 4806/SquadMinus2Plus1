@@ -1,4 +1,4 @@
-package WikiPages;
+package SocialWiki.WikiPages;
 
 import org.springframework.data.repository.CrudRepository;
 
