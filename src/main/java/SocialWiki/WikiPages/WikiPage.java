@@ -18,7 +18,6 @@ public class WikiPage {
      * ID used when creating a WikiPage to represent that it is an original and has no parent
      */
     /*
-        TODO: Should confirm that auto-generated values for ID will never be negative.
         Alternative is method is making parentId = Id. This would be more difficult as the Id is not set until the page has been saved...
     */
     public static final Long IS_ORIGINAL_ID = -1L;

@@ -1,6 +1,8 @@
 package SocialWiki.WikiPages;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,7 +26,7 @@ public class WikiPageController {
      * @return the new WikiPage
      */
     @PostMapping("/createWikiPage")
-    public WikiPage createWikiPage(HttpServletRequest request) {
+    public ResponseEntity<WikiPage> createWikiPage(HttpServletRequest request) {
 
         //Retrieve parameters from request
         String title = request.getParameter("title");
@@ -35,26 +37,48 @@ public class WikiPageController {
         try {
             parentID = Long.parseLong(request.getParameter("parentID"));
         } catch (NumberFormatException e) {
-            return null;
+            return new ResponseEntity<>(new WikiPage(), HttpStatus.PRECONDITION_FAILED);
         }
 
         try {
             authorID = Long.parseLong(request.getParameter("authorID"));
         } catch (NumberFormatException e) {
-            return null;
+            return new ResponseEntity<>(new WikiPage(), HttpStatus.PRECONDITION_FAILED);
+        }
+
+        //Validate parameters
+
+        if (title == null || title.isEmpty()) {    //title must be valid, non-empty string
+            return new ResponseEntity<>(new WikiPage(), HttpStatus.PRECONDITION_FAILED);
+        }
+        else if (content == null) {     //content must be valid string
+            return new ResponseEntity<>(new WikiPage(), HttpStatus.PRECONDITION_FAILED);
+        }
+        else if (parentID.compareTo(0L) == 0 || parentID.compareTo(-1L) < 0) {  //Parent ID must be > 0 or -1
+            return new ResponseEntity<>(new WikiPage(), HttpStatus.PRECONDITION_FAILED);
+        }
+        else if (authorID.compareTo(0L) <= 0) {   //Author ID must be > 0
+            return new ResponseEntity<>(new WikiPage(), HttpStatus.PRECONDITION_FAILED);
         }
 
         WikiPage newPage;
 
         //If the WikiPage being created has no predecessor and is original then use specific constructor
         if (parentID.compareTo(WikiPage.IS_ORIGINAL_ID) == 0) {
-            newPage = new WikiPage(title,content,authorID);
+            newPage = new WikiPage(title, content, authorID);
         }
         else {
-            newPage = new WikiPage(title,content,parentID,authorID);
+            newPage = new WikiPage(title, content, parentID, authorID);
         }
 
-        return wikiPageRepo.save(newPage);
+        //Save the WikiPage
+        try {
+            newPage = wikiPageRepo.save(newPage);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(newPage, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity<>(newPage, HttpStatus.OK);
     }
 
 
