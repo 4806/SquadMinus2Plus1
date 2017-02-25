@@ -1,19 +1,20 @@
-package Users;
+package SocialWiki;
 
+import SocialWiki.Users.User;
+import SocialWiki.Users.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
 
 /**
  * Created by connor on 2/24/17.
  */
 
 @SpringBootApplication
-public class UserApplication {
+public class BootApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(UserApplication.class, args);
+        SpringApplication.run(BootApplication.class, args);
     }
 
     //@Bean

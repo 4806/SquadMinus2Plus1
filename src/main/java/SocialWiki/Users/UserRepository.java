@@ -1,4 +1,4 @@
-package Users;
+package SocialWiki.Users;
 
 import org.springframework.data.repository.CrudRepository;
 

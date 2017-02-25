@@ -1,4 +1,4 @@
-package Users;
+package SocialWiki.Users;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -23,7 +23,7 @@ public class User {
     private long id;
 
     /**
-     * The unique name used for logging in and displaying to other Users
+     * The unique name used for logging in and displaying to other SocialWiki.Users
      */
     @Column(unique = true)
     @Getter @Setter
