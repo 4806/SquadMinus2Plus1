@@ -46,6 +46,12 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>webix</artifactId>
+            <version>4.0.8</version>
+        </dependency>
+
     </dependencies>
 
     <dependencyManagement>
