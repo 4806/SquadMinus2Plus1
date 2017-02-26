@@ -10,14 +10,25 @@
 </head>
 <body>
     <script type="text/javascript">
+        var submitHandler = function( ) {
+            webix.ajax().post("https://socialwiki-4806.herokuapp.com/login", $$("login_form").getValues());
+        };
+
+        var homeHandler = function( ) {
+            location.href = "https://socialwiki-4806.herokuapp.com/";
+        };
+
+        var signupHandler = function( ) {
+            location.href = "https://socialwiki-4806.herokuapp.com/signup";
+        };
 
         var form = [
-            { view:"text", label:"User"},
-            { view:"text", type:"password", label:"Password"},
+            { view:"text", label:"User", name:"user"},
+            { view:"text", type:"password", label:"Password", name:"password"},
             { margin:10,
                 cols:[
-                    { view:"button", value:"Login" , type:"form" },
-                    { view:"button", value:"Cancel" }
+                    { view:"button", value:"Login" , type:"form", click:submitHandler},
+                    { view:"button", value:"Cancel", click:homeHandler }
                 ]
             }
         ];
@@ -26,20 +37,19 @@
             rows:[
                 { view:"toolbar", elements: [
                     {view:"label", label:"SM2P1 Social Wiki Login"},
-                    {view:"button", value:"Home", align:"right", width:100},
-                    {view:"button", value:"Sign Up", align:"right", width:100}
+                    {view:"button", value:"Home", align:"right", width:100, click:homeHandler},
+                    {view:"button", value:"Sign Up", align:"right", width:100, click:signupHandler}
                     ]
                 },
-                {
-                    cols: [
-                        { margin: 30,
-                            width:600,
-                            align:"center",
-                            rows: [
-                                {view: "form", elements: form}
-                            ]
-                        }
-                    ]
+                { cols:[
+                    { view: "form",
+                        margin: "50%",
+                        width:600,
+                        rows: [
+                            {view: "form", id:"login_form", align:"center", elements: form}
+                        ]
+                    }
+                  ]
                 }
             ]
         });
