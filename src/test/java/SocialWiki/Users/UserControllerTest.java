@@ -68,12 +68,58 @@ public class UserControllerTest {
                 .andExpect(content().string(containsString("\"password\":null")))
                 .andExpect(status().isOk());
 
-        // perform unsuccessful login with missing parameter
+        // perform successful login with extra parameter
+        mockMvc.perform(post("/login")
+                .content("login=testEmail1&pass=testPassword1&last=notALastName")
+                .contentType("application/x-www-form-urlencoded"))
+                .andExpect(content().string(containsString("\"id\":1")))
+                .andExpect(content().string(containsString("\"userName\":\"testUserName1\"")))
+                .andExpect(content().string(containsString("\"firstName\":\"testFirstName1\"")))
+                .andExpect(content().string(containsString("\"lastName\":\"testLastName1\"")))
+                .andExpect(content().string(containsString("\"email\":\"testEmail1\"")))
+                .andExpect(content().string(containsString("\"password\":null")))
+                .andExpect(status().isOk());
+
+        // perform unsuccessful login with missing "pass" parameter
         mockMvc.perform(post("/login")
                 .content("login=testUserName1")
                 .contentType("application/x-www-form-urlencoded"))
                 .andExpect(content().string(""))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isUnprocessableEntity());
+
+        //perform unsuccessful login with missing "login" parameter
+        mockMvc.perform(post("/login")
+                .content("pass=testPassword1")
+                .contentType("application/x-www-form-urlencoded"))
+                .andExpect(content().string(""))
+                .andExpect(status().isUnprocessableEntity());
+
+        //perform unsuccessful login with both parameters missing
+        mockMvc.perform(post("/login")
+                .contentType("application/x-www-form-urlencoded"))
+                .andExpect(content().string(""))
+                .andExpect(status().isUnprocessableEntity());
+
+        // perform unsuccessful login with empty "login" parameter
+        mockMvc.perform(post("/login")
+                .content("login=&pass=testPassword1")
+                .contentType("application/x-www-form-urlencoded"))
+                .andExpect(content().string(""))
+                .andExpect(status().isUnprocessableEntity());
+
+        // perform unsuccessful login with empty "pass" parameter
+        mockMvc.perform(post("/login")
+                .content("login=testUserName1&pass=")
+                .contentType("application/x-www-form-urlencoded"))
+                .andExpect(content().string(""))
+                .andExpect(status().isUnprocessableEntity());
+
+        // perform unsuccessful login with both parameters empty
+        mockMvc.perform(post("/login")
+                .content("login=testUserName1&pass=")
+                .contentType("application/x-www-form-urlencoded"))
+                .andExpect(content().string(""))
+                .andExpect(status().isUnprocessableEntity());
 
         // perform unsuccessful login with wrong credentials
         mockMvc.perform(post("/login")

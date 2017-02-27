@@ -33,9 +33,9 @@ public class UserController {
         String login = request.getParameter("login");
         String pass = request.getParameter("pass");
 
-        // send an HTTP 400 response if either parameter is missing
-        if (login == null || pass == null) {
-            return ResponseEntity.badRequest().body(null);
+        // send an HTTP 422 response if either parameter is missing or empty
+        if (login == null || login.isEmpty() || pass == null || pass.isEmpty()) {
+            return ResponseEntity.unprocessableEntity().body(null);
         }
 
         // get the user by userName and password
