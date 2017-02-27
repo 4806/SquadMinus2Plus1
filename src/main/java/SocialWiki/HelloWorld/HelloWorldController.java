@@ -1,4 +1,4 @@
-package HelloWorld;
+package SocialWiki.HelloWorld;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
