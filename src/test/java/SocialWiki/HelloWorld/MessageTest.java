@@ -1,9 +1,7 @@
-package HelloWorld;
+package SocialWiki.HelloWorld;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import javax.validation.constraints.AssertTrue;
 
 import static org.junit.Assert.*;
 
