@@ -95,4 +95,24 @@ public class UserRepositoryTest {
         assertEquals("Failure - userRepository found a user with a email-password pair that does not exist", 0, users.size());
     }
 
+    @Test
+    public void findByUserNameOrEmail() throws Exception {
+        List<User> users = userRepo.findByUserNameOrEmail("testUserName1", "testEmail1");
+        assertEquals("Failure - userRepository query with existing userName and email for user1 could not be found", user1, users.get(0));
+
+        users = userRepo.findByUserNameOrEmail("testUserName1", "testEmail3");
+        assertEquals("Failure - userRepository query with existing userName for user1 could not be found", user1, users.get(0));
+
+        users = userRepo.findByUserNameOrEmail("testUserName3", "testEmail1");
+        assertEquals("Failure - userRepository query with existing email for user1 could not be found", user1, users.get(0));
+
+        users = userRepo.findByUserNameOrEmail("testUserName1", "testEmail2");
+        assertEquals("Failure - userRepository query with existing userName for user1 and email for user2 could not find both", 2, users.size());
+        assertEquals("Failure - userRepository query with existing userName for user1 could not be found", user1, users.get(0));
+        assertEquals("Failure - userRepository query with existing email for user2 could not be found", user2, users.get(1));
+
+        users = userRepo.findByEmailAndPassword("testUserName3", "testEmail3");
+        assertEquals("Failure - userRepository query by userName or email returned users that do not exist", 0, users.size());
+    }
+
 }
