@@ -1,10 +1,11 @@
-package SocialWiki.HelloWorld;
+package SocialWiki.FrontPages;
 
 import org.springframework.stereotype.Component;
 
 /**
  * Created by connor on 2/21/17.
  */
+
 @Component
 public class Message {
 

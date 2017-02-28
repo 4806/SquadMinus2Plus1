@@ -1,4 +1,4 @@
-package SocialWiki.HelloWorld;
+package SocialWiki.FrontPages;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -7,14 +7,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-/**
- * Created by connor on 2/21/17.
- *
- */
-
 @Controller
 @RequestMapping("/")
-public class HelloWorldController {
+public class PageController {
 
     @Autowired
     private Message msg;
