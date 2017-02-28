@@ -9,6 +9,12 @@
 
 </head>
 <body>
+    <style>
+        .label_text {
+            font-weight: 800;
+            font-size: large;
+        }
+    </style>
     <script type="text/javascript">
         var submitHandler = function( ) {
             webix.ajax().post("https://socialwiki-4806.herokuapp.com/login", $$("login_form").getValues());
@@ -23,7 +29,7 @@
         };
 
         var form = [
-            { view:"text", label:"User", name:"userNameOrEmail"},
+            { view:"text", label:"User", name:"login"},
             { view:"text", type:"password", label:"Password", name:"pass"},
             { margin:10,
                 cols:[
@@ -41,16 +47,15 @@
                     {view:"button", value:"Sign Up", align:"right", width:100, click:signupHandler}
                     ]
                 },
-                { cols:[
-                    { view: "form",
-                        margin: "50%",
-                        width:600,
-                        rows: [
-                            {view: "form", id:"login_form", align:"center", elements: form}
-                        ]
-                    }
-                  ]
-                }
+                { view:"label", css:"label_text", label:"Please enter your login information.", align:"center"},
+                { view: "form",
+                    cols: [
+                        { },
+                        {view: "form", id:"login_form", align:"center", elements: form},
+                        { }
+                    ]
+                },
+                { }
             ]
         });
     </script>
