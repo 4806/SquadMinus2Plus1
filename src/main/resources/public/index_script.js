@@ -35,10 +35,7 @@ document.onreadystatechange = function() {
             {view:"label", label:indexHandler.strings.welcomeText, css:"label_big", align:"center"},
             {view:"layout",
                 cols:[
-                    {cols:[
-                        {view:"label", label:'<img src="img/flame_blue.png" width="50%"/>', align:"left", height:200, width:100},
-                        {view:"label", icon:"img/flame_blue.png", label:"About", css:"label_big", align:"left"}
-                    ]},
+                    {view:"label", label:'<img src="img/flame_blue.png" height="50%"/> About', height:100, css:"label_big", align:"center"},
                     {view:"label", label:indexHandler.strings.aboutText, css:"label_indexNorm", align:"left", labelposition:"top"}
                 ]}
         ]
