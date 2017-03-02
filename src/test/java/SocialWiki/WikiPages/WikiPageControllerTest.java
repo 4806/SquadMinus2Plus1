@@ -1,5 +1,7 @@
 package SocialWiki.WikiPages;
 
+import SocialWiki.Users.User;
+import SocialWiki.Users.UserRepository;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,16 +26,80 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest()
 @AutoConfigureMockMvc
 public class WikiPageControllerTest {
+    @Test
+    public void searchWikiPageByAuthor() throws Exception {
+
+        MultiValueMap<String, String> params = new HttpHeaders();
+
+        params.add("author", "testUserName1");
+
+        User testUser1 = new User("testUserName1", "testFirstName1", "testLastName1", "testEmail1", "testPassword1");
+        User testUser2 = new User("testUserName2", "testFirstName2", "testLastName2", "testEmail2", "testPassword2");
+        testUser1 = userRepository.save(testUser1);
+        testUser2 = userRepository.save(testUser2);
+
+        //Set up Database for tests
+        WikiPage testWikiPage1 = new WikiPage("testTitle1", "testContent1", testUser1.getId());
+        WikiPage testWikiPage2 = new WikiPage("testTitlePair", "testContent1", testUser2.getId());
+        WikiPage testWikiPage3 = new WikiPage("testTitlePair", "testContent2", testWikiPage2.getId(), testUser2.getId());
+
+        testWikiPage1 = wikiPageRepository.save(testWikiPage1);
+        testWikiPage2 = wikiPageRepository.save(testWikiPage2);
+        testWikiPage3 = wikiPageRepository.save(testWikiPage3);
+
+        //Check for successful search for single WikiPage
+        this.mockMvc.perform(get("/searchWikiPageByAuthor").params(params))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString(testWikiPage1.toJSON())));
+
+
+        params.set("author", "testUserName2");
+
+        //Check for successful search for multiple WikiPages
+        this.mockMvc.perform(get("/searchWikiPageByAuthor").params(params))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString(testWikiPage2.toJSON())))
+                .andExpect(content().string(containsString(testWikiPage3.toJSON())));
+
+        params.remove("author");
+
+        //Test bad search with no parameter author
+        this.mockMvc.perform(get("/searchWikiPageByAuthor").params(params))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+
+        params.add("author", "");
+
+        //Test bad search with empty author parameter
+        this.mockMvc.perform(get("/searchWikiPageByAuthor").params(params))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+
+        params.set("author", "non-existing author");
+
+        //Check for successful search for WikiPage, but with non-existing author
+        this.mockMvc.perform(get("/searchWikiPageByAuthor").params(params))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("[]")));
+
+    }
 
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
-    private WikiPageRepository repo;
+    private WikiPageRepository wikiPageRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @After
     public void tearDown() throws Exception {
-        repo.deleteAll();
+        wikiPageRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Test
@@ -158,9 +224,9 @@ public class WikiPageControllerTest {
         WikiPage testWikiPage2 = new WikiPage("testTitlePair", "testContent1",2L);
         WikiPage testWikiPage3 = new WikiPage("testTitlePair", "testContent2", testWikiPage2.getId(),2L);
 
-        testWikiPage1 = repo.save(testWikiPage1);
-        testWikiPage2 = repo.save(testWikiPage2);
-        testWikiPage3 = repo.save(testWikiPage3);
+        testWikiPage1 = wikiPageRepository.save(testWikiPage1);
+        testWikiPage2 = wikiPageRepository.save(testWikiPage2);
+        testWikiPage3 = wikiPageRepository.save(testWikiPage3);
 
         //Check for successful search for single WikiPage
         this.mockMvc.perform(get("/searchWikiPageByTitle").params(params))
@@ -192,6 +258,13 @@ public class WikiPageControllerTest {
                 .andDo(print())
                 .andExpect(status().isBadRequest());
 
+        params.set("title", "non-existing title");
+
+        //Check for successful search for WikiPage, but with non-existing title
+        this.mockMvc.perform(get("/searchWikiPageByTitle").params(params))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("[]")));
     }
 
 }

@@ -1,5 +1,7 @@
 package SocialWiki.WikiPages;
 
+import SocialWiki.Users.User;
+import SocialWiki.Users.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,6 +24,12 @@ public class WikiPageController {
      */
     @Autowired
     private WikiPageRepository wikiPageRepo;
+
+    /**
+     * Repository for all Users.
+     */
+    @Autowired
+    private UserRepository userRepo;
 
     /**
      * Method to handle the creation or editing of a WikiPage
@@ -104,5 +113,33 @@ public class WikiPageController {
 
     }
 
+    /**
+     * Method to handle searching for list of WikiPages by author
+     * @param request - contains the Username of the author for the WikiPages being searched for
+     * @return the list of WikiPages with matching author
+     */
+    @GetMapping("/searchWikiPageByAuthor")
+    public ResponseEntity<List<WikiPage>> searchWikiPageByAuthor(HttpServletRequest request) {
+
+        //Retrieve parameters from request
+        String authorUserName = request.getParameter("author");
+
+        if (authorUserName == null || authorUserName.isEmpty()) {    //author must be valid, non-empty string
+            return ResponseEntity.badRequest().body(null);
+        }
+
+        List<User> authorQuery = userRepo.findByUserName(authorUserName);
+
+        if (authorQuery.size() == 1) { //If author was found, return list of pages made by author
+
+            List<WikiPage> pages = wikiPageRepo.findByAuthorID(authorQuery.get(0).getId());
+
+            return new ResponseEntity<>(pages, HttpStatus.OK);
+        }
+
+        //Else if author was not found, then return empty list
+        return new ResponseEntity<>(new ArrayList<WikiPage>(), HttpStatus.OK);
+
+    }
 
 }
