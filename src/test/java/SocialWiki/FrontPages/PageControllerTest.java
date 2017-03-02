@@ -33,4 +33,9 @@ public class PageControllerTest {
         this.mockMvc.perform(get("/login")).andExpect(status().isOk());
     }
 
+    @Test
+    public void signup() throws Exception {
+        this.mockMvc.perform(get("/signup")).andExpect(status().isOk());
+    }
+
 }
