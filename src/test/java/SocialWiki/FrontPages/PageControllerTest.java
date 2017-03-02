@@ -24,13 +24,13 @@ public class PageControllerTest {
     private MockMvc mockMvc;
 
     @Test
-    public void hello() throws Exception {
-        this.mockMvc.perform(get("/")).andDo(print()).andExpect(status().isOk());
+    public void index() throws Exception {
+        this.mockMvc.perform(get("/")).andExpect(status().isOk());
     }
 
     @Test
     public void login() throws Exception {
-        this.mockMvc.perform(get("/login")).andDo(print()).andExpect(status().isOk());
+        this.mockMvc.perform(get("/login")).andExpect(status().isOk());
     }
 
 }
