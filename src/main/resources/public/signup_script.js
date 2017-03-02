@@ -44,12 +44,11 @@ signupHandler.submitHandler = function( ) {
         signupHandler.errorHandler("Signup Failed. Invalid password (only alphanumeric accepted).");
     }
 
-    /*
     webix.ajax().post("/signup", $$("signup_form").getValues(), {
-        error:signupHandler.errorHandler,
+        error:signupHandler.errorResponseHandler,
         success:function(dataString){
             if(dataString === null) {
-                signupHandler.errorHandler();
+                signupHandler.errorResponseHandler();
             }
             var data = JSON.parse(dataString);
             var userName = $$("user").getValue();
@@ -60,16 +59,19 @@ signupHandler.submitHandler = function( ) {
                 $$("signup_result").setValue("Signup Succeeded.");
                 webix.alert("User Signup Successful.", signupHandler.signupSuccessHandler);
             } else {
-                signupHandler.errorHandler();
+                signupHandler.errorResponseHandler();
             }
         }
     });
-    */
 };
 
 signupHandler.errorHandler = function(message) {
     $$("signup_result").define("css","label_error");
     $$("signup_result").setValue(message);
+};
+
+signupHandler.errorResponseHandler = function(data) {
+    signupHandler.errorHandler("Signup Failed.");
 };
 
 signupHandler.homeHandler = function( ) {
