@@ -38,4 +38,12 @@ public interface UserRepository extends CrudRepository<User, Long> {
      * @return a list of Users that match the email and password (should be a max of one since email is unique)
      */
     List<User> findByEmailAndPassword(String email, String password);
+
+    /**
+     * Find the User with the corresponding userName or email
+     * @param userName - the userName for the User that is being queried
+     * @param email - the email for the User that is being queried
+     * @return a list of Users that match the userName or email (should be a max of one since userName and email is unique)
+     */
+    List<User> findByUserNameOrEmail(String userName, String email);
 }
