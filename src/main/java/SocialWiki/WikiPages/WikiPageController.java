@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by Chris on 2/24/2017.
@@ -139,6 +140,39 @@ public class WikiPageController {
 
         //Else if author was not found, then return empty list
         return new ResponseEntity<>(new ArrayList<WikiPage>(), HttpStatus.OK);
+
+    }
+
+    /**
+     * Method to handle searching for list of WikiPages
+     * @param request - contains the parameters of the WikiPages being searched for
+     * @return the list of WikiPages found
+     */
+    @GetMapping("/searchWikiPage")
+    public ResponseEntity<List<WikiPage>> searchWikiPage(HttpServletRequest request) {
+
+        //Retrieve parameters from request
+        String title = request.getParameter("title");
+        String authorUserName = request.getParameter("author");
+        String content = request.getParameter("author");
+
+        Long userID = null;
+
+        if ((title == null || title.isEmpty()) &&
+                (authorUserName == null || authorUserName.isEmpty())&&
+                (content == null || content.isEmpty()) ) {    //If all parameters are empty
+            return ResponseEntity.badRequest().body(null);
+        }
+
+        List<User> authorQuery = userRepo.findByUserName(authorUserName);
+
+        if (authorQuery.size() == 1) {
+            userID = authorQuery.get(0).getId();
+        }
+
+        List<WikiPage> pages = wikiPageRepo.findByTitleAndAuthorIDAndContent(title, userID, content);
+
+        return new ResponseEntity<>(pages, HttpStatus.OK);
 
     }
 
