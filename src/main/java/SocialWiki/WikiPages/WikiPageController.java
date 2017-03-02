@@ -3,10 +3,12 @@ package SocialWiki.WikiPages;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * Created by Chris on 2/24/2017.
@@ -79,6 +81,27 @@ public class WikiPageController {
         }
 
         return new ResponseEntity<>(newPage, HttpStatus.OK);
+    }
+
+    /**
+     * Method to handle searching for list of WikiPages by title
+     * @param request - contains the title of the WikiPages being searched for
+     * @return the list of WikiPages with matching title
+     */
+    @GetMapping("/searchWikiPageByTitle")
+    public ResponseEntity<List<WikiPage>> searchWikiPageByTitle(HttpServletRequest request) {
+
+        //Retrieve parameters from request
+        String title = request.getParameter("title");
+
+        if (title == null || title.isEmpty()) {    //title must be valid, non-empty string
+            return ResponseEntity.badRequest().body(null);
+        }
+
+        List<WikiPage> pages = wikiPageRepo.findByTitle(title);
+
+        return new ResponseEntity<>(pages, HttpStatus.OK);
+
     }
 
 

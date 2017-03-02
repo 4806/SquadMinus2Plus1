@@ -10,9 +10,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.util.MultiValueMap;
-
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -144,6 +144,54 @@ public class WikiPageControllerTest {
                 .andExpect(status().isPreconditionFailed());
 
         params.add("authorID", "1");
+    }
+
+    @Test
+    public void searchWikiPageByTitle() throws Exception {
+
+        MultiValueMap<String, String> params = new HttpHeaders();
+
+        params.add("title", "testTitle1");
+
+        //Set up Database for tests
+        WikiPage testWikiPage1 = new WikiPage("testTitle1", "testContent1",1L);
+        WikiPage testWikiPage2 = new WikiPage("testTitlePair", "testContent1",2L);
+        WikiPage testWikiPage3 = new WikiPage("testTitlePair", "testContent2", testWikiPage2.getId(),2L);
+
+        testWikiPage1 = repo.save(testWikiPage1);
+        testWikiPage2 = repo.save(testWikiPage2);
+        testWikiPage3 = repo.save(testWikiPage3);
+
+        //Check for successful search for single WikiPage
+        this.mockMvc.perform(get("/searchWikiPageByTitle").params(params))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString(testWikiPage1.toJSON())));
+
+
+        params.set("title", "testTitlePair");
+
+        //Check for successful search for multiple WikiPages
+        this.mockMvc.perform(get("/searchWikiPageByTitle").params(params))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString(testWikiPage2.toJSON())))
+                .andExpect(content().string(containsString(testWikiPage3.toJSON())));
+
+        params.remove("title");
+
+        //Test bad search with no parameter title
+        this.mockMvc.perform(get("/searchWikiPageByTitle").params(params))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+
+        params.add("title", "");
+
+        //Test bad search with empty title parameter
+        this.mockMvc.perform(get("/searchWikiPageByTitle").params(params))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+
     }
 
 }

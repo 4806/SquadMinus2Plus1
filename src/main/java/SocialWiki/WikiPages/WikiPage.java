@@ -149,4 +149,18 @@ public class WikiPage {
                 ", creationDate=" + new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(creationDate.getTime()) +
                 '}';
     }
+
+    /**
+     *
+     * @return The JSON format of the WikiPage
+     */
+    public String toJSON() {
+        return "{\"id\":" + id + "," +
+                "\"title\":\"" + title + "\"," +
+                "\"content\":\"" + content + "\"," +
+                "\"parentID\":" + parentID + "," +
+                "\"authorID\":" + authorID + "," +
+                "\"creationDate\":"+ creationDate.getTimeInMillis() + "}";
+    }
+
 }
