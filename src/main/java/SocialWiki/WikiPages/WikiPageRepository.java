@@ -26,9 +26,20 @@ public interface WikiPageRepository extends JpaRepository<WikiPage, Long> {
      */
     List<WikiPage> findByAuthorID(Long authorID);
 
-    @Query("SELECT page FROM WikiPage page WHERE (:title IS NULL OR UPPER(page.title) LIKE UPPER(CONCAT('%',:title,'%')) ) AND " +
-                                                "(:authorID IS NULL OR UPPER(page.authorID) LIKE UPPER(CONCAT('%',:authorID,'%'))) AND " +
-                                                "(:content IS NULL OR UPPER(page.content) LIKE UPPER(CONCAT('%',:content,'%')))")
+    /**
+     * Find all WikiPages that match the query string
+     * @param title - The title of the WikiPage (Can be a substring of full title or WikiPage content, or null)
+     * @param authorID - The author username of the WikiPage (Can be a substring of full username, or null)
+     * @param content - The content of the WikiPage (Can be a substring of full content, or null)
+     * @return all WikiPages matching query
+     */
+    @Query("SELECT page FROM WikiPage page WHERE (:title IS NULL OR " +
+            "                                           UPPER(page.title) LIKE UPPER(CONCAT('%',:title,'%')) OR " +
+            "                                           UPPER(page.content) LIKE UPPER(CONCAT('%',:title,'%')) ) AND " +
+                                                "(:authorID IS NULL OR " +
+            "                                           UPPER(page.authorID) LIKE UPPER(CONCAT('%',:authorID,'%'))) AND " +
+                                                "(:content IS NULL OR " +
+            "                                           UPPER(page.content) LIKE UPPER(CONCAT('%',:content,'%')))")
     List<WikiPage> findByTitleAndAuthorIDAndContent(@Param("title") String title, @Param("authorID") Long authorID, @Param("content") String content);
 
 }
