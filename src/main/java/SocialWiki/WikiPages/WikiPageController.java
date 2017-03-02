@@ -94,56 +94,6 @@ public class WikiPageController {
     }
 
     /**
-     * Method to handle searching for list of WikiPages by title
-     * @param request - contains the title of the WikiPages being searched for
-     * @return the list of WikiPages with matching title
-     */
-    @GetMapping("/searchWikiPageByTitle")
-    public ResponseEntity<List<WikiPage>> searchWikiPageByTitle(HttpServletRequest request) {
-
-        //Retrieve parameters from request
-        String title = request.getParameter("title");
-
-        if (title == null || title.isEmpty()) {    //title must be valid, non-empty string
-            return ResponseEntity.badRequest().body(null);
-        }
-
-        List<WikiPage> pages = wikiPageRepo.findByTitle(title);
-
-        return new ResponseEntity<>(pages, HttpStatus.OK);
-
-    }
-
-    /**
-     * Method to handle searching for list of WikiPages by author
-     * @param request - contains the Username of the author for the WikiPages being searched for
-     * @return the list of WikiPages with matching author
-     */
-    @GetMapping("/searchWikiPageByAuthor")
-    public ResponseEntity<List<WikiPage>> searchWikiPageByAuthor(HttpServletRequest request) {
-
-        //Retrieve parameters from request
-        String authorUserName = request.getParameter("author");
-
-        if (authorUserName == null || authorUserName.isEmpty()) {    //author must be valid, non-empty string
-            return ResponseEntity.badRequest().body(null);
-        }
-
-        List<User> authorQuery = userRepo.findByUserName(authorUserName);
-
-        if (authorQuery.size() == 1) { //If author was found, return list of pages made by author
-
-            List<WikiPage> pages = wikiPageRepo.findByAuthorID(authorQuery.get(0).getId());
-
-            return new ResponseEntity<>(pages, HttpStatus.OK);
-        }
-
-        //Else if author was not found, then return empty list
-        return new ResponseEntity<>(new ArrayList<WikiPage>(), HttpStatus.OK);
-
-    }
-
-    /**
      * Method to handle searching for list of WikiPages
      * @param request - contains the parameters of the WikiPages being searched for
      * @return the list of WikiPages found
@@ -154,12 +104,12 @@ public class WikiPageController {
         //Retrieve parameters from request
         String title = request.getParameter("title");
         String authorUserName = request.getParameter("author");
-        String content = request.getParameter("author");
+        String content = request.getParameter("content");
 
         Long userID = null;
 
         if ((title == null || title.isEmpty()) &&
-                (authorUserName == null || authorUserName.isEmpty())&&
+                (authorUserName == null || authorUserName.isEmpty()) &&
                 (content == null || content.isEmpty()) ) {    //If all parameters are empty
             return ResponseEntity.badRequest().body(null);
         }
