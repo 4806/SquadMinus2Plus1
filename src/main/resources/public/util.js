@@ -9,5 +9,5 @@ pageUtil.validateEmail = function(email) {
 };
 
 pageUtil.validateAlphaNum = function validateCode(code){
-    return code.match(/^[0-9a-z]+$/);
+    return code.match(/^[0-9A-Za-z]+$/);
 };
