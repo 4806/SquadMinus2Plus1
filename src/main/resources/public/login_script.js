@@ -32,8 +32,7 @@ loginHandler.homeHandler = function( ) {
 };
 
 loginHandler.signupHandler = function( ) {
-    location.href = "/";
-    //location.href = "/signup";
+    location.href = "/signup";
 };
 
 loginHandler.loginSuccessHandler = function( ) {
