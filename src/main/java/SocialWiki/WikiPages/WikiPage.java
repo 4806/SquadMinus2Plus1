@@ -151,7 +151,6 @@ public class WikiPage {
     }
 
     /**
-     *
      * @return The JSON format of the WikiPage
      */
     public String toJSON() {
