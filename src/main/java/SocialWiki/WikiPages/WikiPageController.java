@@ -111,7 +111,7 @@ public class WikiPageController {
         if ((title == null || title.isEmpty()) &&
                 (authorUserName == null || authorUserName.isEmpty()) &&
                 (content == null || content.isEmpty()) ) {    //If all parameters are empty
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.status(422).body(null);   //Error 422 for Unprocessable Identity
         }
 
         List<User> authorQuery = userRepo.findByUserName(authorUserName);
