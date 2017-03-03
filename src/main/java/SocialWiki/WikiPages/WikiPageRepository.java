@@ -16,7 +16,7 @@ public interface WikiPageRepository extends JpaRepository<WikiPage, Long> {
      * @param title - title to look for
      * @return all WikiPages with matching title
      */
-    List<WikiPage> findByTitle(String title);
+    List<WikiPage> findByTitleIgnoreCase(String title);
 
     /**
      * Find all WikiPages that match the query string

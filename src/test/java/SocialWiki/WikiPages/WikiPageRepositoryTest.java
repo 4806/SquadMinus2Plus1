@@ -40,26 +40,125 @@ public class WikiPageRepositoryTest {
 
     @Test
     public void findByTitle() throws Exception {
-        List<WikiPage> pages = repo.findByTitle("testTitle1");
 
-        assertEquals("Failure - Number of pages found by findByTable('testTitle1') should be 1", 1, pages.size());
-        assertEquals("Failure - Page found by findByTable('testTitle1') is not correct", testWikiPage1.getId(), pages.get(0).getId());
+        List<WikiPage> pageIDs = new ArrayList<>();
+        pageIDs.add(testWikiPage3);
+        pageIDs.add(testWikiPage4);
+
+        List<WikiPage> pages = repo.findByTitleIgnoreCase("testTitle1");
+        assertEquals("Failure - Number of pages found by findByTitleIgnoreCase('testTitle1') should be 1", 1, pages.size());
+        assertEquals("Failure - Page found by findByTitleIgnoreCase('testTitle1') is not correct", testWikiPage1, pages.get(0));
         pages.clear();
 
-        pages = repo.findByTitle("testTitle2");
+        pages = repo.findByTitleIgnoreCase("tEStTiTLe1");
+        assertEquals("Failure - Number of pages found by findByTitleIgnoreCase('tEStTiTLe1') should be 1", 1, pages.size());
+        assertEquals("Failure - Page found by findByTitleIgnoreCase('tEStTiTLe1') is not correct", testWikiPage1, pages.get(0));
+        pages.clear();
 
-        assertEquals("Failure - Number of pages found by findByTable('testTitle2') should be 1", 1, pages.size());
-        assertEquals("Failure - Page found by findByTable('testTitle2') is not correct", testWikiPage2.getId(), pages.get(0).getId());
+        pages = repo.findByTitleIgnoreCase("");
+        assertEquals("Failure - Number of pages found by findByTitleIgnoreCase('') should be 0", 0, pages.size());
+        pages.clear();
 
-        List<Long> pageIDs = new ArrayList<>();
-        pageIDs.add(testWikiPage3.getId());
-        pageIDs.add(testWikiPage4.getId());
+        pages = repo.findByTitleIgnoreCase("testTitlePair");
+        assertEquals("Failure - Number of pages found by findByTitleIgnoreCase('testTitlePair') should be 2", 2, pages.size());
+        assertTrue("Failure - First page found by findByTitleIgnoreCase('testTitlePair') is not correct", pageIDs.contains(pages.get(0)));
+        assertTrue("Failure - Second page found by findByTitleIgnoreCase('testTitlePair') is not correct", pageIDs.contains(pages.get(1)));
+        pages.clear();
 
-        pages = repo.findByTitle("testTitlePair");
+    }
 
-        assertEquals("Failure - Number of pages found by findByTable('testTitlePair') should be 2", 2, pages.size());
-        assertTrue("Failure - First page found by findByTable('testTitlePair') is not correct", pageIDs.contains(pages.get(0).getId()));
-        assertTrue("Failure - Second page found by findByTable('testTitlePair') is not correct", pageIDs.contains(pages.get(1).getId()));
+    @Test
+    public void findByTitleAndAuthorAndContent() throws Exception {
+
+        List<WikiPage> testList = new ArrayList<>();
+        testList.add(testWikiPage3);
+        testList.add(testWikiPage4);
+
+        //Test when parameters are null or blank
+
+        List<WikiPage> pages = repo.findByTitleAndAuthorAndContent("","","");
+        assertEquals("Failure - Number of pages found by findByTitleAndAuthorAndContent('','','') should be 4", 4, pages.size());
+        pages.clear();
+
+        pages = repo.findByTitleAndAuthorAndContent(null,"","");
+        assertEquals("Failure - Number of pages found by findByTitleAndAuthorAndContent(null,'','') should be 4", 4, pages.size());
+        pages.clear();
+
+        pages = repo.findByTitleAndAuthorAndContent("",null,"");
+        assertEquals("Failure - Number of pages found by findByTitleAndAuthorAndContent('',null,'') should be 4", 4, pages.size());
+        pages.clear();
+
+        pages = repo.findByTitleAndAuthorAndContent("","",null);
+        assertEquals("Failure - Number of pages found by findByTitleAndAuthorAndContent('','',null) should be 4", 4, pages.size());
+        pages.clear();
+
+        pages = repo.findByTitleAndAuthorAndContent(null,null,null);
+        assertEquals("Failure - Number of pages found by findByTitleAndAuthorAndContent(null,null,null) should be 4", 4, pages.size());
+        pages.clear();
+
+        //Test finding single page by 1 parameter
+
+        pages = repo.findByTitleAndAuthorAndContent("testTitle1","","");
+        assertEquals("Failure - Number of pages found by findByTitleAndAuthorAndContent('testTitle1','','') should be 1", 1, pages.size());
+        assertEquals("Failure - Page found by findByTitleAndAuthorAndContent('testTitle1','','') is not correct", testWikiPage1, pages.get(0));
+        pages.clear();
+
+        pages = repo.findByTitleAndAuthorAndContent("", testUser1.getUserName(), "");
+        assertEquals("Failure - Number of pages found by findByTitleAndAuthorAndContent('',testUser1.getUserName(),'') should be 1", 1, pages.size());
+        assertEquals("Failure - Page found by findByTitleAndAuthorAndContent('',testUser1.getUserName(),'') is not correct", testWikiPage1, pages.get(0));
+        pages.clear();
+
+        pages = repo.findByTitleAndAuthorAndContent("","","testContent1");
+        assertEquals("Failure - Number of pages found by findByTitleAndAuthorAndContent('','','testContent1') should be 1", 1, pages.size());
+        assertEquals("Failure - Page found by findByTitleAndAuthorAndContent('','','testContent1') is not correct", testWikiPage1, pages.get(0));
+        pages.clear();
+
+        //Test finding multiple page by 1 parameter that is a substring and mixed casing
+
+        pages = repo.findByTitleAndAuthorAndContent("TitLEpair","","");
+        assertEquals("Failure - Number of pages found by findByTitleAndAuthorAndContent('TitLEpair','','') should be 2", 2, pages.size());
+        assertTrue("Failure - Page 1 found by findByTitleAndAuthorAndContent('TitLEpair','','') is not correct", testList.contains(pages.get(0)));
+        assertTrue("Failure - Page 2 found by findByTitleAndAuthorAndContent('TitLEpair','','') is not correct", testList.contains(pages.get(0)));
+        pages.clear();
+
+        pages = repo.findByTitleAndAuthorAndContent("",testUser3.getUserName().substring(4,testUser3.getUserName().length()).toUpperCase(),"");
+        assertEquals("Failure - Number of pages found by findByTitleAndAuthorAndContent('',testUser3.getUserName().substring(4,testUser3.getUserName().length()).toUpperCase(),'') should be 2", 2, pages.size());
+        assertTrue("Failure - Page 1 found by findByTitleAndAuthorAndContent('',testUser3.getUserName().substring(4,testUser3.getUserName().length()).toUpperCase(),'') is not correct", testList.contains(pages.get(0)));
+        assertTrue("Failure - Page 2 found by findByTitleAndAuthorAndContent('',testUser3.getUserName().substring(4,testUser3.getUserName().length()).toUpperCase(),'') is not correct", testList.contains(pages.get(0)));
+        pages.clear();
+
+        pages = repo.findByTitleAndAuthorAndContent("","","testConTENT");
+        assertEquals("Failure - Number of pages found by findByTitleAndAuthorAndContent('','','testConTENT') should be 4", 4, pages.size());
+        pages.clear();
+
+        //Test finding single page by multiple parameters
+
+        pages = repo.findByTitleAndAuthorAndContent("testTitle1", testUser1.getUserName(),"");
+        assertEquals("Failure - Number of pages found by findByTitleAndAuthorAndContent('testTitle1','testUser1.getUserName()','') should be 1", 1, pages.size());
+        assertEquals("Failure - Page found by findByTitleAndAuthorAndContent('testTitle1','testUser1.getUserName()','') is not correct", testWikiPage1, pages.get(0));
+        pages.clear();
+
+        pages = repo.findByTitleAndAuthorAndContent("testTitle1","","testContent1");
+        assertEquals("Failure - Number of pages found by findByTitleAndAuthorAndContent('testTitle1','','testContent1') should be 1", 1, pages.size());
+        assertEquals("Failure - Page found by findByTitleAndAuthorAndContent('testTitle1','','testContent1') is not correct", testWikiPage1, pages.get(0));
+        pages.clear();
+
+        pages = repo.findByTitleAndAuthorAndContent("", testUser1.getUserName(), "testContent1");
+        assertEquals("Failure - Number of pages found by findByTitleAndAuthorAndContent('',testUser1.getUserName(),'testContent1') should be 1", 1, pages.size());
+        assertEquals("Failure - Page found by findByTitleAndAuthorAndContent('',testUser1.getUserName(),'testContent1') is not correct", testWikiPage1, pages.get(0));
+        pages.clear();
+
+        pages = repo.findByTitleAndAuthorAndContent("testTitle1", testUser1.getUserName(),"testContent1");
+        assertEquals("Failure - Number of pages found by findByTitleAndAuthorAndContent('testTitle1','testUser1.getUserName()','testContent1') should be 1", 1, pages.size());
+        assertEquals("Failure - Page found by findByTitleAndAuthorAndContent('testTitle1','testUser1.getUserName()','testContent1') is not correct", testWikiPage1, pages.get(0));
+        pages.clear();
+
+        //Test finding single page using title value that is within content
+
+        pages = repo.findByTitleAndAuthorAndContent("testContent1","","");
+        assertEquals("Failure - Number of pages found by findByTitleAndAuthorAndContent('testContent1','','') should be 1", 1, pages.size());
+        assertEquals("Failure - Page found by findByTitleAndAuthorAndContent('testContent1','','') is not correct", testWikiPage1, pages.get(0));
+        pages.clear();
 
     }
 
@@ -73,13 +172,15 @@ public class WikiPageRepositoryTest {
         testUser3 = userRepository.save(testUser3);
 
         testWikiPage1 = new WikiPage("testTitle1", "testContent1",testUser1);
-        testWikiPage2 = new WikiPage("testTitle2", "testContent2", testWikiPage1.getId(),testUser2);
-        testWikiPage3 = new WikiPage("testTitlePair", "testContent1",testUser3);
-        testWikiPage4 = new WikiPage("testTitlePair", "testContent2", testWikiPage3.getId(),testUser3);
+        testWikiPage3 = new WikiPage("testTitlePair", "testContent2",testUser3);
 
         testWikiPage1 = repo.save(testWikiPage1);
-        testWikiPage2 = repo.save(testWikiPage2);
         testWikiPage3 = repo.save(testWikiPage3);
+
+        testWikiPage2 = new WikiPage("testTitle2", "testContent3", testWikiPage1.getId(),testUser2);
+        testWikiPage4 = new WikiPage("testTitlePair", "testContent4", testWikiPage3.getId(),testUser3);
+
+        testWikiPage2 = repo.save(testWikiPage2);
         testWikiPage4 = repo.save(testWikiPage4);
 
     }
