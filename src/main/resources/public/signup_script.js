@@ -81,3 +81,41 @@ signupHandler.signupSuccessHandler = function( ) {
     location.href = "/";
     //location.href = "/profile";
 };
+
+document.onreadystatechange = function( ) {
+    var form = [
+        { view:"text", id:"user", label:"User", name:"user", labelWidth:150},
+        { view:"text", id:"email", label:"Email", name:"email", labelWidth:150},
+        { view:"text", id:"name", label:"First Name", name:"first", labelWidth:150},
+        { view:"text", id:"last", label:"Last Name", name:"last", labelWidth:150},
+        { view:"text", type:"password", id:"pass", label:"Password", name:"pass", labelWidth:150},
+        { view:"text", type:"password", id:"passConfirm", label:"Confirm Password", labelWidth:150},
+        { margin:10,
+            cols:[
+                { view:"button", value:"Signup" , type:"form", click:signupHandler.submitHandler},
+                { view:"button", value:"Cancel", click:signupHandler.homeHandler }
+            ]
+        },
+        { view:"label", align:"center", label:"", id:"signup_result" }
+    ];
+
+    webix.ui({
+        rows:[
+            { view:"toolbar", elements: [
+                {view:"label", label:"SM2P1 Social Wiki Signup"},
+                {view:"button", value:"Home", align:"right", width:100, click:signupHandler.homeHandler},
+                {view:"button", value:"Login", align:"right", width:100, click:signupHandler.loginHandler}
+            ]
+            },
+            { view:"label", id:"signup_top_label", css:"label_text", label:"Please enter your information.", align:"center"},
+            { view: "form",
+                cols: [
+                    { },
+                    {view: "form", id:"signup_form", align:"center", elements: form},
+                    { }
+                ]
+            },
+            { }
+        ]
+    });
+};
