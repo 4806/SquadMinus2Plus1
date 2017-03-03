@@ -49,19 +49,19 @@ public class WikiPageController {
         try {
             parentID = Long.parseLong(request.getParameter("parentID"));
         } catch (NumberFormatException e) {
-            return ResponseEntity.status(422).body(null);
+            return ResponseEntity.unprocessableEntity().body(null);
         }
 
         //Validate parameters
 
         if (title == null || title.isEmpty()) {    //title must be valid, non-empty string
-            return ResponseEntity.status(422).body(null);
+            return ResponseEntity.unprocessableEntity().body(null);
         }
         else if (content == null) {     //content must be valid string
-            return ResponseEntity.status(422).body(null);
+            return ResponseEntity.unprocessableEntity().body(null);
         }
         else if (parentID.compareTo(0L) == 0 || parentID.compareTo(-1L) < 0) {  //Parent ID must be > 0 or -1
-            return ResponseEntity.status(422).body(null);
+            return ResponseEntity.unprocessableEntity().body(null);
         }
 
         List<User> authorQuery = userRepo.findByUserName(username);
@@ -70,7 +70,7 @@ public class WikiPageController {
         if (authorQuery.size() == 1) {
             user = authorQuery.get(0);
         } else {
-            return ResponseEntity.status(422).body(null);
+            return ResponseEntity.unprocessableEntity().body(null);
         }
 
         WikiPage newPage;
@@ -90,11 +90,11 @@ public class WikiPageController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
 
-        return new ResponseEntity<>(newPage, HttpStatus.OK);
+        return ResponseEntity.ok(newPage);
     }
 
     /**
-     * Method to handle searching for list of WikiPages
+     * Method to handle searching for list of WikiPages. Will return all WikiPages if all parameters are blank
      * @param request - contains the parameters of the WikiPages being searched for
      * @return the list of WikiPages found
      */
@@ -106,23 +106,14 @@ public class WikiPageController {
         String authorUserName = request.getParameter("author");
         String content = request.getParameter("content");
 
-        String author = null;
-
-        if ((title == null || title.isEmpty()) &&
-                (authorUserName == null || authorUserName.isEmpty()) &&
-                (content == null || content.isEmpty()) ) {    //If all parameters are empty
-            return ResponseEntity.status(422).body(null);   //Error 422 for un-processable Identity
+        if (title == null && authorUserName == null && content == null ) {    //If no parameters where provided
+            return ResponseEntity.unprocessableEntity().body(null);
         }
+        //Note this still allows for parameters to be NULL if at least one is not null. In these cases, null parameters will be treated as empty string by the query.
 
-        List<User> authorQuery = userRepo.findByUserName(authorUserName);
+        List<WikiPage> pages = wikiPageRepo.findByTitleAndAuthorAndContent(title, authorUserName, content);
 
-        if (authorQuery.size() == 1) {  //If username is valid
-            author = authorUserName;
-        }
-
-        List<WikiPage> pages = wikiPageRepo.findByTitleAndAuthorAndContent(title, author, content);
-
-        return new ResponseEntity<>(pages, HttpStatus.OK);
+        return ResponseEntity.ok(pages);
 
     }
 
