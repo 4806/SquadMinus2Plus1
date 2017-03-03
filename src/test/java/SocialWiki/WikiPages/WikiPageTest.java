@@ -1,7 +1,14 @@
 package SocialWiki.WikiPages;
 
+import SocialWiki.Users.User;
+import SocialWiki.Users.UserRepository;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -11,10 +18,15 @@ import static org.junit.Assert.*;
 /**
  * Created by Chris on 2/24/2017.
  */
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class WikiPageTest {
 
     WikiPage testWikiPage1;
     WikiPage testWikiPage2;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Test
     public void getTitle() throws Exception {
@@ -34,11 +46,6 @@ public class WikiPageTest {
         assertEquals("Failure - getParentID for testWikiPage2", testWikiPage1.getId(), testWikiPage2.getParentID());
     }
 
-    @Test
-    public void getAuthorID() throws Exception {
-        assertEquals("Failure - getAuthorID for testWikiPage1", new Long(1L), testWikiPage1.getAuthorID());
-        assertEquals("Failure - getAuthorID for testWikiPage2", new Long(2L), testWikiPage2.getAuthorID());
-    }
 
     @Test
     public void getCreationDate() throws Exception {
@@ -56,8 +63,19 @@ public class WikiPageTest {
 
     @Before
     public void setUp() throws Exception {
-        testWikiPage1 = new WikiPage("testTitle1", "testContent1",1L);
-        testWikiPage2 = new WikiPage("testTitle2", "testContent2", testWikiPage1.getId(),2L);
+        User testUser1 = new User("testUserName1", "testFirstName1", "testLastName1", "testEmail1", "testPassword1");
+        User testUser2 = new User("testUserName2", "testFirstName2", "testLastName2", "testEmail2", "testPassword2");
+        testUser1 = userRepository.save(testUser1);
+        testUser2 = userRepository.save(testUser2);
+
+        testWikiPage1 = new WikiPage("testTitle1", "testContent1",testUser1.getId(),testUser1);
+        testWikiPage2 = new WikiPage("testTitle2", "testContent2", testWikiPage1.getId(),testUser2.getId(),testUser2);
+
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        userRepository.deleteAll();
 
     }
 }

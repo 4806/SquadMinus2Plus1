@@ -1,5 +1,6 @@
 package SocialWiki.WikiPages;
 
+import SocialWiki.Users.User;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
@@ -49,6 +50,13 @@ public class WikiPage {
      */
     private Long authorID;
 
+    public User getAuthor() {
+        return author;
+    }
+
+    @ManyToOne
+    private User author;
+
     /**
      * Date the WikiPage was created. WikiPage is considered created when object is instantiated
      */
@@ -68,12 +76,13 @@ public class WikiPage {
      * @param parentID - ID of proceeding WikiPage
      * @param authorID - ID of authoring User
      */
-    public WikiPage(String title, String content, Long parentID, Long authorID) {
+    public WikiPage(String title, String content, Long parentID, Long authorID, User author) {
         this.title = title;
         this.content = content;
         this.parentID = parentID;
         this.authorID = authorID;
         this.creationDate = Calendar.getInstance();
+        this.author = author;
     }
 
     /**
@@ -82,12 +91,13 @@ public class WikiPage {
      * @param content - Contents of WikiPage
      * @param authorID - ID of authoring User
      */
-    public WikiPage(String title, String content, Long authorID) {
+    public WikiPage(String title, String content, Long authorID, User author) {
         this.title = title;
         this.content = content;
         this.parentID = IS_ORIGINAL_ID;
         this.authorID = authorID;
         this.creationDate = Calendar.getInstance();
+        this.author = author;
     }
 
     /**

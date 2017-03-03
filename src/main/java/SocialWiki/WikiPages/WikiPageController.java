@@ -43,6 +43,9 @@ public class WikiPageController {
         //Retrieve parameters from request
         String title = request.getParameter("title");
         String content = request.getParameter("content");
+        String username = request.getParameter("username");
+
+        User user;
 
         Long parentID, authorID;
 
@@ -73,14 +76,23 @@ public class WikiPageController {
             return new ResponseEntity<>(new WikiPage(), HttpStatus.PRECONDITION_FAILED);
         }
 
+        List<User> authorQuery = userRepo.findByUserName(username);
+
+        //Username must be valid
+        if (authorQuery.size() == 1) {
+            user = authorQuery.get(0);
+        } else {
+            return ResponseEntity.status(422).body(null);
+        }
+
         WikiPage newPage;
 
         //If the WikiPage being created has no predecessor and is original then use specific constructor
         if (parentID.compareTo(WikiPage.IS_ORIGINAL_ID) == 0) {
-            newPage = new WikiPage(title, content, authorID);
+            newPage = new WikiPage(title, content, authorID, user);
         }
         else {
-            newPage = new WikiPage(title, content, parentID, authorID);
+            newPage = new WikiPage(title, content, parentID, user);
         }
 
         //Save the WikiPage
@@ -111,7 +123,7 @@ public class WikiPageController {
         if ((title == null || title.isEmpty()) &&
                 (authorUserName == null || authorUserName.isEmpty()) &&
                 (content == null || content.isEmpty()) ) {    //If all parameters are empty
-            return ResponseEntity.status(422).body(null);   //Error 422 for Unprocessable Identity
+            return ResponseEntity.status(422).body(null);   //Error 422 for un-processable Identity
         }
 
         List<User> authorQuery = userRepo.findByUserName(authorUserName);

@@ -1,5 +1,7 @@
 package SocialWiki.WikiPages;
 
+import SocialWiki.Users.User;
+import SocialWiki.Users.UserRepository;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,10 +25,17 @@ public class WikiPageRepositoryTest {
     @Autowired
     private WikiPageRepository repo;
 
+    @Autowired
+    private UserRepository userRepository;
+
     WikiPage testWikiPage1;
     WikiPage testWikiPage2;
     WikiPage testWikiPage3;
     WikiPage testWikiPage4;
+
+    User testUser1;
+    User testUser2;
+    User testUser3;
 
     @Test
     public void findByTitle() throws Exception {
@@ -55,46 +64,54 @@ public class WikiPageRepositoryTest {
 
     @Test
     public void findByAuthorID() throws Exception {
-        List<WikiPage> pages = repo.findByAuthorID(1L);
+        List<WikiPage> pages = repo.findByAuthorID(testUser1.getId());
 
-        assertEquals("Failure - Number of pages found by findByAuthorID(1L) should be 1", 1, pages.size());
-        assertEquals("Failure - Page found by findByAuthorID(1L) is not correct", testWikiPage1.getId(), pages.get(0).getId());
+        assertEquals("Failure - Number of pages found by findByAuthorID(testUser1.getId()) should be 1", 1, pages.size());
+        assertEquals("Failure - Page found by findByAuthorID(testUser1.getId()) is not correct", testWikiPage1.getId(), pages.get(0).getId());
         pages.clear();
 
-        pages = repo.findByAuthorID(2L);;
+        pages = repo.findByAuthorID(testUser2.getId());;
 
-        assertEquals("Failure - Number of pages found by findByAuthorID(2L) should be 1", 1, pages.size());
-        assertEquals("Failure - Page found by findByAuthorID(2L) is not correct", testWikiPage2.getId(), pages.get(0).getId());
+        assertEquals("Failure - Number of pages found by findByAuthorID(testUser2.getId()) should be 1", 1, pages.size());
+        assertEquals("Failure - Page found by findByAuthorID(testUser2.getId()) is not correct", testWikiPage2.getId(), pages.get(0).getId());
 
         List<Long> pageIDs = new ArrayList<>();
         pageIDs.add(testWikiPage3.getId());
         pageIDs.add(testWikiPage4.getId());
 
-        pages = repo.findByAuthorID(3L);;
+        pages = repo.findByAuthorID(testUser3.getId());;
 
-        assertEquals("Failure - Number of pages found by findByAuthorID(3L) should be 2", 2, pages.size());
-        assertTrue("Failure - First page found by findByAuthorID(3L) is not correct", pageIDs.contains(pages.get(0).getId()));
-        assertTrue("Failure - Second page found by findByAuthorID(3L) is not correct", pageIDs.contains(pages.get(1).getId()));
+        assertEquals("Failure - Number of pages found by findByAuthorID(testUser3.getId()) should be 2", 2, pages.size());
+        assertTrue("Failure - First page found by findByAuthorID(testUser3.getId()) is not correct", pageIDs.contains(pages.get(0).getId()));
+        assertTrue("Failure - Second page found by findByAuthorID(testUser3.getId()) is not correct", pageIDs.contains(pages.get(1).getId()));
 
     }
 
 
     @Before
     public void setUp() throws Exception {
-        testWikiPage1 = new WikiPage("testTitle1", "testContent1",1L);
-        testWikiPage2 = new WikiPage("testTitle2", "testContent2", testWikiPage1.getId(),2L);
-        testWikiPage3 = new WikiPage("testTitlePair", "testContent1",3L);
-        testWikiPage4 = new WikiPage("testTitlePair", "testContent2", testWikiPage3.getId(),3L);
+        testUser1 = new User("testUserName1", "testFirstName1", "testLastName1", "testEmail1", "testPassword1");
+        testUser2 = new User("testUserName2", "testFirstName2", "testLastName2", "testEmail2", "testPassword2");
+        testUser3 = new User("testUserName3", "testFirstName3", "testLastName3", "testEmail3", "testPassword3");
+        testUser1 = userRepository.save(testUser1);
+        testUser2 = userRepository.save(testUser2);
+        testUser3 = userRepository.save(testUser3);
 
-        repo.save(testWikiPage1);
-        repo.save(testWikiPage2);
-        repo.save(testWikiPage3);
-        repo.save(testWikiPage4);
+        testWikiPage1 = new WikiPage("testTitle1", "testContent1",testUser1.getId(),testUser1);
+        testWikiPage2 = new WikiPage("testTitle2", "testContent2", testWikiPage1.getId(),testUser2.getId(),testUser2);
+        testWikiPage3 = new WikiPage("testTitlePair", "testContent1",testUser3.getId(),testUser3);
+        testWikiPage4 = new WikiPage("testTitlePair", "testContent2", testWikiPage3.getId(),testUser3.getId(),testUser3);
+
+        testWikiPage1 = repo.save(testWikiPage1);
+        testWikiPage2 = repo.save(testWikiPage2);
+        testWikiPage3 = repo.save(testWikiPage3);
+        testWikiPage4 = repo.save(testWikiPage4);
 
     }
 
     @After
     public void tearDown() throws Exception {
         repo.deleteAll();
+        userRepository.deleteAll();
     }
 }
