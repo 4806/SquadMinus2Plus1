@@ -14,7 +14,6 @@ import java.util.Calendar;
 @Entity
 public class WikiPage {
 
-
     /**
      * ID used when creating a WikiPage to represent that it is an original and has no parent
      */
@@ -162,6 +161,21 @@ public class WikiPage {
                 "\"parentID\":" + parentID + "," +
                 "\"author\":" + author + "," +
                 "\"creationDate\":"+ creationDate.getTimeInMillis() + "}";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        WikiPage wikiPage = (WikiPage) o;
+
+        if (!id.equals(wikiPage.id)) return false;
+        if (!title.equals(wikiPage.title)) return false;
+        if (content != null ? !content.equals(wikiPage.content) : wikiPage.content != null) return false;
+        if (!parentID.equals(wikiPage.parentID)) return false;
+        if (!author.equals(wikiPage.author)) return false;
+        return creationDate.equals(wikiPage.creationDate);
     }
 
 }
