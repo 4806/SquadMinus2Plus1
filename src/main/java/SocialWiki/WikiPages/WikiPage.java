@@ -46,14 +46,8 @@ public class WikiPage {
     private Long parentID;
 
     /**
-     * The ID of the authoring User of the WikiPage
+     * The authoring User of the WikiPage
      */
-    private Long authorID;
-
-    public User getAuthor() {
-        return author;
-    }
-
     @ManyToOne
     private User author;
 
@@ -74,13 +68,12 @@ public class WikiPage {
      * @param title - Title of WikiPage
      * @param content - Contents of WikiPage
      * @param parentID - ID of proceeding WikiPage
-     * @param authorID - ID of authoring User
+     * @param author - Authoring User
      */
-    public WikiPage(String title, String content, Long parentID, Long authorID, User author) {
+    public WikiPage(String title, String content, Long parentID, User author) {
         this.title = title;
         this.content = content;
         this.parentID = parentID;
-        this.authorID = authorID;
         this.creationDate = Calendar.getInstance();
         this.author = author;
     }
@@ -89,13 +82,12 @@ public class WikiPage {
      * Constructor for original WikiPage, sets the parentID equal to itself
      * @param title - Title of WikiPage
      * @param content - Contents of WikiPage
-     * @param authorID - ID of authoring User
+     * @param author - Authoring User
      */
-    public WikiPage(String title, String content, Long authorID, User author) {
+    public WikiPage(String title, String content, User author) {
         this.title = title;
         this.content = content;
         this.parentID = IS_ORIGINAL_ID;
-        this.authorID = authorID;
         this.creationDate = Calendar.getInstance();
         this.author = author;
     }
@@ -133,11 +125,11 @@ public class WikiPage {
     }
 
     /**
-     * Get the ID of the authoring User
-     * @return the ID of the authoring User
+     * Get the Authoring User
+     * @return the Authoring User
      */
-    public Long getAuthorID() {
-        return authorID;
+    public User getAuthor() {
+        return author;
     }
 
     /**
@@ -155,7 +147,7 @@ public class WikiPage {
                 ", title='" + title + '\'' +
                 ", content='" + content + '\'' +
                 ", parentID=" + parentID +
-                ", authorID=" + authorID +
+                ", author=" + author +
                 ", creationDate=" + new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(creationDate.getTime()) +
                 '}';
     }
@@ -168,7 +160,7 @@ public class WikiPage {
                 "\"title\":\"" + title + "\"," +
                 "\"content\":\"" + content + "\"," +
                 "\"parentID\":" + parentID + "," +
-                "\"authorID\":" + authorID + "," +
+                "\"author\":" + author + "," +
                 "\"creationDate\":"+ creationDate.getTimeInMillis() + "}";
     }
 

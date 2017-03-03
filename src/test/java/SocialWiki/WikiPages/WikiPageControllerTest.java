@@ -13,9 +13,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.util.MultiValueMap;
+
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -37,8 +37,8 @@ public class WikiPageControllerTest {
     @Autowired
     private UserRepository userRepository;
 
-    User testUser1;
-    User testUser2;
+    private User testUser1;
+    private User testUser2;
 
     @After
     public void tearDown() throws Exception {
@@ -65,7 +65,6 @@ public class WikiPageControllerTest {
         params.add("title", "testTitle");
         params.add("content", "testContent");
         params.add("parentID", "-1");
-        params.add("authorID", String.valueOf(testUser1.getId()));
         params.add("username", testUser1.getUserName());
 
         //Check for successful creation
@@ -81,7 +80,7 @@ public class WikiPageControllerTest {
 
         this.mockMvc.perform(post("/createWikiPage").params(params))
                 .andDo(print())
-                .andExpect(status().isPreconditionFailed());
+                .andExpect(status().is(422));
 
         params.set("title", "testTitle");
 
@@ -90,32 +89,16 @@ public class WikiPageControllerTest {
 
         this.mockMvc.perform(post("/createWikiPage").params(params))
                 .andDo(print())
-                .andExpect(status().isPreconditionFailed());
+                .andExpect(status().is(422));
 
         //Check for unsuccessful creation due to parent ID = -2
         params.set("parentID", "-2");
 
         this.mockMvc.perform(post("/createWikiPage").params(params))
                 .andDo(print())
-                .andExpect(status().isPreconditionFailed());
+                .andExpect(status().is(422));
 
         params.set("parentID", "-1");
-
-        //Check for unsuccessful creation due to author ID = 0
-        params.set("authorID", "0");
-
-        this.mockMvc.perform(post("/createWikiPage").params(params))
-                .andDo(print())
-                .andExpect(status().isPreconditionFailed());
-
-        //Check for unsuccessful creation due to author ID = -1
-        params.set("authorID", "-1");
-
-        this.mockMvc.perform(post("/createWikiPage").params(params))
-                .andDo(print())
-                .andExpect(status().isPreconditionFailed());
-
-        params.set("authorID", "1");
 
         //Check for successful creation with empty content
         params.set("content", "");
@@ -134,7 +117,7 @@ public class WikiPageControllerTest {
 
         this.mockMvc.perform(post("/createWikiPage").params(params))
                 .andDo(print())
-                .andExpect(status().isPreconditionFailed());
+                .andExpect(status().is(422));
 
         params.add("title", "testTitle");
 
@@ -143,7 +126,7 @@ public class WikiPageControllerTest {
 
         this.mockMvc.perform(post("/createWikiPage").params(params))
                 .andDo(print())
-                .andExpect(status().isPreconditionFailed());
+                .andExpect(status().is(422));
 
         params.add("content", "testContent");
 
@@ -152,18 +135,10 @@ public class WikiPageControllerTest {
 
         this.mockMvc.perform(post("/createWikiPage").params(params))
                 .andDo(print())
-                .andExpect(status().isPreconditionFailed());
+                .andExpect(status().is(422));
 
         params.add("parentID", "-1");
 
-        //Check for unsuccessful creation due to missing authorID parameter
-        params.remove("authorID");
-
-        this.mockMvc.perform(post("/createWikiPage").params(params))
-                .andDo(print())
-                .andExpect(status().isPreconditionFailed());
-
-        params.add("authorID", "1");
     }
 
 }

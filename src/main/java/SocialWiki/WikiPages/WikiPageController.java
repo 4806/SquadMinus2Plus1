@@ -10,9 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Created by Chris on 2/24/2017.
@@ -34,7 +32,7 @@ public class WikiPageController {
 
     /**
      * Method to handle the creation or editing of a WikiPage
-     * @param request - contains the title, content, parentID, and authorID of the WikiPage being created/altered
+     * @param request - contains the title, content, parentID, and author username of the WikiPage being created/altered
      * @return the new WikiPage
      */
     @PostMapping("/createWikiPage")
@@ -46,34 +44,24 @@ public class WikiPageController {
         String username = request.getParameter("username");
 
         User user;
-
-        Long parentID, authorID;
+        Long parentID;
 
         try {
             parentID = Long.parseLong(request.getParameter("parentID"));
         } catch (NumberFormatException e) {
-            return new ResponseEntity<>(new WikiPage(), HttpStatus.PRECONDITION_FAILED);
-        }
-
-        try {
-            authorID = Long.parseLong(request.getParameter("authorID"));
-        } catch (NumberFormatException e) {
-            return new ResponseEntity<>(new WikiPage(), HttpStatus.PRECONDITION_FAILED);
+            return ResponseEntity.status(422).body(null);
         }
 
         //Validate parameters
 
         if (title == null || title.isEmpty()) {    //title must be valid, non-empty string
-            return new ResponseEntity<>(new WikiPage(), HttpStatus.PRECONDITION_FAILED);
+            return ResponseEntity.status(422).body(null);
         }
         else if (content == null) {     //content must be valid string
-            return new ResponseEntity<>(new WikiPage(), HttpStatus.PRECONDITION_FAILED);
+            return ResponseEntity.status(422).body(null);
         }
         else if (parentID.compareTo(0L) == 0 || parentID.compareTo(-1L) < 0) {  //Parent ID must be > 0 or -1
-            return new ResponseEntity<>(new WikiPage(), HttpStatus.PRECONDITION_FAILED);
-        }
-        else if (authorID.compareTo(0L) <= 0) {   //Author ID must be > 0
-            return new ResponseEntity<>(new WikiPage(), HttpStatus.PRECONDITION_FAILED);
+            return ResponseEntity.status(422).body(null);
         }
 
         List<User> authorQuery = userRepo.findByUserName(username);
@@ -89,7 +77,7 @@ public class WikiPageController {
 
         //If the WikiPage being created has no predecessor and is original then use specific constructor
         if (parentID.compareTo(WikiPage.IS_ORIGINAL_ID) == 0) {
-            newPage = new WikiPage(title, content, authorID, user);
+            newPage = new WikiPage(title, content, user);
         }
         else {
             newPage = new WikiPage(title, content, parentID, user);
@@ -99,7 +87,7 @@ public class WikiPageController {
         try {
             newPage = wikiPageRepo.save(newPage);
         } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(newPage, HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
 
         return new ResponseEntity<>(newPage, HttpStatus.OK);
@@ -118,7 +106,7 @@ public class WikiPageController {
         String authorUserName = request.getParameter("author");
         String content = request.getParameter("content");
 
-        Long userID = null;
+        String author = null;
 
         if ((title == null || title.isEmpty()) &&
                 (authorUserName == null || authorUserName.isEmpty()) &&
@@ -128,11 +116,11 @@ public class WikiPageController {
 
         List<User> authorQuery = userRepo.findByUserName(authorUserName);
 
-        if (authorQuery.size() == 1) {
-            userID = authorQuery.get(0).getId();
+        if (authorQuery.size() == 1) {  //If username is valid
+            author = authorUserName;
         }
 
-        List<WikiPage> pages = wikiPageRepo.findByTitleAndAuthorIDAndContent(title, userID, content);
+        List<WikiPage> pages = wikiPageRepo.findByTitleAndAuthorAndContent(title, author, content);
 
         return new ResponseEntity<>(pages, HttpStatus.OK);
 
