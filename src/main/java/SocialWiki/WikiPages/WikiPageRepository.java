@@ -17,7 +17,10 @@ public interface WikiPageRepository extends JpaRepository<WikiPage, Long> {
      * @param title - title to look for
      * @return all WikiPages with matching title
      */
-    List<WikiPage> findByTitleIgnoreCase(String title);
+    @Query("SELECT NEW SocialWiki.WikiPages.WikiPageResult(page.id, page.title, page.parentID, author.userName, page.creationDate) " +
+            "FROM WikiPage page LEFT JOIN page.author author " +
+            "WHERE UPPER(page.title) = UPPER(:title)")
+    List<WikiPageResult> findByTitleIgnoreCase(@Param("title") String title);
 
     /**
      * Find all WikiPages that match the query string

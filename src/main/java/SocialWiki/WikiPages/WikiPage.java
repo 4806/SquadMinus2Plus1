@@ -152,18 +152,6 @@ public class WikiPage {
                 '}';
     }
 
-    /**
-     * @return The JSON format of the WikiPage
-     */
-    public String toJSON() {
-        return "{\"id\":" + id + "," +
-                "\"title\":\"" + title + "\"," +
-                "\"content\":\"" + content + "\"," +
-                "\"parentID\":" + parentID + "," +
-                "\"author\":" + author + "," +
-                "\"creationDate\":"+ creationDate.getTimeInMillis() + "}";
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

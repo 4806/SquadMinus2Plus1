@@ -23,7 +23,12 @@ public class WikiPageResult {
         return creationDate.equals(that.creationDate);
     }
 
-    public static  WikiPageResult getResults(WikiPage page) {
+    /**
+     * Creates a WikiPageResult object from te given WikiPage
+     * @param page - The WikiPage to create a WikiPageResult from
+     * @return The associated WikiPageResult from the WikiPage
+     */
+    public static  WikiPageResult getResult(WikiPage page) {
         return new WikiPageResult(page.getId(),page.getTitle(),page.getParentID(),page.getAuthor().getUserName(),page.getCreationDate());
     }
 
@@ -38,6 +43,14 @@ public class WikiPageResult {
                 '}';
     }
 
+    /**
+     * Creates a WikiPageResult from all required fields
+     * @param id - The ID of the WikiPage
+     * @param title - The title of the WikiPage
+     * @param parentID - The parent ID of the WikiPage
+     * @param author - The username of the author of the WikiPage
+     * @param creationDate - the creation data of the WikiPage
+     */
     public WikiPageResult(Long id, String title, Long parentID, String author, Calendar creationDate) {
         this.id = id;
         this.title = title;
@@ -46,50 +59,49 @@ public class WikiPageResult {
         this.creationDate = creationDate;
     }
 
+    /**
+     * Get the ID of the WikiPage
+     * @return the ID of the WikiPage
+     */
     public Long getId() {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
+    /**
+     * Get the title of the WikiPage
+     * @return the title of the WikiPage
+     */
     public String getTitle() {
         return title;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
+    /**
+     * Get the ID of the proceeding WikiPage
+     * @return the ID of the proceeding WikiPage
+     */
     public Long getParentID() {
         return parentID;
     }
 
-    public void setParentID(Long parentID) {
-        this.parentID = parentID;
-    }
-
+    /**
+     * Get the Authoring Users uername
+     * @return the Authoring Users username
+     */
     public String getAuthor() {
         return author;
     }
 
-    public void setAuthor(String author) {
-        this.author = author;
-    }
-
+    /**
+     * Get the date the WikiPage was created
+     * @return the date the WikiPage was created
+     */
     public Calendar getCreationDate() {
         return creationDate;
-    }
-
-    public void setCreationDate(Calendar creationDate) {
-        this.creationDate = creationDate;
     }
 
     /**
      * The unique ID for a WikiPage
      */
-
     private Long id;
 
     /**
@@ -103,7 +115,7 @@ public class WikiPageResult {
     private Long parentID;
 
     /**
-     * The authoring User of the WikiPage
+     * The username of the authoring User of the WikiPage
      */
     private String author;
 

@@ -37,7 +37,7 @@ public class WikiPageController {
      * @return the new WikiPage
      */
     @PostMapping("/createWikiPage")
-    public ResponseEntity<WikiPage> createWikiPage(HttpServletRequest request) {
+    public ResponseEntity<FullWikiPageResult> createWikiPage(HttpServletRequest request) {
 
         //Retrieve parameters from request
         String title = request.getParameter("title");
@@ -91,7 +91,7 @@ public class WikiPageController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
 
-        return ResponseEntity.ok(newPage);
+        return ResponseEntity.ok(FullWikiPageResult.getFullResult(newPage));
     }
 
     /**

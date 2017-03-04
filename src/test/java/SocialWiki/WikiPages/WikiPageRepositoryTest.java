@@ -41,18 +41,19 @@ public class WikiPageRepositoryTest {
     @Test
     public void findByTitle() throws Exception {
 
-        List<WikiPage> pageIDs = new ArrayList<>();
-        pageIDs.add(testWikiPage3);
-        pageIDs.add(testWikiPage4);
+        List<WikiPageResult> testList = new ArrayList<>();
+        testList.add(WikiPageResult.getResult(testWikiPage3));
+        testList.add(WikiPageResult.getResult(testWikiPage4));
+        WikiPageResult testResult1 = WikiPageResult.getResult(testWikiPage1);
 
-        List<WikiPage> pages = wikiPageRepository.findByTitleIgnoreCase("testTitle1");
+        List<WikiPageResult> pages = wikiPageRepository.findByTitleIgnoreCase("testTitle1");
         assertEquals("Failure - Number of pages found by findByTitleIgnoreCase('testTitle1') should be 1", 1, pages.size());
-        assertEquals("Failure - Page found by findByTitleIgnoreCase('testTitle1') is not correct", testWikiPage1, pages.get(0));
+        assertEquals("Failure - Page found by findByTitleIgnoreCase('testTitle1') is not correct", testResult1, pages.get(0));
         pages.clear();
 
         pages = wikiPageRepository.findByTitleIgnoreCase("tEStTiTLe1");
         assertEquals("Failure - Number of pages found by findByTitleIgnoreCase('tEStTiTLe1') should be 1", 1, pages.size());
-        assertEquals("Failure - Page found by findByTitleIgnoreCase('tEStTiTLe1') is not correct", testWikiPage1, pages.get(0));
+        assertEquals("Failure - Page found by findByTitleIgnoreCase('tEStTiTLe1') is not correct", testResult1, pages.get(0));
         pages.clear();
 
         pages = wikiPageRepository.findByTitleIgnoreCase("");
@@ -61,8 +62,8 @@ public class WikiPageRepositoryTest {
 
         pages = wikiPageRepository.findByTitleIgnoreCase("testTitlePair");
         assertEquals("Failure - Number of pages found by findByTitleIgnoreCase('testTitlePair') should be 2", 2, pages.size());
-        assertTrue("Failure - First page found by findByTitleIgnoreCase('testTitlePair') is not correct", pageIDs.contains(pages.get(0)));
-        assertTrue("Failure - Second page found by findByTitleIgnoreCase('testTitlePair') is not correct", pageIDs.contains(pages.get(1)));
+        assertTrue("Failure - First page found by findByTitleIgnoreCase('testTitlePair') is not correct", testList.contains(pages.get(0)));
+        assertTrue("Failure - Second page found by findByTitleIgnoreCase('testTitlePair') is not correct", testList.contains(pages.get(1)));
         pages.clear();
 
     }
@@ -71,10 +72,10 @@ public class WikiPageRepositoryTest {
     public void findByTitleAndAuthorAndContent() throws Exception {
 
         List<WikiPageResult> testList = new ArrayList<>();
-        testList.add(WikiPageResult.getResults(testWikiPage3));
-        testList.add(WikiPageResult.getResults(testWikiPage4));
+        testList.add(WikiPageResult.getResult(testWikiPage3));
+        testList.add(WikiPageResult.getResult(testWikiPage4));
 
-        WikiPageResult testResult1 = WikiPageResult.getResults(testWikiPage1);
+        WikiPageResult testResult1 = WikiPageResult.getResult(testWikiPage1);
 
         //Test when parameters are null or blank
 
