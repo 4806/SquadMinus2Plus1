@@ -7,3 +7,15 @@
     font-size: larger;
     color: red;
 }
+.label_big {
+    font-weight: 800;
+    font-size: xx-large;
+}
+.label_indexNorm {
+    font-weight: 400;
+    font-size: x-large;
+    color: darkslategrey;
+}
+body.webix_full_screen{
+    overflow: scroll;
+}
