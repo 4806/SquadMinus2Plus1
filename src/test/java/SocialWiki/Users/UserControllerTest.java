@@ -10,7 +10,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
+
 import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -48,7 +51,7 @@ public class UserControllerTest {
         mockMvc.perform(post("/login")
                 .content("login=testUserName1&pass=testPassword1")
                 .contentType("application/x-www-form-urlencoded"))
-                .andExpect(content().string(containsString("\"id\":1")))
+                .andExpect(content().string(containsString("\"id\":")))
                 .andExpect(content().string(containsString("\"userName\":\"testUserName1\"")))
                 .andExpect(content().string(containsString("\"firstName\":\"testFirstName1\"")))
                 .andExpect(content().string(containsString("\"lastName\":\"testLastName1\"")))
@@ -60,7 +63,7 @@ public class UserControllerTest {
         mockMvc.perform(post("/login")
                 .content("login=testEmail1&pass=testPassword1")
                 .contentType("application/x-www-form-urlencoded"))
-                .andExpect(content().string(containsString("\"id\":1")))
+                .andExpect(content().string(containsString("\"id\":")))
                 .andExpect(content().string(containsString("\"userName\":\"testUserName1\"")))
                 .andExpect(content().string(containsString("\"firstName\":\"testFirstName1\"")))
                 .andExpect(content().string(containsString("\"lastName\":\"testLastName1\"")))
@@ -72,7 +75,7 @@ public class UserControllerTest {
         mockMvc.perform(post("/login")
                 .content("login=testEmail1&pass=testPassword1&last=notALastName")
                 .contentType("application/x-www-form-urlencoded"))
-                .andExpect(content().string(containsString("\"id\":1")))
+                .andExpect(content().string(containsString("\"id\":")))
                 .andExpect(content().string(containsString("\"userName\":\"testUserName1\"")))
                 .andExpect(content().string(containsString("\"firstName\":\"testFirstName1\"")))
                 .andExpect(content().string(containsString("\"lastName\":\"testLastName1\"")))
@@ -127,6 +130,107 @@ public class UserControllerTest {
                 .contentType("application/x-www-form-urlencoded"))
                 .andExpect(content().string(""))
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void create() throws Exception {
+        // perform successful creation
+        mockMvc.perform(post("/signup")
+                .content("user=testUserName2&first=testFirstName2&last=testLastName2&email=testEmail2&pass=testPassword2")
+                .contentType("application/x-www-form-urlencoded"))
+                .andExpect(content().string(containsString("\"id\":")))
+                .andExpect(content().string(containsString("\"userName\":\"testUserName2\"")))
+                .andExpect(content().string(containsString("\"firstName\":\"testFirstName2\"")))
+                .andExpect(content().string(containsString("\"lastName\":\"testLastName2\"")))
+                .andExpect(content().string(containsString("\"email\":\"testEmail2\"")))
+                .andExpect(content().string(containsString("\"password\":null")))
+                .andExpect(status().isCreated());
+
+        List<User> users = userRepo.findByUserName("testUserName2");
+        assertEquals("Failure - userControllerTest did not successfully create new user", 1, users.size());
+
+        // perform unsuccessful creation with same userName
+        mockMvc.perform(post("/signup")
+                .content("user=testUserName2&first=testFirstName2&last=testLastName2&email=testEmail3&pass=testPassword2")
+                .contentType("application/x-www-form-urlencoded"))
+                .andExpect(status().isConflict());
+
+        // perform unsuccessful creation with same email
+        mockMvc.perform(post("/signup")
+                .content("user=testUserName3&first=testFirstName2&last=testLastName2&email=testEmail2&pass=testPassword2")
+                .contentType("application/x-www-form-urlencoded"))
+                .andExpect(status().isConflict());
+
+        // perform unsuccessful creation with same userName and email
+        mockMvc.perform(post("/signup")
+                .content("user=testUserName2&first=testFirstName2&last=testLastName2&email=testEmail2&pass=testPassword2")
+                .contentType("application/x-www-form-urlencoded"))
+                .andExpect(status().isConflict());
+
+        // perform unsuccessful creation with missing userName parameter
+        mockMvc.perform(post("/signup")
+                .content("first=testFirstName3&last=testLastName3&email=testEmail3&pass=testPassword3")
+                .contentType("application/x-www-form-urlencoded"))
+                .andExpect(status().isUnprocessableEntity());
+
+        // perform unsuccessful creation with empty userName parameter
+        mockMvc.perform(post("/signup")
+                .content("user=&first=testFirstName3&last=testLastName3&email=testEmail3&pass=testPassword3")
+                .contentType("application/x-www-form-urlencoded"))
+                .andExpect(status().isUnprocessableEntity());
+
+        // perform unsuccessful creation with missing firstName parameter
+        mockMvc.perform(post("/signup")
+                .content("user=testUserName3&last=testLastName3&email=testEmail3&pass=testPassword3")
+                .contentType("application/x-www-form-urlencoded"))
+                .andExpect(status().isUnprocessableEntity());
+
+        // perform unsuccessful creation with empty firstName parameter
+        mockMvc.perform(post("/signup")
+                .content("user=testUserName3&first=&last=testLastName3&email=testEmail3&pass=testPassword3")
+                .contentType("application/x-www-form-urlencoded"))
+                .andExpect(status().isUnprocessableEntity());
+
+        // perform unsuccessful creation with missing lastName parameter
+        mockMvc.perform(post("/signup")
+                .content("user=testUserName3&first=testFirstName3&email=testEmail3&pass=testPassword3")
+                .contentType("application/x-www-form-urlencoded"))
+                .andExpect(status().isUnprocessableEntity());
+
+        // perform unsuccessful creation with empty lastName parameter
+        mockMvc.perform(post("/signup")
+                .content("user=testUserName3&first=testFirstName3&last=&email=testEmail3&pass=testPassword3")
+                .contentType("application/x-www-form-urlencoded"))
+                .andExpect(status().isUnprocessableEntity());
+
+        // perform unsuccessful creation with missing email parameter
+        mockMvc.perform(post("/signup")
+                .content("user=testUserName3&first=testFirstName3&last=testLastName3&pass=testPassword3")
+                .contentType("application/x-www-form-urlencoded"))
+                .andExpect(status().isUnprocessableEntity());
+
+        // perform unsuccessful creation with empty email parameter
+        mockMvc.perform(post("/signup")
+                .content("user=testUserName3&first=testFirstName3&last=testLastName3&email=&pass=testPassword3")
+                .contentType("application/x-www-form-urlencoded"))
+                .andExpect(status().isUnprocessableEntity());
+
+        // perform unsuccessful creation with missing password parameter
+        mockMvc.perform(post("/signup")
+                .content("user=testUserName3&first=testFirstName3&last=testLastName3&email=testEmail3")
+                .contentType("application/x-www-form-urlencoded"))
+                .andExpect(status().isUnprocessableEntity());
+
+        // perform unsuccessful creation with empty password parameter
+        mockMvc.perform(post("/signup")
+                .content("user=testUserName3&first=testFirstName3&last=testLastName3&email=testEmail3&pass=")
+                .contentType("application/x-www-form-urlencoded"))
+                .andExpect(status().isUnprocessableEntity());
+
+        // perform unsuccessful creation with no parameters
+        mockMvc.perform(post("/signup")
+                .contentType("application/x-www-form-urlencoded"))
+                .andExpect(status().isUnprocessableEntity());
     }
 
 }

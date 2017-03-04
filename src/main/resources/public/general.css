@@ -1,0 +1,9 @@
+.label_text {
+    font-weight: 800;
+    font-size: large;
+}
+.label_error {
+    font-weight: 900;
+    font-size: larger;
+    color: red;
+}
