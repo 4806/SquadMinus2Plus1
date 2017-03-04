@@ -1,6 +1,7 @@
 package SocialWiki.WikiPages;
 
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 /**
@@ -39,7 +40,7 @@ public class WikiPageResult {
                 ", title='" + title + '\'' +
                 ", parentID=" + parentID +
                 ", author='" + author + '\'' +
-                ", creationDate=" + creationDate +
+                ", creationDate=" + new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(creationDate) +
                 '}';
     }
 
