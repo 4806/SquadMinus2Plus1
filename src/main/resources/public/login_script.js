@@ -39,3 +39,37 @@ loginHandler.loginSuccessHandler = function( ) {
     location.href = "/";
     //location.href = "/profile";
 };
+
+document.onreadystatechange = function( ) {
+    var form = [
+        { view:"text", id:"user", label:"User", name:"login"},
+        { view:"text", type:"password", label:"Password", name:"pass"},
+        { margin:10,
+            cols:[
+                { view:"button", value:"Login" , type:"form", click:loginHandler.submitHandler},
+                { view:"button", value:"Cancel", click:loginHandler.homeHandler }
+            ]
+        },
+        { view:"label", align:"center", label:"", id:"login_result" }
+    ];
+
+    webix.ui({
+        rows:[
+            { view:"toolbar", elements: [
+                {view:"label", label:"SM2P1 Social Wiki Login"},
+                {view:"button", value:"Home", align:"right", width:100, click:loginHandler.homeHandler},
+                {view:"button", value:"Sign Up", align:"right", width:100, click:loginHandler.signupHandler}
+            ]
+            },
+            { view:"label", id:"login_top_label", css:"label_text", label:"Please enter your login information.", align:"center"},
+            { view: "form",
+                cols: [
+                    { },
+                    {view: "form", id:"login_form", align:"center", elements: form},
+                    { }
+                ]
+            },
+            { }
+        ]
+    });
+};
