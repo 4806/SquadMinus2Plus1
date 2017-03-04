@@ -146,8 +146,8 @@ public class UserControllerTest {
                 .andExpect(content().string(containsString("\"password\":null")))
                 .andExpect(status().isCreated());
 
-        List<User> users = userRepo.findByUserName("testUserName2");
-        assertEquals("Failure - userControllerTest did not successfully create new user", 1, users.size());
+        User user = userRepo.findByUserName("testUserName2");
+        assertNotEquals("Failure - userControllerTest did not successfully create new user", null, user);
 
         // perform unsuccessful creation with same userName
         mockMvc.perform(post("/signup")

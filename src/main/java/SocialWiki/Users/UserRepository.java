@@ -12,38 +12,38 @@ public interface UserRepository extends CrudRepository<User, Long> {
     /**
      * Find the User with the corresponding userName
      * @param userName - the userName for the User that is being queried
-     * @return a list of Users that match the userName (should be a max of one since userName is unique)
+     * @return the User that matches the userName
      */
-    List<User> findByUserName(String userName);
+    User findByUserName(String userName);
 
     /**
      * Find the User with the corresponding email
      * @param email - the email for the User that is being queried
-     * @return a list of Users that match the email (should be a max of one since email is unique)
+     * @return the User that matches the email
      */
-    List<User> findByEmail(String email);
+    User findByEmail(String email);
 
     /**
      * Find the User with the corresponding userName and password
      * @param userName - the userName for the User that is being queried
      * @param password - the password for the User's account
-     * @return a list of Users that match the userName and password (should be a max of one since userName is unique)
+     * @return the User that matches the userName and password
      */
-    List<User> findByUserNameAndPassword(String userName, String password);
+    User findByUserNameAndPassword(String userName, String password);
 
     /**
      * Find the User with the corresponding email and password
      * @param email - the email for the User that is being queried
      * @param password - the password for the User's account
-     * @return a list of Users that match the email and password (should be a max of one since email is unique)
+     * @return the User that matches the email and password
      */
-    List<User> findByEmailAndPassword(String email, String password);
+    User findByEmailAndPassword(String email, String password);
 
     /**
      * Find the User with the corresponding userName or email
      * @param userName - the userName for the User that is being queried
      * @param email - the email for the User that is being queried
-     * @return a list of Users that match the userName or email (should be a max of one since userName and email is unique)
+     * @return a list of Users that match the userName or email (should be a max of two since userName and email is unique)
      */
     List<User> findByUserNameOrEmail(String userName, String email);
 }

@@ -39,20 +39,20 @@ public class UserController {
         }
 
         // get the user by userName and password
-        List<User> users = userRepo.findByUserNameAndPassword(login, pass);
+        User user = userRepo.findByUserNameAndPassword(login, pass);
 
         // if it could not find by using a username, try using an email instead
-        if (users.isEmpty()) {
-            users = userRepo.findByEmailAndPassword(login, pass);
+        if (user == null) {
+            user = userRepo.findByEmailAndPassword(login, pass);
 
             // send an HTTP 401 response, if no user exists for provided login info
-            if (users.isEmpty()) {
+            if (user == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
             }
         }
 
         // send an HTTP 200 response with the session user
-        return ResponseEntity.ok(users.get(0).asSessionUser());
+        return ResponseEntity.ok(user.asSessionUser());
     }
 
     /**
