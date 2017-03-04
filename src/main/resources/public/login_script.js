@@ -47,7 +47,7 @@ webix.ready(function( ) {
 
     webix.ui({
         rows:[
-            generalPages.toolbarLoggedOut,
+            generalPages.toolbarHomeSignUp,
             { view:"label", id:"login_top_label", css:"label_text", label:"Please enter your login information.", align:"center"},
             { view: "form",
                 cols: [

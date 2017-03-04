@@ -13,7 +13,7 @@ indexHandler.strings.aboutTheTeam = "We are a team of fourth year software engin
 webix.ready(function() {
     webix.ui({
         rows:[
-            generalPages.toolbarLoggedOut,
+            generalPages.toolbarLogInSignUp,
             { height:50 },
             { view:"label", label:indexHandler.strings.welcomeText, css:"label_big", align:"center"},
             { height:50 },

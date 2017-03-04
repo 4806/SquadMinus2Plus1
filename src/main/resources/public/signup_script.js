@@ -101,7 +101,7 @@ webix.ready(function( ) {
 
     webix.ui({
         rows:[
-            generalPages.toolbarSignup,
+            generalPages.toolbarHomeLogin,
             { view:"label", id:"signup_top_label", css:"label_text", label:"Please enter your information.", align:"center"},
             { view: "form",
                 cols: [
