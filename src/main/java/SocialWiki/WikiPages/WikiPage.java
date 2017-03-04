@@ -9,6 +9,7 @@ import java.util.Calendar;
 
 /**
  * Created by Chris on 2/24/2017.
+ * Object representation of a WikiPage. Holds all information about a single WikiPage
  */
 @Component
 @Entity

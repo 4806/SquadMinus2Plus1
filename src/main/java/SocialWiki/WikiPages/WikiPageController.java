@@ -14,6 +14,7 @@ import java.util.List;
 
 /**
  * Created by Chris on 2/24/2017.
+ * WikiPage controller provides a REST API interface that gives access to functionality allowing the creation, retrieval, and searching of WikiPages
  */
 @RestController
 public class WikiPageController {
@@ -99,7 +100,7 @@ public class WikiPageController {
      * @return the list of WikiPages found
      */
     @GetMapping("/searchWikiPage")
-    public ResponseEntity<List<WikiPage>> searchWikiPage(HttpServletRequest request) {
+    public ResponseEntity<List<WikiPageResult>> searchWikiPage(HttpServletRequest request) {
 
         //Retrieve parameters from request
         String title = request.getParameter("title");
@@ -111,7 +112,7 @@ public class WikiPageController {
         }
         //Note this still allows for parameters to be NULL if at least one is not null. In these cases, null parameters will be treated as empty string by the query.
 
-        List<WikiPage> pages = wikiPageRepo.findByTitleAndAuthorAndContent(title, authorUserName, content);
+        List<WikiPageResult> pages = wikiPageRepo.findByTitleAndAuthorAndContent(title, authorUserName, content);
 
         return ResponseEntity.ok(pages);
 

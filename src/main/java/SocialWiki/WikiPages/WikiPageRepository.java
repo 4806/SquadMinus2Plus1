@@ -8,6 +8,7 @@ import java.util.List;
 
 /**
  * Created by Chris on 2/24/2017.
+ * Repository to persist all WikiPages
  */
 public interface WikiPageRepository extends JpaRepository<WikiPage, Long> {
 
@@ -25,13 +26,15 @@ public interface WikiPageRepository extends JpaRepository<WikiPage, Long> {
      * @param content - The content of the WikiPage (Can be a substring of full content, or null)
      * @return all WikiPages matching query
      */
-    @Query("SELECT page FROM WikiPage page LEFT JOIN page.author author WHERE (:title IS NULL OR " +
-            "                                           UPPER(page.title) LIKE UPPER(CONCAT('%',:title,'%')) OR " +
-            "                                           UPPER(page.content) LIKE UPPER(CONCAT('%',:title,'%')) ) AND " +
-                                                "(:username IS NULL OR " +
-            "                                           UPPER(author.userName) LIKE UPPER(CONCAT('%',:username,'%'))) AND " +
-                                                "(:content IS NULL OR " +
-            "                                           UPPER(page.content) LIKE UPPER(CONCAT('%',:content,'%')))")
-    List<WikiPage> findByTitleAndAuthorAndContent(@Param("title") String title, @Param("username") String username, @Param("content") String content);
+    @Query("SELECT NEW SocialWiki.WikiPages.WikiPageResult(page.id, page.title, page.parentID, author.userName, page.creationDate) " +
+            "FROM WikiPage page LEFT JOIN page.author author " +
+                "WHERE (:title IS NULL OR " +
+                    "UPPER(page.title) LIKE UPPER(CONCAT('%',:title,'%')) OR " +
+                    "UPPER(page.content) LIKE UPPER(CONCAT('%',:title,'%')) ) AND " +
+                "(:username IS NULL OR " +
+                    "UPPER(author.userName) LIKE UPPER(CONCAT('%',:username,'%'))) AND " +
+                "(:content IS NULL OR " +
+                    "UPPER(page.content) LIKE UPPER(CONCAT('%',:content,'%')))")
+    List<WikiPageResult> findByTitleAndAuthorAndContent(@Param("title") String title, @Param("username") String username, @Param("content") String content);
 
 }
