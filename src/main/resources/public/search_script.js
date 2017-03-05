@@ -31,12 +31,24 @@ searchPage.searchForPages = function() {
                 loginHandler.errorHandler();
             }
             var items = JSON.parse(dataString);
-            $$("resultlist").clearAll();
-            for( var i = 0; i < items.length; i++){
-                items[i].creationDate = new Date(items[i].creationDate);
-                $$("resultlist").add(items[i]);
+
+            if( items.length === 0 ){
+                //Show no results
+
+                $$("infostatus").setValue("No results were found.");
+                $$("resultlist").hide();
+                $$("infostatus").show();
+            } else {
+                //Repopulate list if results
+
+                $$("resultlist").clearAll();
+                for( var i = 0; i < items.length; i++){
+                    items[i].creationDate = new Date(items[i].creationDate);
+                    $$("resultlist").add(items[i]);
+                }
+                $$("resultlist").refresh();
             }
-            $$("resultlist").refresh();
+
         }
     });
 };
