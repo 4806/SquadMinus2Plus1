@@ -13,23 +13,23 @@ indexHandler.strings.aboutTheTeam = "We are a team of fourth year software engin
 webix.ready(function() {
     webix.ui({
         rows:[
-            generalPages.toolbarLoggedOut,
+            generalPages.toolbarLogInSignUp,
             { height:50 },
-            {view:"label", label:indexHandler.strings.welcomeText, css:"label_big", align:"center"},
+            { view:"label", label:indexHandler.strings.welcomeText, css:"label_big", align:"center"},
             { height:50 },
-            {view:"label", label:'<img src="img/flame_blue.png" height="100%"/> About The Wiki', css:"label_big", align:"center"},
-            {template:indexHandler.strings.aboutText, css:"label_indexNorm", align:"center", autoheight:true, autowidth:true, borderless:true},
+            { view:"label", label:'<img src="img/flame_blue.png" height="100%"/> About The Wiki', css:"label_big", align:"center"},
+            { template:"<center>"+indexHandler.strings.aboutText+"</center>", css:"label_indexNorm", align:"center", autoheight:true, borderless:true},
             { height:50 },
-            {view:"label", label:'<img src="img/flame_blue.png" height="100%"/> About The Team', css:"label_big", align:"center"},
-            {template:indexHandler.strings.aboutTheTeam, css:"label_indexNorm", align:"center", autoheight:true, autowidth:true, borderless:true},
+            { view:"label", label:'<img src="img/flame_blue.png" height="100%"/> About The Team', css:"label_big", align:"center"},
+            { template:"<center>"+indexHandler.strings.aboutTheTeam+"</center>", css:"label_indexNorm", align:"center", autoheight:true, borderless:true},
             { height:50 },
             { cols:[
                 { },
-                {view:"button", value:"Sign Up Now!", align:"center", click:generalPages.handler.signupClick},
+                { view:"button", value:"Sign Up Now!", align:"center", click:generalPages.handler.signupClick},
                 { }
             ]},
             { },
-            {view:"label", label:'<img src="img/flame_blue.png" height="50%"/>', height:100, align:"center"}
+            { view:"label", label:'<img src="img/flame_blue.png" height="50%"/>', height:100, align:"center"}
         ]
     });
 });
