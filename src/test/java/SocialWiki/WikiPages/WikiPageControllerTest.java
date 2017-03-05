@@ -23,6 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /**
  * Created by Chris on 2/24/2017.
+ * Unit tests for WikiPageController class
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest()
@@ -67,7 +68,7 @@ public class WikiPageControllerTest {
         params.add("title", "testTitle");
         params.add("content", "testContent");
         params.add("parentID", "-1");
-        params.add("username", testUser1.getUserName());
+        params.add("user", testUser1.getUserName());
         this.mockMvc.perform(post("/createWikiPage").params(params))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -80,7 +81,7 @@ public class WikiPageControllerTest {
         params.add("title", "");
         params.add("content", "testContent");
         params.add("parentID", "-1");
-        params.add("username", testUser1.getUserName());
+        params.add("user", testUser1.getUserName());
         this.mockMvc.perform(post("/createWikiPage").params(params))
                 .andDo(print())
                 .andExpect(status().isUnprocessableEntity());
@@ -90,7 +91,7 @@ public class WikiPageControllerTest {
         params.add("title", "testTitle");
         params.add("content", "testContent");
         params.add("parentID", "0");
-        params.add("username", testUser1.getUserName());
+        params.add("user", testUser1.getUserName());
         this.mockMvc.perform(post("/createWikiPage").params(params))
                 .andDo(print())
                 .andExpect(status().isUnprocessableEntity());
@@ -100,17 +101,17 @@ public class WikiPageControllerTest {
         params.add("title", "testTitle");
         params.add("content", "testContent");
         params.add("parentID", "-2");
-        params.add("username", testUser1.getUserName());
+        params.add("user", testUser1.getUserName());
         this.mockMvc.perform(post("/createWikiPage").params(params))
                 .andDo(print())
                 .andExpect(status().isUnprocessableEntity());
         params.clear();
 
-        //Check for unsuccessful creation due to empty username
+        //Check for unsuccessful creation due to empty user
         params.add("title", "testTitle");
         params.add("content", "testContent");
         params.add("parentID", "-2");
-        params.add("username", "");
+        params.add("user", "");
         this.mockMvc.perform(post("/createWikiPage").params(params))
                 .andDo(print())
                 .andExpect(status().isUnprocessableEntity());
@@ -120,7 +121,7 @@ public class WikiPageControllerTest {
         params.add("title", "testTitle");
         params.add("content", "");
         params.add("parentID", "-1");
-        params.add("username", testUser1.getUserName());
+        params.add("user", testUser1.getUserName());
         this.mockMvc.perform(post("/createWikiPage").params(params))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -132,7 +133,7 @@ public class WikiPageControllerTest {
         //Check for unsuccessful creation due to missing title parameter
         params.add("content", "testContent");
         params.add("parentID", "-1");
-        params.add("username", testUser1.getUserName());
+        params.add("user", testUser1.getUserName());
         this.mockMvc.perform(post("/createWikiPage").params(params))
                 .andDo(print())
                 .andExpect(status().isUnprocessableEntity());
@@ -141,7 +142,7 @@ public class WikiPageControllerTest {
         //Check for unsuccessful creation due to missing content parameter
         params.add("title", "testTitle");
         params.add("parentID", "-1");
-        params.add("username", testUser1.getUserName());
+        params.add("user", testUser1.getUserName());
         this.mockMvc.perform(post("/createWikiPage").params(params))
                 .andDo(print())
                 .andExpect(status().isUnprocessableEntity());
@@ -150,13 +151,13 @@ public class WikiPageControllerTest {
         //Check for unsuccessful creation due to missing parentID parameter
         params.add("title", "testTitle");
         params.add("content", "testContent");
-        params.add("username", testUser1.getUserName());
+        params.add("user", testUser1.getUserName());
         this.mockMvc.perform(post("/createWikiPage").params(params))
                 .andDo(print())
                 .andExpect(status().isUnprocessableEntity());
         params.clear();
 
-        //Check for unsuccessful creation due to missing username parameter
+        //Check for unsuccessful creation due to missing user parameter
         params.add("title", "testTitle");
         params.add("content", "testContent");
         params.add("parentID", "-1");
@@ -170,16 +171,16 @@ public class WikiPageControllerTest {
     @Test
     public void searchWikiPage() throws Exception {
 
-        WikiPage testWikiPage1 = new WikiPage("testTitle1", "testContent1",testUser1);
-        WikiPage testWikiPage2 = new WikiPage("testTitlePair", "testContent2",testUser2);
+        ConcreteWikiPage testConcreteWikiPage1 = new ConcreteWikiPage("testTitle1", "testContent1",testUser1);
+        ConcreteWikiPage testConcreteWikiPage2 = new ConcreteWikiPage("testTitlePair", "testContent2",testUser2);
 
-        testWikiPage1 = wikiPageRepository.save(testWikiPage1);
-        testWikiPage2 = wikiPageRepository.save(testWikiPage2);
+        testConcreteWikiPage1 = wikiPageRepository.save(testConcreteWikiPage1);
+        testConcreteWikiPage2 = wikiPageRepository.save(testConcreteWikiPage2);
 
-        WikiPage testWikiPage3 = new WikiPage("testTitlePair", "testContent3", testWikiPage2.getId(),testUser2);
+        ConcreteWikiPage testConcreteWikiPage3 = new ConcreteWikiPage("testTitlePair", "testContent3", testConcreteWikiPage2.getId(),testUser2);
 
-        testWikiPage2 = wikiPageRepository.save(testWikiPage2);
-        testWikiPage3 = wikiPageRepository.save(testWikiPage3);
+        testConcreteWikiPage2 = wikiPageRepository.save(testConcreteWikiPage2);
+        testConcreteWikiPage3 = wikiPageRepository.save(testConcreteWikiPage3);
 
         MultiValueMap<String, String> params = new HttpHeaders();
 
@@ -193,15 +194,15 @@ public class WikiPageControllerTest {
         this.mockMvc.perform(get("/searchWikiPage").params(params))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.[0].id", is(testWikiPage1.getId().intValue())));
+                .andExpect(jsonPath("$.[0].id", is(testConcreteWikiPage1.getId().intValue())));
         params.clear();
 
-        //Check for successful search using author parameter
-        params.add("author", testUser1.getUserName());
+        //Check for successful search using user parameter
+        params.add("user", testUser1.getUserName());
         this.mockMvc.perform(get("/searchWikiPage").params(params))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.[0].id", is(testWikiPage1.getId().intValue())));
+                .andExpect(jsonPath("$.[0].id", is(testConcreteWikiPage1.getId().intValue())));
         params.clear();
 
         //Check for successful search using content parameter
@@ -209,16 +210,16 @@ public class WikiPageControllerTest {
         this.mockMvc.perform(get("/searchWikiPage").params(params))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.[0].id", is(testWikiPage1.getId().intValue())));
+                .andExpect(jsonPath("$.[0].id", is(testConcreteWikiPage1.getId().intValue())));
         params.clear();
 
-        //Check for successful search using title and username parameters
+        //Check for successful search using title and user parameters
         params.add("title", "testTitle1");
-        params.add("author", testUser1.getUserName());
+        params.add("user", testUser1.getUserName());
         this.mockMvc.perform(get("/searchWikiPage").params(params))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.[0].id", is(testWikiPage1.getId().intValue())));
+                .andExpect(jsonPath("$.[0].id", is(testConcreteWikiPage1.getId().intValue())));
         params.clear();
 
         //Check for successful search using title and content parameters
@@ -227,26 +228,26 @@ public class WikiPageControllerTest {
         this.mockMvc.perform(get("/searchWikiPage").params(params))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.[0].id", is(testWikiPage1.getId().intValue())));
+                .andExpect(jsonPath("$.[0].id", is(testConcreteWikiPage1.getId().intValue())));
         params.clear();
 
-        //Check for successful search using username and content parameters
-        params.add("author", testUser1.getUserName());
+        //Check for successful search using user and content parameters
+        params.add("user", testUser1.getUserName());
         params.add("content", "testContent1");
         this.mockMvc.perform(get("/searchWikiPage").params(params))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.[0].id", is(testWikiPage1.getId().intValue())));
+                .andExpect(jsonPath("$.[0].id", is(testConcreteWikiPage1.getId().intValue())));
         params.clear();
 
         //Check for successful search using all parameters
         params.add("title", "testTitle1");
-        params.add("author", testUser1.getUserName());
+        params.add("user", testUser1.getUserName());
         params.add("content", "testContent1");
         this.mockMvc.perform(get("/searchWikiPage").params(params))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.[0].id", is(testWikiPage1.getId().intValue())));
+                .andExpect(jsonPath("$.[0].id", is(testConcreteWikiPage1.getId().intValue())));
         params.clear();
 
         //Check for successful search resulting in multiple WikiPages found
@@ -254,8 +255,8 @@ public class WikiPageControllerTest {
         this.mockMvc.perform(get("/searchWikiPage").params(params))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.[0].id", is(testWikiPage2.getId().intValue())))
-                .andExpect(jsonPath("$.[1].id", is(testWikiPage3.getId().intValue())));
+                .andExpect(jsonPath("$.[0].id", is(testConcreteWikiPage2.getId().intValue())))
+                .andExpect(jsonPath("$.[1].id", is(testConcreteWikiPage3.getId().intValue())));
         params.clear();
 
     }

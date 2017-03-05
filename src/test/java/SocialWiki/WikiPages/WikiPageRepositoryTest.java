@@ -18,6 +18,7 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * Created by Chris on 2/25/2017.
+ * Unit tests for WikiPageRepository class
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -29,10 +30,10 @@ public class WikiPageRepositoryTest {
     @Autowired
     private UserRepository userRepository;
 
-    private WikiPage testWikiPage1;
-    private WikiPage testWikiPage2;
-    private WikiPage testWikiPage3;
-    private WikiPage testWikiPage4;
+    private ConcreteWikiPage testConcreteWikiPage1;
+    private ConcreteWikiPage testConcreteWikiPage2;
+    private ConcreteWikiPage testConcreteWikiPage3;
+    private ConcreteWikiPage testConcreteWikiPage4;
 
     private User testUser1;
     private User testUser2;
@@ -41,12 +42,12 @@ public class WikiPageRepositoryTest {
     @Test
     public void findByTitle() throws Exception {
 
-        List<WikiPageResult> testList = new ArrayList<>();
-        testList.add(WikiPageResult.getResult(testWikiPage3));
-        testList.add(WikiPageResult.getResult(testWikiPage4));
-        WikiPageResult testResult1 = WikiPageResult.getResult(testWikiPage1);
+        List<WikiPageWithAuthorProxy> testList = new ArrayList<>();
+        testList.add(WikiPageWithAuthorProxy.getResult(testConcreteWikiPage3));
+        testList.add(WikiPageWithAuthorProxy.getResult(testConcreteWikiPage4));
+        WikiPageWithAuthorProxy testResult1 = WikiPageWithAuthorProxy.getResult(testConcreteWikiPage1);
 
-        List<WikiPageResult> pages = wikiPageRepository.findByTitleIgnoreCase("testTitle1");
+        List<WikiPageWithAuthorProxy> pages = wikiPageRepository.findByTitleIgnoreCase("testTitle1");
         assertEquals("Failure - Number of pages found by findByTitleIgnoreCase('testTitle1') should be 1", 1, pages.size());
         assertEquals("Failure - Page found by findByTitleIgnoreCase('testTitle1') is not correct", testResult1, pages.get(0));
         pages.clear();
@@ -71,15 +72,15 @@ public class WikiPageRepositoryTest {
     @Test
     public void findByTitleAndAuthorAndContent() throws Exception {
 
-        List<WikiPageResult> testList = new ArrayList<>();
-        testList.add(WikiPageResult.getResult(testWikiPage3));
-        testList.add(WikiPageResult.getResult(testWikiPage4));
+        List<WikiPageWithAuthorProxy> testList = new ArrayList<>();
+        testList.add(WikiPageWithAuthorProxy.getResult(testConcreteWikiPage3));
+        testList.add(WikiPageWithAuthorProxy.getResult(testConcreteWikiPage4));
 
-        WikiPageResult testResult1 = WikiPageResult.getResult(testWikiPage1);
+        WikiPageWithAuthorProxy testResult1 = WikiPageWithAuthorProxy.getResult(testConcreteWikiPage1);
 
         //Test when parameters are null or blank
 
-        List<WikiPageResult> pages = wikiPageRepository.findByTitleAndAuthorAndContent("","","");
+        List<WikiPageWithAuthorProxy> pages = wikiPageRepository.findByTitleAndAuthorAndContent("","","");
         assertEquals("Failure - Number of pages found by findByTitleAndAuthorAndContent('','','') should be 4", 4, pages.size());
         pages.clear();
 
@@ -174,17 +175,17 @@ public class WikiPageRepositoryTest {
         testUser2 = userRepository.save(testUser2);
         testUser3 = userRepository.save(testUser3);
 
-        testWikiPage1 = new WikiPage("testTitle1", "testContent1",testUser1);
-        testWikiPage3 = new WikiPage("testTitlePair", "testContent2",testUser3);
+        testConcreteWikiPage1 = new ConcreteWikiPage("testTitle1", "testContent1",testUser1);
+        testConcreteWikiPage3 = new ConcreteWikiPage("testTitlePair", "testContent2",testUser3);
 
-        testWikiPage1 = wikiPageRepository.save(testWikiPage1);
-        testWikiPage3 = wikiPageRepository.save(testWikiPage3);
+        testConcreteWikiPage1 = wikiPageRepository.save(testConcreteWikiPage1);
+        testConcreteWikiPage3 = wikiPageRepository.save(testConcreteWikiPage3);
 
-        testWikiPage2 = new WikiPage("testTitle2", "testContent3", testWikiPage1.getId(),testUser2);
-        testWikiPage4 = new WikiPage("testTitlePair", "testContent4", testWikiPage3.getId(),testUser3);
+        testConcreteWikiPage2 = new ConcreteWikiPage("testTitle2", "testContent3", testConcreteWikiPage1.getId(),testUser2);
+        testConcreteWikiPage4 = new ConcreteWikiPage("testTitlePair", "testContent4", testConcreteWikiPage3.getId(),testUser3);
 
-        testWikiPage2 = wikiPageRepository.save(testWikiPage2);
-        testWikiPage4 = wikiPageRepository.save(testWikiPage4);
+        testConcreteWikiPage2 = wikiPageRepository.save(testConcreteWikiPage2);
+        testConcreteWikiPage4 = wikiPageRepository.save(testConcreteWikiPage4);
 
     }
 
