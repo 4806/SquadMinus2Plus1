@@ -116,4 +116,30 @@ public class WikiPageController {
 
     }
 
+    /**
+     * Method to handle retrieval of WikiPages
+     * @param request - contains id of the WikiPages being retrieved
+     * @return the WikiPages found
+     */
+    @GetMapping("/retrieveWikiPage")
+    public ResponseEntity<WikiPageWithAuthorAndContentProxy> retrieveWikiPage(HttpServletRequest request) {
+
+        Long id;
+
+        try {
+            id = Long.parseLong(request.getParameter("id"));
+        } catch (NumberFormatException e) {
+            return ResponseEntity.unprocessableEntity().body(null);
+        }
+
+        WikiPageWithAuthorAndContentProxy page = wikiPageRepo.findById(id);
+
+        if (page == null) {
+            return ResponseEntity.unprocessableEntity().body(null);
+        } else {
+            return ResponseEntity.ok(page);
+        }
+
+    }
+
 }
