@@ -39,10 +39,10 @@ public class UserController {
 
         // TODO: write tests for this, but this will never happen until the session invalidation is moved to logout feature
         // check that another session doesn't already exist for this request, and if there is, send a 403 response
-        session = request.getSession(false);
-        if (session != null) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
-        }
+//        session = request.getSession(false);
+//        if (session != null) {
+//            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+//        }
 
         // get the login parameters from the post request
         String login = request.getParameter("login");
@@ -90,10 +90,10 @@ public class UserController {
 
         // TODO: write tests for this, but this will never happen until the session invalidation is moved to logout feature
         // check that another session doesn't already exist for this request, and if there is, send a 403 response
-        session = request.getSession(false);
-        if (session != null) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
-        }
+//        session = request.getSession(false);
+//        if (session != null) {
+//            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+//        }
 
         // get the sign-up parameters from the post request
         String user = request.getParameter("user");
