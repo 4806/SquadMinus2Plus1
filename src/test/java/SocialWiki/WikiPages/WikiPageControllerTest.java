@@ -261,4 +261,37 @@ public class WikiPageControllerTest {
 
     }
 
+    @Test
+    public void retrieveWikiPage() throws Exception {
+
+        ConcreteWikiPage testConcreteWikiPage1 = new ConcreteWikiPage("testTitle1", "testContent1",testUser1);
+
+        testConcreteWikiPage1 = wikiPageRepository.save(testConcreteWikiPage1);
+
+        MultiValueMap<String, String> params = new HttpHeaders();
+
+        //Check for unsuccessful search due to no parameters
+        this.mockMvc.perform(get("/retrieveWikiPage").params(params))
+                .andDo(print())
+                .andExpect(status().isUnprocessableEntity());
+
+        //Check for unsuccessful search using bad id
+        params.add("id", "-1");
+        this.mockMvc.perform(get("/retrieveWikiPage").params(params))
+                .andDo(print())
+                .andExpect(status().isUnprocessableEntity());
+        params.clear();
+
+        //Check for successful search using proper id
+        params.add("id", testConcreteWikiPage1.getId().toString());
+        this.mockMvc.perform(get("/retrieveWikiPage").params(params))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(testConcreteWikiPage1.getId().intValue())));
+        params.clear();
+
+    }
+
+
+
 }

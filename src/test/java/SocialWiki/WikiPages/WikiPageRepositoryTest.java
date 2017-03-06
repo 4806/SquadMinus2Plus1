@@ -166,6 +166,19 @@ public class WikiPageRepositoryTest {
 
     }
 
+    @Test
+    public void findById() throws Exception {
+
+        WikiPageWithAuthorAndContentProxy testResult1 = WikiPageWithAuthorAndContentProxy.getFullResult(testConcreteWikiPage1);
+
+        WikiPageWithAuthorAndContentProxy page = wikiPageRepository.findById(testConcreteWikiPage1.getId());
+        assertEquals("Failure - Page found by findById(testConcreteWikiPage1.getId()) is not correct", testResult1, page);
+
+        page = wikiPageRepository.findById(-1L);
+        assertEquals("Failure - Page found by findById(-1L) is not correct", null, page);
+
+    }
+
     @Before
     public void setUp() throws Exception {
         testUser1 = new User("testUserName1", "testFirstName1", "testLastName1", "testEmail1", "testPassword1");
