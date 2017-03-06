@@ -1,0 +1,21 @@
+.label_text {
+    font-weight: 800;
+    font-size: large;
+}
+.label_error {
+    font-weight: 900;
+    font-size: larger;
+    color: red;
+}
+.label_big {
+    font-weight: 800;
+    font-size: xx-large;
+}
+.label_indexNorm {
+    font-weight: 500;
+    font-size: large;
+    color: darkslategrey;
+}
+body.webix_full_screen{
+    overflow: scroll;
+}

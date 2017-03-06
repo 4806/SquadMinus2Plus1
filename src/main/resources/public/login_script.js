@@ -27,16 +27,37 @@ loginHandler.errorHandler = function( ) {
     $$("login_result").setValue("Login Failed. Please Try Again.");
 };
 
-loginHandler.homeHandler = function( ) {
-    location.href = "/";
-};
-
-loginHandler.signupHandler = function( ) {
-    location.href = "/";
-    //location.href = "/signup";
-};
-
 loginHandler.loginSuccessHandler = function( ) {
     location.href = "/";
     //location.href = "/profile";
 };
+
+webix.ready(function( ) {
+    var form = [
+        { view:"text", id:"user", label:"User", name:"login"},
+        { view:"text", type:"password", label:"Password", name:"pass"},
+        { margin:10,
+            cols:[
+                { view:"button", value:"Login" , type:"form", click:loginHandler.submitHandler},
+                { view:"button", value:"Cancel", click:generalPages.handler.homeClick }
+            ]
+        },
+        { view:"label", align:"center", label:"", id:"login_result" }
+    ];
+
+    webix.ui({
+        rows:[
+            generalPages.toolbarHomeSignUp,
+            { view:"label", id:"login_top_label", css:"label_text", label:"Please enter your login information.", align:"center"},
+            { view: "form",
+                cols: [
+                    { },
+                    {view: "form", id:"login_form", align:"center", elements: form},
+                    { }
+                ]
+            },
+            { },
+            {view:"label", label:'<img src="img/flame_blue.png" height="50%"/>', height:100, align:"center"}
+        ]
+    });
+});
