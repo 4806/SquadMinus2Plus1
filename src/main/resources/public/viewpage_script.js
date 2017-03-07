@@ -24,7 +24,10 @@ viewPage.getContent = function() {
         error:viewPage.handler.errorHandler,
         success:function(dataString){
             if (dataString !== null) {
-                var html = editPage.converter.makeHtml(dataString);
+                var page = JSON.parse(dataString);
+                var html = "<h1>" + page.title + "</h1>";
+                html += "<h3>Created by " + page.author + " on " + new Date(page.creationDate) + "</h3><br/><hr/>";
+                html += viewPage.converter.makeHtml(page.content);
                 $$("content").setHTML(html);
             }
         }
@@ -38,7 +41,7 @@ webix.ready(function() {
             generalPages.toolbarLogInSignUp,
             {
                 view:"template",
-                template:"<p>Content</p>",
+                template:"<p></p>",
                 id:"content",
                 height:600,
                 scroll:true
