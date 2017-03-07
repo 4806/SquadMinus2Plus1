@@ -23,7 +23,7 @@ generalPages.handler.userClick = function() {
 };
 
 generalPages.handler.addPageClick = function() {
-    //TODO: Implement
+    location.href = "/editwiki";
 };
 
 generalPages.toolbarUserAdd = {
@@ -50,6 +50,7 @@ generalPages.toolbarLogInSignUp = {
         {view:"label", label:'<img src="img/flame_white.png" width="50%"/>', width:50, align:"left"},
         {view:"label", label:"Social Wiki", align:"left"},
         {view:"search", id:"searchbox", placeholder:"Search Pages", align:"right", width:200, on:{onSearchIconClick:generalPages.handler.searchClick}},
+        {view:"button", value:"New Page", align:"right", width:100, click:generalPages.handler.addPageClick},
         {view:"button", value:"Login", align:"right", width:100, click:generalPages.handler.loginClick},
         {view:"button", value:"Sign Up", align:"right", width:100, click:generalPages.handler.signupClick}
     ]

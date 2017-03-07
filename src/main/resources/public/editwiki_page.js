@@ -9,8 +9,53 @@ editPage.preview = false;
 
 editPage.converter = new showdown.Converter();
 
+editPage.pageContent = null;
+
 editPage.handler.acceptClick = function() {
-    //TODO: Implement
+    var pageData = {};
+    pageData.content = $$("rawtext").getValue();
+    pageData.title = $$("title").getValue();
+    pageData.user = "default";  //TODO: Remove this and change it for the current user logged in, or handle in backend with session cookie
+
+    if(editPage.pageContent !== null) {
+        pageData.parentID = editPage.pageContent.id;
+    } else {
+        pageData.parentID = -1;
+    }
+
+    webix.ajax().post("/createWikiPage", pageData, {
+        error:function(){ webix.alert("Could not submit the page.", function(){}); },
+        success:function(dataString){
+                var newPage = JSON.parse(dataString);
+                if(newPage.id !== undefined) {
+                    webix.alert("Page submitted successfully!.", function(){ location.href = "/viewpage?id=" + newPage.id; });
+                }
+            }
+    });
+};
+
+editPage.handler.errorHandler = function() {
+    webix.alert("Could not retrieve the page.", function(){});
+};
+
+editPage.getContent = function() {
+    var params = generalPages.getUrlContent(location.href);
+    if(params.id !== undefined) {
+        webix.ajax().get("/retrieveWikiPage?id=" + params.id, {
+            error:editPage.handler.errorHandler,
+            success:function(dataString){
+                if (dataString !== null) {
+                    editPage.pageContent = JSON.parse(dataString);
+                    if(editPage.pageContent.content !== undefined) {
+                        $$("rawtext").setValue(editPage.pageContent.content);
+                    }
+                    if(editPage.pageContent.title !== undefined) {
+                        $$("title").setValue(editPage.pageContent.title);
+                    }
+                }
+            }
+        });
+    }
 };
 
 editPage.handler.previewToggle = function() {
@@ -83,4 +128,5 @@ webix.ready(function() {
 
     //Don't show the preview page at start
     $$("preview").hide();
+    editPage.getContent();
 });
