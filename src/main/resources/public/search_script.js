@@ -23,7 +23,7 @@ searchPage.handler.error = function() {
 
 searchPage.searchForPages = function() {
     var searchString = generalPages.getUrlContent(location.href);
-    if( !searchString.text === undefined ){
+    if( searchString.text === undefined ){
         return;
     }
     webix.ajax().get("/searchWikiPage?title=" + searchString.text, {
