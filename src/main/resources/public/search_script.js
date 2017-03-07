@@ -10,7 +10,9 @@ searchPage.handler = {};
 
 searchPage.handler.itemClick = function(itemId) {
     var item = $$("resultlist").getItem(itemId);
-    //TODO:Redirect to that page
+    if( item.id !== undefined ) {
+        location.href = "/viewpage?id=" + item.id;
+    }
 };
 
 searchPage.handler.error = function() {
@@ -21,7 +23,7 @@ searchPage.handler.error = function() {
 
 searchPage.searchForPages = function() {
     var searchString = generalPages.getUrlContent(location.href);
-    if( !searchString.text === undefined ){
+    if( searchString.text === undefined ){
         return;
     }
     webix.ajax().get("/searchWikiPage?title=" + searchString.text, {
@@ -56,7 +58,7 @@ searchPage.searchForPages = function() {
 webix.ready(function(){
     webix.ui({
         rows:[
-            generalPages.toolbarLoggedOut,
+            generalPages.toolbarHomeLogin,
             { height:50 },
             { cols:[
                 { },

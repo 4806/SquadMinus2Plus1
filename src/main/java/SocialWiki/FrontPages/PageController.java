@@ -22,11 +22,6 @@ public class PageController {
         return "signup";
     }
 
-    @GetMapping("/editwiki")
-    public String editwiki(Model model){
-        return "editwiki";
-    }
-
     @GetMapping("/search")
     public String search(Model model){
         return "search";

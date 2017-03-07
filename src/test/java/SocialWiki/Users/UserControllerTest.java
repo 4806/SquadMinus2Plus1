@@ -9,13 +9,17 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpSession;
 import java.util.List;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
@@ -48,7 +52,7 @@ public class UserControllerTest {
     @Test
     public void login() throws Exception {
         // perform successful login with userName
-        mockMvc.perform(post("/login")
+        MvcResult result = mockMvc.perform(post("/login")
                 .content("login=testUserName1&pass=testPassword1")
                 .contentType("application/x-www-form-urlencoded"))
                 .andExpect(content().string(containsString("\"id\":")))
@@ -57,10 +61,14 @@ public class UserControllerTest {
                 .andExpect(content().string(containsString("\"lastName\":\"testLastName1\"")))
                 .andExpect(content().string(containsString("\"email\":\"testEmail1\"")))
                 .andExpect(content().string(containsString("\"password\":null")))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andReturn();
+
+        HttpSession session1 = result.getRequest().getSession(false);
+        assertNotEquals("Failure - successful login did not create a session for user", null, session1);
 
         // perform successful login with email
-        mockMvc.perform(post("/login")
+        result = mockMvc.perform(post("/login")
                 .content("login=testEmail1&pass=testPassword1")
                 .contentType("application/x-www-form-urlencoded"))
                 .andExpect(content().string(containsString("\"id\":")))
@@ -69,7 +77,13 @@ public class UserControllerTest {
                 .andExpect(content().string(containsString("\"lastName\":\"testLastName1\"")))
                 .andExpect(content().string(containsString("\"email\":\"testEmail1\"")))
                 .andExpect(content().string(containsString("\"password\":null")))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andReturn();
+
+        HttpSession session2 = result.getRequest().getSession(false);
+        assertNotEquals("Failure - successful login did not create a session for user", null, session2);
+
+        assertNotEquals("Failure - login of a new user did not invalidate the session of the old user", session1.getId(), session2.getId());
 
         // perform successful login with extra parameter
         mockMvc.perform(post("/login")
@@ -84,11 +98,15 @@ public class UserControllerTest {
                 .andExpect(status().isOk());
 
         // perform unsuccessful login with missing "pass" parameter
-        mockMvc.perform(post("/login")
+        result = mockMvc.perform(post("/login")
                 .content("login=testUserName1")
                 .contentType("application/x-www-form-urlencoded"))
                 .andExpect(content().string(""))
-                .andExpect(status().isUnprocessableEntity());
+                .andExpect(status().isUnprocessableEntity())
+                .andReturn();
+
+        session1 = result.getRequest().getSession(false);
+        assertEquals("Failure - unsuccessful login created a new session", null, session1);
 
         //perform unsuccessful login with missing "login" parameter
         mockMvc.perform(post("/login")
@@ -135,7 +153,7 @@ public class UserControllerTest {
     @Test
     public void create() throws Exception {
         // perform successful creation
-        mockMvc.perform(post("/signup")
+        MvcResult result = mockMvc.perform(post("/signup")
                 .content("user=testUserName2&first=testFirstName2&last=testLastName2&email=testEmail2&pass=testPassword2")
                 .contentType("application/x-www-form-urlencoded"))
                 .andExpect(content().string(containsString("\"id\":")))
@@ -144,16 +162,45 @@ public class UserControllerTest {
                 .andExpect(content().string(containsString("\"lastName\":\"testLastName2\"")))
                 .andExpect(content().string(containsString("\"email\":\"testEmail2\"")))
                 .andExpect(content().string(containsString("\"password\":null")))
-                .andExpect(status().isCreated());
+                .andExpect(status().isCreated())
+                .andReturn();
 
-        List<User> users = userRepo.findByUserName("testUserName2");
-        assertEquals("Failure - userControllerTest did not successfully create new user", 1, users.size());
+        HttpSession session1 = result.getRequest().getSession(false);
+        assertNotEquals("Failure - successful creation of new user did not create a session for user", null, session1);
+
+        User user = userRepo.findByUserName("testUserName2");
+        assertNotEquals("Failure - userControllerTest did not successfully create new user", null, user);
+
+        // perform successful creation of a second user
+        result = mockMvc.perform(post("/signup")
+                .content("user=testUserName3&first=testFirstName3&last=testLastName3&email=testEmail3&pass=testPassword3")
+                .contentType("application/x-www-form-urlencoded"))
+                .andExpect(content().string(containsString("\"id\":")))
+                .andExpect(content().string(containsString("\"userName\":\"testUserName3\"")))
+                .andExpect(content().string(containsString("\"firstName\":\"testFirstName3\"")))
+                .andExpect(content().string(containsString("\"lastName\":\"testLastName3\"")))
+                .andExpect(content().string(containsString("\"email\":\"testEmail3\"")))
+                .andExpect(content().string(containsString("\"password\":null")))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        HttpSession session2 = result.getRequest().getSession(false);
+        assertNotEquals("Failure - successful creation of new user did not create a session for user", null, session2);
+
+        assertNotEquals("Failure - creation of a new user did not invalidate the session of the old user", session1.getId(), session2.getId());
+
+        user = userRepo.findByUserName("testUserName3");
+        assertNotEquals("Failure - userControllerTest did not successfully create new user", null, user);
 
         // perform unsuccessful creation with same userName
-        mockMvc.perform(post("/signup")
+        result = mockMvc.perform(post("/signup")
                 .content("user=testUserName2&first=testFirstName2&last=testLastName2&email=testEmail3&pass=testPassword2")
                 .contentType("application/x-www-form-urlencoded"))
-                .andExpect(status().isConflict());
+                .andExpect(status().isConflict())
+                .andReturn();
+
+        session1 = result.getRequest().getSession(false);
+        assertEquals("Failure - unsuccessful creation of new user created a new session", null, session1);
 
         // perform unsuccessful creation with same email
         mockMvc.perform(post("/signup")
