@@ -18,9 +18,19 @@ public interface WikiPageRepository extends JpaRepository<ConcreteWikiPage, Long
      * @return all WikiPages with matching title
      */
     @Query("SELECT NEW SocialWiki.WikiPages.WikiPageWithAuthorProxy(page) " +
-            "FROM ConcreteWikiPage page LEFT JOIN page.author author " +
+            "FROM ConcreteWikiPage page  " +
             "WHERE UPPER(page.title) = UPPER(:title)")
     List<WikiPageWithAuthorProxy> findByTitleIgnoreCase(@Param("title") String title);
+
+    /**
+     * Finds the WikiPage in repository with matching id
+     * @param id - id to look for
+     * @return The WikiPages with matching id
+     */
+    @Query("SELECT NEW SocialWiki.WikiPages.WikiPageWithAuthorAndContentProxy(page) " +
+            "FROM ConcreteWikiPage page  " +
+            "WHERE page.id = :id")
+    WikiPageWithAuthorAndContentProxy findById(@Param("id") Long id);
 
     /**
      * Find all WikiPages that match the query string

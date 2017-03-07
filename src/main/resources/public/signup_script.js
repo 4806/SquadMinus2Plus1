@@ -82,7 +82,7 @@ signupHandler.signupSuccessHandler = function( ) {
     //location.href = "/profile";
 };
 
-document.onreadystatechange = function( ) {
+webix.ready(function( ) {
     var form = [
         { view:"text", id:"user", label:"User", name:"user", labelWidth:150},
         { view:"text", id:"email", label:"Email", name:"email", labelWidth:150},
@@ -101,12 +101,7 @@ document.onreadystatechange = function( ) {
 
     webix.ui({
         rows:[
-            { view:"toolbar", elements: [
-                {view:"label", label:"SM2P1 Social Wiki Signup"},
-                {view:"button", value:"Home", align:"right", width:100, click:signupHandler.homeHandler},
-                {view:"button", value:"Login", align:"right", width:100, click:signupHandler.loginHandler}
-            ]
-            },
+            generalPages.toolbarHomeLogin,
             { view:"label", id:"signup_top_label", css:"label_text", label:"Please enter your information.", align:"center"},
             { view: "form",
                 cols: [
@@ -115,7 +110,8 @@ document.onreadystatechange = function( ) {
                     { }
                 ]
             },
-            { }
+            { },
+            {view:"label", label:'<img src="img/flame_blue.png" height="50%"/>', height:100, align:"center"}
         ]
     });
-};
+});
