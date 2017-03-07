@@ -32,4 +32,9 @@ public class PageController {
         return "search";
     }
 
+    @GetMapping("/viewpage")
+    public String viewpage(Model model){
+        return "viewpage";
+    }
+
 }
