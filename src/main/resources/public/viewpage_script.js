@@ -7,8 +7,10 @@ viewPage.handler = {};
 
 viewPage.converter = new showdown.Converter();
 
+viewPage.pageData = null;
+
 viewPage.handler.editClick = function() {
-    //TODO: Implement
+    location.href = "/editwiki?id=" + viewPage.pageData.id;
 };
 
 viewPage.handler.errorHandler = function() {
@@ -24,10 +26,10 @@ viewPage.getContent = function() {
         error:viewPage.handler.errorHandler,
         success:function(dataString){
             if (dataString !== null) {
-                var page = JSON.parse(dataString);
-                var html = "<h1>" + page.title + "</h1>";
-                html += "<h3>Created by " + page.author + " on " + new Date(page.creationDate) + "</h3><br/><hr/>";
-                html += viewPage.converter.makeHtml(page.content);
+                viewPage.pageData = JSON.parse(dataString);
+                var html = "<h1>" + viewPage.pageData.title + "</h1>";
+                html += "<h3>Created by " + viewPage.pageData.author + " on " + new Date(viewPage.pageData.creationDate) + "</h3><br/><hr/>";
+                html += viewPage.converter.makeHtml(viewPage.pageData.content);
                 $$("content").setHTML(html);
             }
         }

@@ -32,4 +32,9 @@ public class PageController {
         return "viewpage";
     }
 
+    @GetMapping("/editwiki")
+    public String editwiki(Model model){
+        return "editwiki";
+    }
+
 }
