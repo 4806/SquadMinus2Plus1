@@ -10,7 +10,9 @@ searchPage.handler = {};
 
 searchPage.handler.itemClick = function(itemId) {
     var item = $$("resultlist").getItem(itemId);
-    //TODO:Redirect to that page
+    if( item.id !== undefined ) {
+        location.href = "/viewpage?id=" + item.id;
+    }
 };
 
 searchPage.handler.error = function() {
@@ -56,7 +58,7 @@ searchPage.searchForPages = function() {
 webix.ready(function(){
     webix.ui({
         rows:[
-            generalPages.toolbarLoggedOut,
+            generalPages.toolbarHomeLogin,
             { height:50 },
             { cols:[
                 { },
