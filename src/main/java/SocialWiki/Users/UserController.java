@@ -1,12 +1,13 @@
 package SocialWiki.Users;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.*;
 import java.util.List;
 
 /**
@@ -29,6 +30,20 @@ public class UserController {
      */
     @PostMapping("/login")
     public ResponseEntity<User> login(HttpServletRequest request) {
+        // TODO: move this functionality to the logout feature once it is introduced
+        // invalidate the old session, so that one for the new user can be created later
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+
+        // TODO: write tests for this, but this will never happen until the session invalidation is moved to logout feature
+        // check that another session doesn't already exist for this request, and if there is, send a 403 response
+//        session = request.getSession(false);
+//        if (session != null) {
+//            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+//        }
+
         // get the login parameters from the post request
         String login = request.getParameter("login");
         String pass = request.getParameter("pass");
@@ -39,20 +54,24 @@ public class UserController {
         }
 
         // get the user by userName and password
-        List<User> users = userRepo.findByUserNameAndPassword(login, pass);
+        User user = userRepo.findByUserNameAndPassword(login, pass);
 
         // if it could not find by using a username, try using an email instead
-        if (users.isEmpty()) {
-            users = userRepo.findByEmailAndPassword(login, pass);
+        if (user == null) {
+            user = userRepo.findByEmailAndPassword(login, pass);
 
             // send an HTTP 401 response, if no user exists for provided login info
-            if (users.isEmpty()) {
+            if (user == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
             }
         }
 
+        // create a new session for the User
+        session = request.getSession();
+        session.setAttribute("user", user);
+
         // send an HTTP 200 response with the session user
-        return ResponseEntity.ok(users.get(0).asSessionUser());
+        return ResponseEntity.ok(user.asSessionUser());
     }
 
     /**
@@ -62,6 +81,20 @@ public class UserController {
      */
     @PostMapping("/signup")
     public ResponseEntity<User> create(HttpServletRequest request) {
+        // TODO: move this functionality to the logout feature once it is introduced
+        // invalidate the old session, so that one for the new user can be created later
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+
+        // TODO: write tests for this, but this will never happen until the session invalidation is moved to logout feature
+        // check that another session doesn't already exist for this request, and if there is, send a 403 response
+//        session = request.getSession(false);
+//        if (session != null) {
+//            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+//        }
+
         // get the sign-up parameters from the post request
         String user = request.getParameter("user");
         String first = request.getParameter("first");
@@ -93,6 +126,10 @@ public class UserController {
         // create the new User and save it in the user repository
         User newUser = new User(user, first, last, email, pass);
         userRepo.save(newUser);
+
+        // create a new session for the new User
+        session = request.getSession();
+        session.setAttribute("user", newUser);
 
         // send an HTTP 201 response with the new session User
         return ResponseEntity.status(HttpStatus.CREATED).body(newUser.asSessionUser());

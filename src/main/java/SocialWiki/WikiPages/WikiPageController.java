@@ -65,12 +65,10 @@ public class WikiPageController {
             return ResponseEntity.unprocessableEntity().body(null);
         }
 
-        List<User> authorQuery = userRepo.findByUserName(username);
+        user = userRepo.findByUserName(username);
 
         //Username must be valid
-        if (authorQuery.size() == 1) {
-            user = authorQuery.get(0);
-        } else {
+        if (user == null) {
             return ResponseEntity.unprocessableEntity().body(null);
         }
 
