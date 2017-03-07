@@ -22,4 +22,9 @@ public class PageController {
         return "signup";
     }
 
+    @GetMapping("/search")
+    public String search(Model model){
+        return "search";
+    }
+
 }

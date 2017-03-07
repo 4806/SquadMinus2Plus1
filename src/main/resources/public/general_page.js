@@ -15,7 +15,7 @@ generalPages.handler.signupClick = function() {
 };
 
 generalPages.handler.searchClick = function() {
-    //TODO: Implement
+    location.href = "/search?text=" + $$("searchbox").getValue();
 };
 
 generalPages.handler.userClick = function() {
@@ -26,7 +26,7 @@ generalPages.toolbarUser = {
     view:"toolbar", elements: [
         {view:"label", label:'<img src="img/flame_white.png" width="50%"/>', width:50, align:"left"},
         {view:"label", label:"Social Wiki", align:"left"},
-        {view:"search", id:"searchbox", placeholder:"Search Pages", align:"right", width:200, click:generalPages.handler.searchClick},
+        {view:"search", id:"searchbox", placeholder:"Search Pages", align:"right", width:200, on:{onSearchIconClick:generalPages.handler.searchClick}},
         {view:"button", value:"User", align:"right", width:100, click:generalPages.handler.userClick}
     ]
 };
@@ -45,7 +45,7 @@ generalPages.toolbarLogInSignUp = {
     view:"toolbar", container:"header", elements: [
         {view:"label", label:'<img src="img/flame_white.png" width="50%"/>', width:50, align:"left"},
         {view:"label", label:"Social Wiki", align:"left"},
-        {view:"search", id:"searchbox", placeholder:"Search Pages", align:"right", width:200, click:generalPages.handler.searchClick},
+        {view:"search", id:"searchbox", placeholder:"Search Pages", align:"right", width:200, on:{onSearchIconClick:generalPages.handler.searchClick}},
         {view:"button", value:"Login", align:"right", width:100, click:generalPages.handler.loginClick},
         {view:"button", value:"Sign Up", align:"right", width:100, click:generalPages.handler.signupClick}
     ]
@@ -55,8 +55,29 @@ generalPages.toolbarHomeLogin = {
     view:"toolbar", elements: [
         {view:"label", label:'<img src="img/flame_white.png" width="50%"/>', width:50, align:"left"},
         {view:"label", label:"Social Wiki", align:"left"},
-        {view:"search", id:"searchbox", placeholder:"Search Pages", align:"right", width:200, click:generalPages.handler.searchClick},
+        {view:"search", id:"searchbox", placeholder:"Search Pages", align:"right", width:200, on:{onSearchIconClick:generalPages.handler.searchClick}},
         {view:"button", value:"Home", align:"right", width:100, click:generalPages.handler.homeClick},
         {view:"button", value:"Login", align:"right", width:100, click:generalPages.handler.loginClick}
     ]
+};
+
+//This will extract all of the parameters included in a URL
+generalPages.getUrlContent = function(url) {
+    var questionIndex = url.lastIndexOf("?");
+    if( questionIndex === -1 ) {
+        return {};
+    }
+
+    var content = url.substr( questionIndex + 1);
+    if( content === "" ) {
+        return {};
+    }
+
+    var paramsRaw = content.split("&");
+    var params = {};
+    for( var i = 0; i < paramsRaw.length; i++ ){
+        var vals = paramsRaw[i].split("=");
+        params[vals[0]] = vals[1];
+    }
+    return params;
 };
