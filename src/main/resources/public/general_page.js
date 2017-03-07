@@ -22,7 +22,11 @@ generalPages.handler.userClick = function() {
     //TODO: Implement
 };
 
-generalPages.toolbarUser = {
+generalPages.handler.addPageClick = function() {
+    //TODO: Implement
+};
+
+generalPages.toolbarUserAdd = {
     view:"toolbar", elements: [
         {view:"label", label:'<img src="img/flame_white.png" width="50%"/>', width:50, align:"left"},
         {view:"label", label:"Social Wiki", align:"left"},
