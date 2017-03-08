@@ -22,4 +22,19 @@ public class PageController {
         return "signup";
     }
 
+    @GetMapping("/search")
+    public String search(Model model){
+        return "search";
+    }
+
+    @GetMapping("/viewpage")
+    public String viewpage(Model model){
+        return "viewpage";
+    }
+
+    @GetMapping("/editwiki")
+    public String editwiki(Model model){
+        return "editwiki";
+    }
+
 }
