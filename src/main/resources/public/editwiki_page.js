@@ -15,7 +15,7 @@ editPage.handler.acceptClick = function() {
     var pageData = {};
     pageData.content = $$("rawtext").getValue();
     pageData.title = $$("title").getValue();
-    pageData.user = "default";  //TODO: Remove this and change it for the current user logged in, or handle in backend with session cookie
+    pageData.user = generalPages.getCookie("user") || "unknown";
 
     if(editPage.pageContent !== null) {
         pageData.parentID = editPage.pageContent.id;
@@ -81,9 +81,10 @@ editPage.handler.previewToggle = function() {
 };
 
 webix.ready(function() {
+    var toolBar = (generalPages.getCookie("user") === null) ? generalPages.toolbarLogInSignUp : generalPages.toolbarHomeUserLogOut;
     webix.ui({
         rows:[
-            generalPages.toolbarLogInSignUp,
+            toolBar,
             { margin:10, cols:[
                 {
                     view:"text",

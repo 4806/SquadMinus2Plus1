@@ -11,9 +11,10 @@ indexHandler.strings.aboutTheTeam = "We are a team of fourth year software engin
 
 
 webix.ready(function() {
+    var toolBar = (generalPages.getCookie("user") === null) ? generalPages.toolbarLogInSignUp : generalPages.toolbarUserLogOut;
     webix.ui({
         rows:[
-            generalPages.toolbarLogInSignUp,
+            toolBar,
             { height:50 },
             { view:"label", label:indexHandler.strings.welcomeText, css:"label_big", align:"center"},
             { height:50 },
