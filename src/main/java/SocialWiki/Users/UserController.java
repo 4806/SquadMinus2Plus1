@@ -27,11 +27,11 @@ public class UserController {
     /**
      * Authenticate a User's login information and return a version of the User to be used in the session
      * @param request - an HTTP request that contains the login information
+     * @param response - am HTTP response that will be used to provide the user cookie on successful login
      * @return an HTTP response that contains the User for the session, or an error response
      */
     @PostMapping("/login")
     public ResponseEntity<User> login(HttpServletRequest request, HttpServletResponse response) {
-        // TODO: find a way to test this, as mockMvc seems to not utilize sessions
         // check that another session doesn't already exist for this request, and if there is, send a 403 response
         HttpSession session = request.getSession(false);
         if (session != null) {
@@ -74,11 +74,11 @@ public class UserController {
     /**
      * Create a new User in the system, add it to the user repository, and return a version of the User to be used in the session
      * @param request - an HTTP request that contains the new User's information
+     * @param response - am HTTP response that will be used to provide the user cookie on successful User creation
      * @return an HTTP response that contains the new User for the session, or an error response
      */
     @PostMapping("/signup")
     public ResponseEntity<User> create(HttpServletRequest request, HttpServletResponse response) {
-        // TODO: find a way to test this, as mockMvc seems to not utilize sessions
         // check that another session doesn't already exist for this request, and if there is, send a 403 response
         HttpSession session = request.getSession(false);
         if (session != null) {
@@ -128,6 +128,12 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(newUser.asSessionUser());
     }
 
+    /**
+     * Log the user out of their current session
+     * @param request - an HTTP request that contains the session's cookie information
+     * @param response - am HTTP response that will be used to clear the user cookie on successful log out
+     * @return an HTTP response that signifies whether the log out was successful
+     */
     @PostMapping("/logout")
     public ResponseEntity<String> logout(HttpServletRequest request, HttpServletResponse response) {
         // send an HTTP 403 response if there is currently not a session
