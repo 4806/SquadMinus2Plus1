@@ -56,9 +56,10 @@ searchPage.searchForPages = function() {
 };
 
 webix.ready(function(){
+    var toolBar = (generalPages.getCookie("user") === null) ? generalPages.toolbarHomeLogin : generalPages.toolbarHomeUserLogOut;
     webix.ui({
         rows:[
-            generalPages.toolbarHomeLogin,
+            toolBar,
             { height:50 },
             { cols:[
                 { },

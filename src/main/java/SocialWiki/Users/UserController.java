@@ -1,5 +1,6 @@
 package SocialWiki.Users;
 
+import SocialWiki.Cookies.CookieManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -26,23 +27,16 @@ public class UserController {
     /**
      * Authenticate a User's login information and return a version of the User to be used in the session
      * @param request - an HTTP request that contains the login information
+     * @param response - am HTTP response that will be used to provide the user cookie on successful login
      * @return an HTTP response that contains the User for the session, or an error response
      */
     @PostMapping("/login")
-    public ResponseEntity<User> login(HttpServletRequest request) {
-        // TODO: move this functionality to the logout feature once it is introduced
-        // invalidate the old session, so that one for the new user can be created later
+    public ResponseEntity<User> login(HttpServletRequest request, HttpServletResponse response) {
+        // check that another session doesn't already exist for this request, and if there is, send a 403 response
         HttpSession session = request.getSession(false);
         if (session != null) {
-            session.invalidate();
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
-
-        // TODO: write tests for this, but this will never happen until the session invalidation is moved to logout feature
-        // check that another session doesn't already exist for this request, and if there is, send a 403 response
-//        session = request.getSession(false);
-//        if (session != null) {
-//            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
-//        }
 
         // get the login parameters from the post request
         String login = request.getParameter("login");
@@ -70,6 +64,9 @@ public class UserController {
         session = request.getSession();
         session.setAttribute("user", user);
 
+        // add the user cookie to the response
+        response.addCookie(CookieManager.getUserCookie(user.getUserName()));
+
         // send an HTTP 200 response with the session user
         return ResponseEntity.ok(user.asSessionUser());
     }
@@ -77,23 +74,16 @@ public class UserController {
     /**
      * Create a new User in the system, add it to the user repository, and return a version of the User to be used in the session
      * @param request - an HTTP request that contains the new User's information
+     * @param response - am HTTP response that will be used to provide the user cookie on successful User creation
      * @return an HTTP response that contains the new User for the session, or an error response
      */
     @PostMapping("/signup")
-    public ResponseEntity<User> create(HttpServletRequest request) {
-        // TODO: move this functionality to the logout feature once it is introduced
-        // invalidate the old session, so that one for the new user can be created later
+    public ResponseEntity<User> create(HttpServletRequest request, HttpServletResponse response) {
+        // check that another session doesn't already exist for this request, and if there is, send a 403 response
         HttpSession session = request.getSession(false);
         if (session != null) {
-            session.invalidate();
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
-
-        // TODO: write tests for this, but this will never happen until the session invalidation is moved to logout feature
-        // check that another session doesn't already exist for this request, and if there is, send a 403 response
-//        session = request.getSession(false);
-//        if (session != null) {
-//            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
-//        }
 
         // get the sign-up parameters from the post request
         String user = request.getParameter("user");
@@ -131,7 +121,35 @@ public class UserController {
         session = request.getSession();
         session.setAttribute("user", newUser);
 
+        // add the user cookie to the response
+        response.addCookie(CookieManager.getUserCookie(user));
+
         // send an HTTP 201 response with the new session User
         return ResponseEntity.status(HttpStatus.CREATED).body(newUser.asSessionUser());
     }
+
+    /**
+     * Log the user out of their current session
+     * @param request - an HTTP request that contains the session's cookie information
+     * @param response - am HTTP response that will be used to clear the user cookie on successful log out
+     * @return an HTTP response that signifies whether the log out was successful
+     */
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(HttpServletRequest request, HttpServletResponse response) {
+        // send an HTTP 403 response if there is currently not a session
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+
+        // invalidate the old session, so that one for the new user can be created later
+        session.invalidate();
+
+        // add the clearUser cookie so that it deletes the browsers cookie
+        response.addCookie(CookieManager.getClearUserCookie());
+
+        // send an HTTP 204 response to signify successful logout
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+    }
+
 }

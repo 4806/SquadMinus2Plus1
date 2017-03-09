@@ -16,7 +16,7 @@ public class BootApplication {
     @Bean
     public CommandLineRunner tester(UserRepository userrepo) {
         return (args) -> {
-            User u = new User("default", "First", "Last", "myemail", "pass");
+            User u = new User("unknown", "First", "Last", "myemail", "pass");
             userrepo.save(u);
         };
     }

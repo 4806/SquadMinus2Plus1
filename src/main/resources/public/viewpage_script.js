@@ -38,9 +38,10 @@ viewPage.getContent = function() {
 };
 
 webix.ready(function() {
+    var toolBar = (generalPages.getCookie("user") === null) ? generalPages.toolbarLogInSignUp : generalPages.toolbarHomeUserLogOut;
     webix.ui({
         rows:[
-            generalPages.toolbarLogInSignUp,
+            toolBar,
             {
                 view:"template",
                 template:"<p></p>",
