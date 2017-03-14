@@ -18,12 +18,12 @@ generalPages.handler.logoutClick = function() {
     webix.ajax().post("/logout", {}, {
         error:function() {
             webix.alert("User Logout Unsuccessful", function() {
-                    location.href = "/"
+                    location.href = "/";
                 });
             },
         success:function() {
             webix.alert("User Logout Successful", function() {
-                    location.href = "/"
+                    location.href = "/";
                 });
             }
     });
@@ -44,7 +44,7 @@ generalPages.handler.addPageClick = function() {
 generalPages.getCookie = function (name) {
     var re = new RegExp(name + "=([^;]+)");
     var value = re.exec(document.cookie);
-    return (value != null) ? value[1] : null;
+    return (value !== null) ? value[1] : null;
 };
 
 generalPages.toolbarUserAdd = {
