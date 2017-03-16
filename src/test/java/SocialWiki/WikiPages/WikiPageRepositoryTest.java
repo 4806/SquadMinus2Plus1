@@ -78,26 +78,10 @@ public class WikiPageRepositoryTest {
 
         WikiPageWithAuthorProxy testResult1 = WikiPageWithAuthorProxy.getResult(testConcreteWikiPage1);
 
-        //Test when parameters are null or blank
+        //Test when parameters are blank
 
         List<WikiPageWithAuthorProxy> pages = wikiPageRepository.findByTitleAndAuthorAndContent("","","");
         assertEquals("Failure - Number of pages found by findByTitleAndAuthorAndContent('','','') should be 4", 4, pages.size());
-        pages.clear();
-
-        pages = wikiPageRepository.findByTitleAndAuthorAndContent(null,"","");
-        assertEquals("Failure - Number of pages found by findByTitleAndAuthorAndContent(null,'','') should be 4", 4, pages.size());
-        pages.clear();
-
-        pages = wikiPageRepository.findByTitleAndAuthorAndContent("",null,"");
-        assertEquals("Failure - Number of pages found by findByTitleAndAuthorAndContent('',null,'') should be 4", 4, pages.size());
-        pages.clear();
-
-        pages = wikiPageRepository.findByTitleAndAuthorAndContent("","",null);
-        assertEquals("Failure - Number of pages found by findByTitleAndAuthorAndContent('','',null) should be 4", 4, pages.size());
-        pages.clear();
-
-        pages = wikiPageRepository.findByTitleAndAuthorAndContent(null,null,null);
-        assertEquals("Failure - Number of pages found by findByTitleAndAuthorAndContent(null,null,null) should be 4", 4, pages.size());
         pages.clear();
 
         //Test finding single page by 1 parameter

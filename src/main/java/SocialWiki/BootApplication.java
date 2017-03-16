@@ -17,7 +17,9 @@ public class BootApplication {
     public CommandLineRunner tester(UserRepository userrepo) {
         return (args) -> {
             User u = new User("unknown", "First", "Last", "myemail", "pass");
-            userrepo.save(u);
+            if (userrepo.findByEmail("myemail") == null){
+                userrepo.save(u);
+            }
         };
     }
     public static void main(String[] args) {

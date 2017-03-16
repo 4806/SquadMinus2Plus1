@@ -107,6 +107,17 @@ public class WikiPageController {
 
         if (title == null && username == null && content == null ) {    //If no parameters where provided
             return ResponseEntity.unprocessableEntity().body(null);
+        } else {
+            //Need to sanitize input to ensure no NULL parameters are passed in query
+            if (title == null) {
+                title = "";
+            }
+            if (username == null) {
+                username = "";
+            }
+            if (content == null) {
+                content = "";
+            }
         }
         //Note this still allows for parameters to be NULL if at least one is not null. In these cases, null parameters will be treated as empty string by the query.
 

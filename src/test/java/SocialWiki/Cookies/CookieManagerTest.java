@@ -2,6 +2,7 @@ package SocialWiki.Cookies;
 
 import SocialWiki.Users.User;
 import SocialWiki.Users.UserRepository;
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,6 +87,11 @@ public class CookieManagerTest {
         result.getRequest().getSession().invalidate();
 
         assertFalse("Failure - user cookie check passed when it should have failed", CookieManager.checkUserCookie(result.getRequest()));
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        repo.deleteAll();
     }
 
 }
