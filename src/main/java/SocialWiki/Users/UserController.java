@@ -160,7 +160,7 @@ public class UserController {
      * @return an HTTP response that signifies whether the deletion was successful
      */
     @DeleteMapping("/deleteUser")
-    public ResponseEntity<String> delete(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<String> deleteUser(HttpServletRequest request, HttpServletResponse response) {
         // send an HTTP 403 response if there is currently not a session
         HttpSession session = request.getSession(false);
         if (session == null) {
