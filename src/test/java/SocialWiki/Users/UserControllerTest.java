@@ -18,6 +18,7 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -337,5 +338,52 @@ public class UserControllerTest {
                 .contentType("application/x-www-form-urlencoded"))
                 .andExpect(cookie().doesNotExist("user"))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void deleteUser() throws Exception {
+        // perform login to get session
+        MvcResult result = mockMvc.perform(post("/login")
+                .content("login=testUserName1&pass=testPassword1")
+                .contentType("application/x-www-form-urlencoded"))
+                .andReturn();
+
+        MockHttpSession session = (MockHttpSession) result.getRequest().getSession(false);
+
+        // perform successful delete with existing session
+        mockMvc.perform(delete("/deleteUser")
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(cookie().value("user", ""))
+                .andExpect(cookie().maxAge("user", 0))
+                .andExpect(status().isNoContent());
+
+        // perform unsuccessful delete with invalidated session
+        mockMvc.perform(delete("/deleteUser")
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(cookie().doesNotExist("user"))
+                .andExpect(status().isForbidden());
+
+        // perform unsuccessful delete with no session
+        mockMvc.perform(delete("/deleteUser")
+                .contentType("application/x-www-form-urlencoded"))
+                .andExpect(cookie().doesNotExist("user"))
+                .andExpect(status().isForbidden());
+
+        // perform unsuccessful login with deleted credentials
+        mockMvc.perform(post("/login")
+                .content("login=testUserName1&pass=testPassword1")
+                .contentType("application/x-www-form-urlencoded"))
+                .andExpect(cookie().doesNotExist("user"))
+                .andExpect(content().string(""))
+                .andExpect(status().isUnauthorized());
+
+        // perform unsuccessful creation with deleted userName
+        mockMvc.perform(post("/signup")
+                .content("user=testUserName1&first=testFirstName1&last=testLastName1&email=testEmail1&pass=testPassword1")
+                .contentType("application/x-www-form-urlencoded"))
+                .andExpect(cookie().doesNotExist("user"))
+                .andExpect(status().isConflict());
     }
 }

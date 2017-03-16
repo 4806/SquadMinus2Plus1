@@ -1,6 +1,8 @@
 package SocialWiki.Users;
 
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -29,7 +31,10 @@ public interface UserRepository extends CrudRepository<User, Long> {
      * @param password - the password for the User's account
      * @return the User that matches the userName and password
      */
-    User findByUserNameAndPassword(String userName, String password);
+    @Query("SELECT u " +
+            "FROM SocialWiki.Users.User u " +
+            "WHERE u.userName = :userName AND u.password = :password AND u.isDeleted = false")
+    User findByUserNameAndPassword(@Param("userName") String userName, @Param("password") String password);
 
     /**
      * Find the User with the corresponding email and password

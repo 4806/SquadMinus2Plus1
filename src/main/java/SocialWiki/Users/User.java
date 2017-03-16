@@ -55,9 +55,16 @@ public class User {
     private String password;
 
     /**
+     * The flag that marks the user's account as deleted
+     */
+    @Getter
+    private boolean isDeleted;
+
+    /**
      * Default constructor
      */
     public User() {
+        this.isDeleted = false;
     }
 
     /**
@@ -74,6 +81,7 @@ public class User {
         this.lastName = lastName;
         this.email = email;
         this.password = password;
+        this.isDeleted = false;
     }
 
     /**
@@ -90,6 +98,7 @@ public class User {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
+        this.isDeleted = false;
     }
 
     /**
@@ -137,4 +146,14 @@ public class User {
                 this.email);
     }
 
+    /**
+     * Clear the user's sensitive data and flag user account as being deleted
+     */
+    public void delete() {
+        this.isDeleted = true;
+        this.firstName = null;
+        this.lastName = null;
+        this.email = null;
+        this.password = null;
+    }
 }
