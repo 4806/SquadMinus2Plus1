@@ -103,6 +103,12 @@ public class UserRepositoryTest {
 
         user = userRepo.findByUserNameAndPassword(null, null);
         assertEquals("Failure - userRepository found a user with a null userName and password", null, user);
+
+        user = userRepo.findByUserNameAndPassword("testUserName1", "testPassword1");
+        user.delete();
+        userRepo.save(user);
+        user = userRepo.findByUserNameAndPassword("testUserName1", "testPassword1");
+        assertEquals("Failure - userRepository found a user that was deleted", null, user);
     }
 
     @Test
