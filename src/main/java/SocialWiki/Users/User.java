@@ -10,7 +10,7 @@ import javax.persistence.*;
  * Created by connor on 2/23/17.
  */
 
-@Entity
+@Entity(name = "WikiUser")
 @Component
 public class User {
 
