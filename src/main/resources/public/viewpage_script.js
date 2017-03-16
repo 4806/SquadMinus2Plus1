@@ -34,8 +34,8 @@ viewPage.getContent = function() {
                 var heading = "<h1>" + viewPage.pageData.title + "</h1>";
                 heading += "<h3>Created by " + viewPage.pageData.author + " on " + new Date(viewPage.pageData.creationDate);
 
-                if (viewPage.pageData.parentID == -1) { //If the original copy
-                    $$("previousversionbutton").hide()
+                if (viewPage.pageData.parentID === -1) { //If the original copy
+                    $$("previousversionbutton").hide();
                 }
 
                 heading += "</h3>"; //<br/><hr/>
