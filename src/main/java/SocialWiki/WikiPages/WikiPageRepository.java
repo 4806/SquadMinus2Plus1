@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by Chris on 2/24/2017.
@@ -31,6 +32,43 @@ public interface WikiPageRepository extends JpaRepository<ConcreteWikiPage, Long
             "FROM ConcreteWikiPage page  " +
             "WHERE page.id = :id")
     WikiPageWithAuthorAndContentProxy findById(@Param("id") Long id);
+
+
+
+
+    /**
+     * Finds the descendants of source WikiPage
+     * Need to make native query to access recursive capabilities of PostgreSQL. This makes creating objects within the query impossible and forces
+     * the return to be a list of objects.
+     * @param sourceId - The id of root WikiPage
+     * @return Descendant WikiPages
+     */
+    @Query(nativeQuery = true,
+            value = "WITH RECURSIVE pages AS (" +
+                    " SELECT p1.*" +
+                    " FROM concrete_wiki_page p1 WHERE p1.id = :source" +
+                    " UNION ALL" +
+                    " SELECT p2.*" +
+                    " FROM concrete_wiki_page p2 INNER JOIN pages p1 ON p2.parentid = p1.id" +
+                    ") SELECT * FROM pages")
+    List<List<Objects>> findDescendantsById(@Param("source") Long sourceId);
+
+    /**
+     * Finds the ancestors of source WikiPage
+     * Need to make native query to access recursive capabilities of PostgreSQL. This makes creating objects within the query impossible and forces
+     * the return to be a list of objects.
+     * @param sourceId - The id of leaf WikiPage
+     * @return Ancestor WikiPages
+     */
+    @Query(nativeQuery = true,
+            value = "WITH RECURSIVE pages AS (" +
+                    " SELECT p1.*" +
+                    " FROM concrete_wiki_page p1 WHERE p1.id = :source" +
+                    " UNION ALL" +
+                    " SELECT p2.*" +
+                    " FROM pages p1 JOIN concrete_wiki_page p2 ON p2.id = p1.parentid" +
+                    ") SELECT * FROM pages")
+    List<List<Objects>> findAncestorsById(@Param("source") Long sourceId);
 
     /**
      * Find all WikiPages that match the query string. Cannot accept NULL parameters
