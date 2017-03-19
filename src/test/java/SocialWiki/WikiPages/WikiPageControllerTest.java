@@ -346,7 +346,7 @@ public class WikiPageControllerTest {
                 .andExpect(jsonPath("$.[4].id", is(testConcreteWikiPage6.getId().intValue())));
         params.clear();
 
-        //Check for successful search of complex hierarchy using id of node in middle Also check for correct ascending order by Id
+        //Check for successful search of complex hierarchy using id of node in middle. Also check for correct ascending order by Id
         params.add("id", testConcreteWikiPage4.getId().toString());
         this.mockMvc.perform(get("/retrieveWikiPageHistory").params(params))
                 .andDo(print())
@@ -358,7 +358,7 @@ public class WikiPageControllerTest {
                 .andExpect(jsonPath("$.[4].id", is(testConcreteWikiPage6.getId().intValue())));
         params.clear();
 
-        //Check for successful search of complex hierarchy using id leaf node Also check for correct ascending order by Id
+        //Check for successful search of complex hierarchy using id leaf node. Also check for correct ascending order by Id
         params.add("id", testConcreteWikiPage6.getId().toString());
         this.mockMvc.perform(get("/retrieveWikiPageHistory").params(params))
                 .andDo(print())

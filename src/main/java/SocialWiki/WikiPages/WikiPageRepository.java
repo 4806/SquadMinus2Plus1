@@ -4,10 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import javax.lang.model.element.Name;
-import javax.persistence.*;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Created by Chris on 2/24/2017.
@@ -61,7 +58,6 @@ public interface WikiPageRepository extends JpaRepository<ConcreteWikiPage, Long
      */
     @Query(name = "ConcreteWikiPage.findRootById") //calls the NamedNativeQuery defined in the ConcreteWikiPage Class
     ConcreteWikiPage findRootById(@Param("source") Long sourceId);
-
 
     /**
      * Find all WikiPages that match the query string. Cannot accept NULL parameters
