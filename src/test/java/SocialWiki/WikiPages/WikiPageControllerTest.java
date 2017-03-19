@@ -292,6 +292,85 @@ public class WikiPageControllerTest {
 
     }
 
+    @Test
+    public void retrieveWikiPageHistory() throws Exception {
+        ConcreteWikiPage testConcreteWikiPage1 = new ConcreteWikiPage("testTitle1", "testContent1",testUser1);
+        ConcreteWikiPage testConcreteWikiPage2 = new ConcreteWikiPage("testTitle2", "testContent2",testUser2);
+
+        testConcreteWikiPage1 = wikiPageRepository.save(testConcreteWikiPage1);
+        testConcreteWikiPage2 = wikiPageRepository.save(testConcreteWikiPage2);
+
+        ConcreteWikiPage testConcreteWikiPage3 = new ConcreteWikiPage("testTitle1", "testContent3", testConcreteWikiPage1.getId(),testUser1);
+        ConcreteWikiPage testConcreteWikiPage4 = new ConcreteWikiPage("testTitle1", "testContent4", testConcreteWikiPage1.getId(),testUser1);
+
+        testConcreteWikiPage3 = wikiPageRepository.save(testConcreteWikiPage3);
+        testConcreteWikiPage4 = wikiPageRepository.save(testConcreteWikiPage4);
+
+        ConcreteWikiPage testConcreteWikiPage5 = new ConcreteWikiPage("testTitle1", "testContent5", testConcreteWikiPage3.getId(),testUser2);
+        ConcreteWikiPage testConcreteWikiPage6 = new ConcreteWikiPage("testTitle1", "testContent6", testConcreteWikiPage3.getId(),testUser2);
+
+        testConcreteWikiPage5 = wikiPageRepository.save(testConcreteWikiPage5);
+        testConcreteWikiPage6 = wikiPageRepository.save(testConcreteWikiPage6);
+
+        MultiValueMap<String, String> params = new HttpHeaders();
+
+        //Check for unsuccessful search due to no parameters
+        this.mockMvc.perform(get("/retrieveWikiPageHistory").params(params))
+                .andDo(print())
+                .andExpect(status().isUnprocessableEntity());
+
+        //Check for unsuccessful search due to invalid parameters
+        params.add("id", "-1");
+        this.mockMvc.perform(get("/retrieveWikiPageHistory").params(params))
+                .andDo(print())
+                .andExpect(status().isUnprocessableEntity());
+        params.clear();
+
+        //Check for successful search of hierarchy of single page
+        params.add("id", testConcreteWikiPage2.getId().toString());
+        this.mockMvc.perform(get("/retrieveWikiPageHistory").params(params))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0].id", is(testConcreteWikiPage2.getId().intValue())));
+        params.clear();
+
+        //Check for successful search of complex hierarchy using id of root. Also check for correct ascending order by Id
+        params.add("id", testConcreteWikiPage1.getId().toString());
+        this.mockMvc.perform(get("/retrieveWikiPageHistory").params(params))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0].id", is(testConcreteWikiPage1.getId().intValue())))
+                .andExpect(jsonPath("$.[1].id", is(testConcreteWikiPage3.getId().intValue())))
+                .andExpect(jsonPath("$.[2].id", is(testConcreteWikiPage4.getId().intValue())))
+                .andExpect(jsonPath("$.[3].id", is(testConcreteWikiPage5.getId().intValue())))
+                .andExpect(jsonPath("$.[4].id", is(testConcreteWikiPage6.getId().intValue())));
+        params.clear();
+
+        //Check for successful search of complex hierarchy using id of node in middle Also check for correct ascending order by Id
+        params.add("id", testConcreteWikiPage4.getId().toString());
+        this.mockMvc.perform(get("/retrieveWikiPageHistory").params(params))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0].id", is(testConcreteWikiPage1.getId().intValue())))
+                .andExpect(jsonPath("$.[1].id", is(testConcreteWikiPage3.getId().intValue())))
+                .andExpect(jsonPath("$.[2].id", is(testConcreteWikiPage4.getId().intValue())))
+                .andExpect(jsonPath("$.[3].id", is(testConcreteWikiPage5.getId().intValue())))
+                .andExpect(jsonPath("$.[4].id", is(testConcreteWikiPage6.getId().intValue())));
+        params.clear();
+
+        //Check for successful search of complex hierarchy using id leaf node Also check for correct ascending order by Id
+        params.add("id", testConcreteWikiPage6.getId().toString());
+        this.mockMvc.perform(get("/retrieveWikiPageHistory").params(params))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0].id", is(testConcreteWikiPage1.getId().intValue())))
+                .andExpect(jsonPath("$.[1].id", is(testConcreteWikiPage3.getId().intValue())))
+                .andExpect(jsonPath("$.[2].id", is(testConcreteWikiPage4.getId().intValue())))
+                .andExpect(jsonPath("$.[3].id", is(testConcreteWikiPage5.getId().intValue())))
+                .andExpect(jsonPath("$.[4].id", is(testConcreteWikiPage6.getId().intValue())));
+        params.clear();
+    }
+
 
 
 }

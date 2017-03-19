@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -167,7 +168,7 @@ public class WikiPageRepositoryTest {
     @Test
     public void findDescendantsById() throws Exception {
 
-        List<List<Objects>> pages = wikiPageRepository.findDescendantsById(testConcreteWikiPage1.getId());
+        List<ConcreteWikiPage> pages = wikiPageRepository.findDescendantsById(testConcreteWikiPage1.getId());
         assertEquals("Failure - Number of pages found by findDescendantsById(testConcreteWikiPage1.getId()) is not correct", 2, pages.size());
 
         pages = wikiPageRepository.findDescendantsById(testConcreteWikiPage4.getId());
@@ -180,7 +181,7 @@ public class WikiPageRepositoryTest {
     @Test
     public void findAncestorsById() throws Exception {
 
-        List<List<Objects>> pages = wikiPageRepository.findAncestorsById(testConcreteWikiPage1.getId());
+        List<ConcreteWikiPage> pages = wikiPageRepository.findAncestorsById(testConcreteWikiPage1.getId());
         assertEquals("Failure - Number of pages found by findAncestorsById(testConcreteWikiPage1.getId()) is not correct", 1, pages.size());
 
         pages = wikiPageRepository.findAncestorsById(testConcreteWikiPage4.getId());
@@ -188,6 +189,18 @@ public class WikiPageRepositoryTest {
 
         pages = wikiPageRepository.findAncestorsById(-1L);
         assertEquals("Failure - Number of pages found by findAncestorsById(-1L) is not correct", 0, pages.size());
+    }
+
+    @Test
+    public void findRootById() throws Exception {
+        ConcreteWikiPage page = wikiPageRepository.findRootById(testConcreteWikiPage1.getId());
+        assertEquals("Failure -page found by findRootById(testConcreteWikiPage1.getId()) is not correct", testConcreteWikiPage1.getId(), page.getId());
+
+        page = wikiPageRepository.findRootById(testConcreteWikiPage2.getId());
+        assertEquals("Failure -page found by findRootById(testConcreteWikiPage2.getId()) is not correct", testConcreteWikiPage1.getId(), page.getId());
+
+        page = wikiPageRepository.findRootById(-1L);
+        assertNull("Failure - page found by findRootById(-1L) should be null", page);
     }
 
     @Before

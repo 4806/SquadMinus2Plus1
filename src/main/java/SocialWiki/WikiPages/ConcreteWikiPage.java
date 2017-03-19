@@ -1,6 +1,7 @@
 package SocialWiki.WikiPages;
 
 import SocialWiki.Users.User;
+import groovy.transform.Field;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
@@ -12,6 +13,47 @@ import java.util.Calendar;
  */
 @Component
 @Entity
+// These queries are created here as opposed to the Repository Class as they are native Postgres queries and having them defined here allows for the query result to be a ConcreteWikiPage object,
+// as opposed to a list of object arrays representing the returned columns. This allows for the result set to be much easier to work with.
+@NamedNativeQueries({
+        @NamedNativeQuery(
+                name = "ConcreteWikiPage.findAncestorsById",
+                query = "WITH RECURSIVE pages AS (" +
+                        " SELECT p1.*" +
+                        " FROM concrete_wiki_page p1 WHERE p1.id = :source" +
+                        " UNION ALL" +
+                        " SELECT p2.*" +
+                        " FROM pages p1 JOIN concrete_wiki_page p2 ON p2.id = p1.parentid" +
+                        ") SELECT * FROM pages " +
+                        "ORDER BY pages.parentid",
+                resultClass = ConcreteWikiPage.class
+        ),
+        @NamedNativeQuery(
+                name = "ConcreteWikiPage.findDescendantsById",
+                query = "WITH RECURSIVE pages AS (" +
+                        " SELECT p1.*" +
+                        " FROM concrete_wiki_page p1 WHERE p1.id = :source" +
+                        " UNION ALL" +
+                        " SELECT p2.*" +
+                        " FROM concrete_wiki_page p2 INNER JOIN pages p1 ON p2.parentid = p1.id" +
+                        ") SELECT * FROM pages " +
+                        "ORDER BY pages.id",
+                resultClass = ConcreteWikiPage.class
+        ),
+        @NamedNativeQuery(
+                name = "ConcreteWikiPage.findRootById",
+                query = "WITH RECURSIVE pages AS (" +
+                        " SELECT p1.*" +
+                        " FROM concrete_wiki_page p1 WHERE p1.id = :source" +
+                        " UNION ALL" +
+                        " SELECT p2.*" +
+                        " FROM pages p1 JOIN concrete_wiki_page p2 ON p2.id = p1.parentid" +
+                        ") SELECT * FROM pages " +
+                        "ORDER BY pages.parentid ASC " +
+                        "LIMIT 1",
+                resultClass = ConcreteWikiPage.class
+        )
+})
 public class ConcreteWikiPage implements WikiPage {
 
     /**
@@ -140,6 +182,18 @@ public class ConcreteWikiPage implements WikiPage {
         if (!creationDate.equals(that.creationDate)) return false;
         if (!content.equals(that.content)) return false;
         return author.equals(that.author);
+    }
+
+    @Override
+    public String toString() {
+        return "ConcreteWikiPage{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", parentID=" + parentID +
+                ", creationDate=" + creationDate +
+                ", content='" + content + '\'' +
+                ", author=" + author +
+                '}';
     }
 
 }
