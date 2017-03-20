@@ -81,6 +81,12 @@ public class WikiPageController {
         }
         else {
             newPage = new ConcreteWikiPage(title, content, parentID, user);
+            WikiPageWithAuthorAndContentProxy parent = wikiPageRepo.findById(parentID);
+
+            if (parent.getTitle().equals(newPage.getTitle()) && parent.getContent().equals(newPage.getContent())) { //Ensure that a change was actually made before saving
+                return ResponseEntity.unprocessableEntity().body(null);
+            }
+
         }
 
         //Save the ConcreteWikiPage

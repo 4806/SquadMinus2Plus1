@@ -18,6 +18,9 @@ import org.springframework.util.MultiValueMap;
 
 import javax.servlet.http.Cookie;
 
+import java.util.Arrays;
+import java.util.Optional;
+
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -80,14 +83,57 @@ public class WikiPageControllerTest {
         params.add("title", "testTitle");
         params.add("content", "testContent");
         params.add("parentID", "-1");
-        this.mockMvc.perform(post("/createWikiPage")
+        result = this.mockMvc.perform(post("/createWikiPage")
                             .params(params)
                             .session(session))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title", is("testTitle")))
                 .andExpect(jsonPath("$.content", is("testContent")))
-                .andExpect(jsonPath("$.parentID", is(-1)));
+                .andExpect(jsonPath("$.parentID", is(-1)))
+                .andReturn();
+        params.clear();
+
+        Optional<String> idSubstring = Arrays.stream( result.getResponse().getContentAsString().split(",")).filter(s -> s.contains("id\":")).findFirst();
+        String parentid = idSubstring.get().substring(5, idSubstring.get().length());
+
+        //Check for successful edit with altered content
+        params.add("title", "testTitle");
+        params.add("content", "testContent2");
+        params.add("parentID", parentid);
+        this.mockMvc.perform(post("/createWikiPage")
+                            .params(params)
+                            .session(session))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title", is("testTitle")))
+                .andExpect(jsonPath("$.content", is("testContent2")))
+                .andExpect(jsonPath("$.parentID", is(Integer.parseInt(parentid))));
+        params.clear();
+
+        //Check for successful edit with altered title
+        params.add("title", "testTitle2");
+        params.add("content", "testContent");
+        params.add("parentID", parentid);
+        this.mockMvc.perform(post("/createWikiPage")
+                .params(params)
+                .session(session))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title", is("testTitle2")))
+                .andExpect(jsonPath("$.content", is("testContent")))
+                .andExpect(jsonPath("$.parentID", is(Integer.parseInt(parentid))));
+        params.clear();
+
+        //Check for unsuccessful edit due to same title and content
+        params.add("title", "testTitle");
+        params.add("content", "testContent");
+        params.add("parentID", parentid);
+        this.mockMvc.perform(post("/createWikiPage")
+                            .params(params)
+                            .session(session))
+                .andDo(print())
+                .andExpect(status().isUnprocessableEntity());
         params.clear();
 
         //Check for unsuccessful creation due to empty title
