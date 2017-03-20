@@ -15,7 +15,6 @@ editPage.handler.acceptClick = function() {
     var pageData = {};
     pageData.content = $$("rawtext").getValue();
     pageData.title = $$("title").getValue();
-    pageData.user = generalPages.getCookie("user") || "unknown";
 
     if(editPage.pageContent !== null) {
         pageData.parentID = editPage.pageContent.id;
