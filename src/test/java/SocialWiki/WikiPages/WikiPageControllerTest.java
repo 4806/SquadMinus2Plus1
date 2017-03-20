@@ -94,7 +94,7 @@ public class WikiPageControllerTest {
                 .andReturn();
         params.clear();
 
-        Optional<String> idSubstring = Arrays.stream( result.getResponse().getContentAsString().split(",")).filter(s -> s.contains("id\":")).findFirst();
+        Optional<String> idSubstring = Arrays.stream( result.getResponse().getContentAsString().split("[\\{\\,\\}]")).filter(s -> s.contains("id\":")).findFirst();
         String parentid = idSubstring.get().substring(5, idSubstring.get().length());
 
         //Check for successful edit with altered content
