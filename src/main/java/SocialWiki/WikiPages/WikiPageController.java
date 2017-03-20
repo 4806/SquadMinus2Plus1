@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
 /**
  * Created by Chris on 2/24/2017.
@@ -173,7 +171,7 @@ public class WikiPageController {
             return ResponseEntity.unprocessableEntity().body(null);
         }
 
-        //Get ancestors of given page
+        //Get root WikiPage from given page
         ConcreteWikiPage root = wikiPageRepo.findRootById(id);
 
         if (root == null) {    //If no root exist than invalid page given
@@ -183,7 +181,7 @@ public class WikiPageController {
         //Get descendants of root
         List<ConcreteWikiPage> descendants = wikiPageRepo.findDescendantsById(root.getId());
 
-        //Create list to hold all WikiPage objects
+        //Create list to hold all WikiPage proxy objects
         List<WikiPageWithAuthorProxy> pages = new ArrayList<>();
 
         //need to parse descendants list in order to create WikiPage proxy objects to send back as response
