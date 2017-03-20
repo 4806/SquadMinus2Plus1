@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -152,5 +153,45 @@ public class WikiPageController {
         }
 
     }
+
+    /**
+     * Method to handle retrieval of WikiPage history
+     * @param request - contains id of the WikiPage which is source of search
+     * @return the WikiPages found
+     */
+    @GetMapping("/retrieveWikiPageHistory")
+    public ResponseEntity<List<WikiPageWithAuthorProxy>> retrieveWikiPageHistory(HttpServletRequest request) {
+
+        //Retrieve parameters from request
+        Long id;
+
+        try {
+            id = Long.parseLong(request.getParameter("id"));
+        } catch (NumberFormatException e) {
+            return ResponseEntity.unprocessableEntity().body(null);
+        }
+
+        //Get root WikiPage from given page
+        ConcreteWikiPage root = wikiPageRepo.findRootById(id);
+
+        if (root == null) {    //If no root exist than invalid page given
+            return ResponseEntity.unprocessableEntity().body(null);
+        }
+
+        //Get descendants of root
+        List<ConcreteWikiPage> descendants = wikiPageRepo.findDescendantsById(root.getId());
+
+        //Create list to hold all WikiPage proxy objects
+        List<WikiPageWithAuthorProxy> pages = new ArrayList<>();
+
+        //need to parse descendants list in order to create WikiPage proxy objects to send back as response
+        for (ConcreteWikiPage page: descendants) {
+            pages.add(new WikiPageWithAuthorProxy(page));
+        }
+
+        return ResponseEntity.ok(pages);
+
+    }
+
 
 }

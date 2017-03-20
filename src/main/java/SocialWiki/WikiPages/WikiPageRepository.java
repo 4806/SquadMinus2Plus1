@@ -33,6 +33,33 @@ public interface WikiPageRepository extends JpaRepository<ConcreteWikiPage, Long
     WikiPageWithAuthorAndContentProxy findById(@Param("id") Long id);
 
     /**
+     * Finds the descendants of source WikiPage
+     * Need to make native query to access recursive capabilities of PostgreSQL.
+     * @param sourceId - The id of source WikiPage
+     * @return Descendant WikiPages
+     */
+    @Query(name = "ConcreteWikiPage.findDescendantsById") //calls the NamedNativeQuery defined in the ConcreteWikiPage Class
+    List<ConcreteWikiPage> findDescendantsById(@Param("source") Long sourceId);
+
+    /**
+     * Finds the ancestors of source WikiPage
+     * Need to make native query to access recursive capabilities of PostgreSQL.
+     * @param sourceId - The id of source WikiPage
+     * @return Ancestor WikiPages
+     */
+    @Query(name = "ConcreteWikiPage.findAncestorsById") //calls the NamedNativeQuery defined in the ConcreteWikiPage Class
+    List<ConcreteWikiPage> findAncestorsById(@Param("source") Long sourceId);
+
+    /**
+     * Finds the root WikiPage of source WikiPage
+     * Need to make native query to access recursive capabilities of PostgreSQL.
+     * @param sourceId - The id of source WikiPage
+     * @return Root WikiPages
+     */
+    @Query(name = "ConcreteWikiPage.findRootById") //calls the NamedNativeQuery defined in the ConcreteWikiPage Class
+    ConcreteWikiPage findRootById(@Param("source") Long sourceId);
+
+    /**
      * Find all WikiPages that match the query string. Cannot accept NULL parameters
      * @param title - The title of the ConcreteWikiPage (Can be a substring of full title or ConcreteWikiPage content, or null)
      * @param username - The author username of the ConcreteWikiPage (Can be a substring of full username, or null)
