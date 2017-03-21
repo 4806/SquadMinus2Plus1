@@ -11,8 +11,8 @@ module.exports = function(config) {
 
         // list of files / patterns to load in the browser
         files: [
-            'node_modules/webix/webix.js',
-            'node_modules/showdown/dist/showdown.js',
+            'src/main/resources/public/lib/webix.js',
+            'src/main/resources/public/lib/showdown.js',
             'src/main/resources/public/*.js',
             'src/test/javascript/**/*.js'
         ],
@@ -29,7 +29,7 @@ module.exports = function(config) {
             // source files, that you wanna generate coverage for
             // do not include tests or libraries
             // (these files will be instrumented by Istanbul)
-            'src/main/resources/**/*.js': ['coverage']
+            'src/main/resources/public/*.js': ['coverage']
         },
 
         coverageReporter: {
