@@ -10,9 +10,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.MultiValueMap;
+
+import javax.servlet.http.Cookie;
+
+import java.util.Arrays;
+import java.util.Optional;
 
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -60,6 +67,14 @@ public class WikiPageControllerTest {
     @Test
     public void createWikiPage() throws Exception {
 
+        // perform login to get session
+        MvcResult result = this.mockMvc.perform(post("/login")
+                .content("login="+ testUser1.getUserName() + "&pass=" + testUser1.getPassword())
+                .contentType("application/x-www-form-urlencoded"))
+                .andReturn();
+
+        MockHttpSession session = (MockHttpSession) result.getRequest().getSession(false);
+
         //Cannot use Id when checking return string as Id is randomly generated value. Cannot creation date as there is no way to know exact time of creation
 
         MultiValueMap<String, String> params = new HttpHeaders();
@@ -68,21 +83,66 @@ public class WikiPageControllerTest {
         params.add("title", "testTitle");
         params.add("content", "testContent");
         params.add("parentID", "-1");
-        params.add("user", testUser1.getUserName());
-        this.mockMvc.perform(post("/createWikiPage").params(params))
+        result = this.mockMvc.perform(post("/createWikiPage")
+                            .params(params)
+                            .session(session))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title", is("testTitle")))
                 .andExpect(jsonPath("$.content", is("testContent")))
-                .andExpect(jsonPath("$.parentID", is(-1)));
+                .andExpect(jsonPath("$.parentID", is(-1)))
+                .andReturn();
+        params.clear();
+
+        Optional<String> idSubstring = Arrays.stream( result.getResponse().getContentAsString().split("[\\{\\,\\}]")).filter(s -> s.contains("id\":")).findFirst();
+        String parentid = idSubstring.get().substring(5, idSubstring.get().length());
+
+        //Check for successful edit with altered content
+        params.add("title", "testTitle");
+        params.add("content", "testContent2");
+        params.add("parentID", parentid);
+        this.mockMvc.perform(post("/createWikiPage")
+                            .params(params)
+                            .session(session))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title", is("testTitle")))
+                .andExpect(jsonPath("$.content", is("testContent2")))
+                .andExpect(jsonPath("$.parentID", is(Integer.parseInt(parentid))));
+        params.clear();
+
+        //Check for successful edit with altered title
+        params.add("title", "testTitle2");
+        params.add("content", "testContent");
+        params.add("parentID", parentid);
+        this.mockMvc.perform(post("/createWikiPage")
+                .params(params)
+                .session(session))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title", is("testTitle2")))
+                .andExpect(jsonPath("$.content", is("testContent")))
+                .andExpect(jsonPath("$.parentID", is(Integer.parseInt(parentid))));
+        params.clear();
+
+        //Check for unsuccessful edit due to same title and content
+        params.add("title", "testTitle");
+        params.add("content", "testContent");
+        params.add("parentID", parentid);
+        this.mockMvc.perform(post("/createWikiPage")
+                            .params(params)
+                            .session(session))
+                .andDo(print())
+                .andExpect(status().isUnprocessableEntity());
         params.clear();
 
         //Check for unsuccessful creation due to empty title
         params.add("title", "");
         params.add("content", "testContent");
         params.add("parentID", "-1");
-        params.add("user", testUser1.getUserName());
-        this.mockMvc.perform(post("/createWikiPage").params(params))
+        this.mockMvc.perform(post("/createWikiPage")
+                            .params(params)
+                            .session(session))
                 .andDo(print())
                 .andExpect(status().isUnprocessableEntity());
         params.clear();
@@ -91,8 +151,9 @@ public class WikiPageControllerTest {
         params.add("title", "testTitle");
         params.add("content", "testContent");
         params.add("parentID", "0");
-        params.add("user", testUser1.getUserName());
-        this.mockMvc.perform(post("/createWikiPage").params(params))
+        this.mockMvc.perform(post("/createWikiPage")
+                            .params(params)
+                            .session(session))
                 .andDo(print())
                 .andExpect(status().isUnprocessableEntity());
         params.clear();
@@ -101,28 +162,29 @@ public class WikiPageControllerTest {
         params.add("title", "testTitle");
         params.add("content", "testContent");
         params.add("parentID", "-2");
-        params.add("user", testUser1.getUserName());
-        this.mockMvc.perform(post("/createWikiPage").params(params))
+        this.mockMvc.perform(post("/createWikiPage")
+                            .params(params)
+                            .session(session))
                 .andDo(print())
                 .andExpect(status().isUnprocessableEntity());
         params.clear();
 
-        //Check for unsuccessful creation due to empty user
+        //Check for unsuccessful creation due to no user session
         params.add("title", "testTitle");
         params.add("content", "testContent");
         params.add("parentID", "-2");
-        params.add("user", "");
         this.mockMvc.perform(post("/createWikiPage").params(params))
                 .andDo(print())
-                .andExpect(status().isUnprocessableEntity());
+                .andExpect(status().isForbidden());
         params.clear();
 
         //Check for successful creation with empty content
         params.add("title", "testTitle");
         params.add("content", "");
         params.add("parentID", "-1");
-        params.add("user", testUser1.getUserName());
-        this.mockMvc.perform(post("/createWikiPage").params(params))
+        this.mockMvc.perform(post("/createWikiPage")
+                        .params(params)
+                        .session(session))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title", is("testTitle")))
@@ -133,8 +195,9 @@ public class WikiPageControllerTest {
         //Check for unsuccessful creation due to missing title parameter
         params.add("content", "testContent");
         params.add("parentID", "-1");
-        params.add("user", testUser1.getUserName());
-        this.mockMvc.perform(post("/createWikiPage").params(params))
+        this.mockMvc.perform(post("/createWikiPage")
+                            .params(params)
+                            .session(session))
                 .andDo(print())
                 .andExpect(status().isUnprocessableEntity());
         params.clear();
@@ -142,8 +205,9 @@ public class WikiPageControllerTest {
         //Check for unsuccessful creation due to missing content parameter
         params.add("title", "testTitle");
         params.add("parentID", "-1");
-        params.add("user", testUser1.getUserName());
-        this.mockMvc.perform(post("/createWikiPage").params(params))
+        this.mockMvc.perform(post("/createWikiPage")
+                            .params(params)
+                            .session(session))
                 .andDo(print())
                 .andExpect(status().isUnprocessableEntity());
         params.clear();
@@ -151,19 +215,23 @@ public class WikiPageControllerTest {
         //Check for unsuccessful creation due to missing parentID parameter
         params.add("title", "testTitle");
         params.add("content", "testContent");
-        params.add("user", testUser1.getUserName());
-        this.mockMvc.perform(post("/createWikiPage").params(params))
+        this.mockMvc.perform(post("/createWikiPage")
+                            .params(params)
+                            .session(session))
                 .andDo(print())
                 .andExpect(status().isUnprocessableEntity());
         params.clear();
 
-        //Check for unsuccessful creation due to missing user parameter
+        //Check for unsuccessful creation due to invalid user session
         params.add("title", "testTitle");
         params.add("content", "testContent");
         params.add("parentID", "-1");
-        this.mockMvc.perform(post("/createWikiPage").params(params))
+        session.invalidate();
+        this.mockMvc.perform(post("/createWikiPage")
+                            .params(params)
+                            .session(session))
                 .andDo(print())
-                .andExpect(status().isUnprocessableEntity());
+                .andExpect(status().isForbidden());
         params.clear();
 
     }

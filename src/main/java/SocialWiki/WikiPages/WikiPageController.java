@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,18 +35,24 @@ public class WikiPageController {
 
     /**
      * Method to handle the creation or editing of a ConcreteWikiPage
-     * @param request - contains the title, content, parentID, and author username of the ConcreteWikiPage being created/altered
+     * @param request - contains the title, content, parentID of the ConcreteWikiPage being created/altered
      * @return the new ConcreteWikiPage
      */
     @PostMapping("/createWikiPage")
     public ResponseEntity<WikiPageWithAuthorAndContentProxy> createWikiPage(HttpServletRequest request) {
 
+        // send an HTTP 403 response if there is currently not a session
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+
+        // get the logged in user from the current session
+        User user = (User) session.getAttribute("user");
+
         //Retrieve parameters from request
         String title = request.getParameter("title");
         String content = request.getParameter("content");
-        String username = request.getParameter("user");
-
-        User user;
         Long parentID;
 
         try {
@@ -59,17 +66,10 @@ public class WikiPageController {
         if (title == null || title.isEmpty()) {    //title must be valid, non-empty string
             return ResponseEntity.unprocessableEntity().body(null);
         }
-        else if (content == null) {     //content must be valid string
+        if (content == null) {     //content must be valid string
             return ResponseEntity.unprocessableEntity().body(null);
         }
-        else if (parentID.compareTo(0L) == 0 || parentID.compareTo(-1L) < 0) {  //Parent ID must be > 0 or -1
-            return ResponseEntity.unprocessableEntity().body(null);
-        }
-
-        user = userRepo.findByUserName(username);
-
-        //Username must be valid
-        if (user == null) {
+        if (parentID.compareTo(0L) == 0 || parentID.compareTo(-1L) < 0) {  //Parent ID must be > 0 or -1
             return ResponseEntity.unprocessableEntity().body(null);
         }
 
@@ -81,6 +81,12 @@ public class WikiPageController {
         }
         else {
             newPage = new ConcreteWikiPage(title, content, parentID, user);
+            WikiPageWithAuthorAndContentProxy parent = wikiPageRepo.findById(parentID);
+
+            if (parent.getTitle().equals(newPage.getTitle()) && parent.getContent().equals(newPage.getContent())) { //Ensure that a change was actually made before saving
+                return ResponseEntity.unprocessableEntity().body(null);
+            }
+
         }
 
         //Save the ConcreteWikiPage
