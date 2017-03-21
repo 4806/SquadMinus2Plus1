@@ -12,5 +12,4 @@ notifications:
 services:
   postgresql
 install:
-  - npm install
   - npm install showdown
