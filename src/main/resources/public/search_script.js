@@ -55,38 +55,40 @@ searchPage.searchForPages = function() {
     });
 };
 
-webix.ready(function(){
-    var toolBar = (generalPages.getCookie("user") === null) ? generalPages.toolbarHomeLogin : generalPages.toolbarHomeUserLogOut;
-    webix.ui({
-        rows:[
-            toolBar,
-            { height:50 },
-            { cols:[
-                { },
-                { view:"label",
-                    id:"infostatus",
-                    label:"",
-                    align:"center",
-                    css:"label_error"
-                },
-                {
-                    view:"list",
-                    id:"resultlist",
-                    template:"#title# <div> Created By: #author# on #creationDate#</div>",
-                    type:{
-                        height:62
-                    },
-                    on:{
-                        onItemClick:searchPage.handler.itemClick
-                    },
-                    data:searchPage.results
-                },
-                { },
-            ]},
-            { height:50 },
-            { view:"label", label:'<img src="img/flame_blue.png" height="50%"/>', height:100, align:"center"}
-        ]
-    });
-    $$("infostatus").hide();
-    searchPage.searchForPages();
-});
+searchPage.onReady = function() {
+  var toolBar = (generalPages.getCookie("user") === null) ? generalPages.toolbarHomeLogin : generalPages.toolbarHomeUserLogOut;
+  webix.ui({
+      rows:[
+          toolBar,
+          { height:50 },
+          { cols:[
+              { },
+              { view:"label",
+                  id:"infostatus",
+                  label:"",
+                  align:"center",
+                  css:"label_error"
+              },
+              {
+                  view:"list",
+                  id:"resultlist",
+                  template:"#title# <div> Created By: #author# on #creationDate#</div>",
+                  type:{
+                      height:62
+                  },
+                  on:{
+                      onItemClick:searchPage.handler.itemClick
+                  },
+                  data:searchPage.results
+              },
+              { },
+          ]},
+          { height:50 },
+          { view:"label", label:'<img src="img/flame_blue.png" height="50%"/>', height:100, align:"center"}
+      ]
+  });
+  $$("infostatus").hide();
+  searchPage.searchForPages();
+};
+
+webix.ready(searchPage.onReady);
