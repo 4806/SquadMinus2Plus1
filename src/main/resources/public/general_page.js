@@ -108,24 +108,3 @@ generalPages.toolbarHomeLogin = {
         {view:"button", value:"Login", align:"right", width:100, click:generalPages.handler.loginClick}
     ]
 };
-
-//This will extract all of the parameters included in a URL
-generalPages.getUrlContent = function(url) {
-    var questionIndex = url.lastIndexOf("?");
-    if( questionIndex === -1 ) {
-        return {};
-    }
-
-    var content = url.substr( questionIndex + 1);
-    if( content === "" ) {
-        return {};
-    }
-
-    var paramsRaw = content.split("&");
-    var params = {};
-    for( var i = 0; i < paramsRaw.length; i++ ){
-        var vals = paramsRaw[i].split("=");
-        params[vals[0]] = vals[1];
-    }
-    return params;
-};

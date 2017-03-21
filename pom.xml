@@ -76,6 +76,43 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
+            <plugin>
+                <groupId>com.github.eirslett</groupId>
+                <artifactId>frontend-maven-plugin</artifactId>
+                <version>1.3</version>
+
+                <executions>
+
+                    <execution>
+                        <id>install node and npm</id>
+                        <goals>
+                            <goal>install-node-and-npm</goal>
+                        </goals>
+
+                        <configuration>
+                            <nodeVersion>v6.10.0</nodeVersion>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>npm install</id>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                    </execution>
+
+                    <execution>
+                        <id>npm test</id>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>${npm.test}</arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+
+            </plugin>
         </plugins>
         <resources>
             <resource>
@@ -83,6 +120,36 @@
             </resource>
         </resources>
     </build>
+
+    <profiles>
+        <profile>
+            <id>npm-test</id>
+            <activation>
+                <os>
+                    <family>!windows</family>
+                </os>
+            </activation>
+
+            <properties>
+                <npm.test>test</npm.test>
+            </properties>
+
+        </profile>
+
+        <profile>
+            <id>npm-test-windows</id>
+            <activation>
+                <os>
+                    <family>windows</family>
+                </os>
+            </activation>
+
+            <properties>
+                <npm.test>run test:windows</npm.test>
+            </properties>
+
+        </profile>
+    </profiles>
 
 
 </project>
