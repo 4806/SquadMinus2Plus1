@@ -20,12 +20,12 @@ describe("signup_script", function(){
 
       it("Empty First Name", function() {
         $$("name").setValue("");
-        expect(signupHandler.submitHandler()).toBe(false);
+        expect(signupHandler.validateSignupForm()).toBe(false);
       });
 
       it("Illegal Charaters in First Name", function(){
         $$("name").setValue("&&*/&Test<");
-        expect(signupHandler.submitHandler()).toBe(false);
+        expect(signupHandler.validateSignupForm()).toBe(false);
       });
 
     });
@@ -34,12 +34,12 @@ describe("signup_script", function(){
 
       it("Empty Last Name", function() {
         $$("last").setValue("");
-        expect(signupHandler.submitHandler()).toBe(false);
+        expect(signupHandler.validateSignupForm()).toBe(false);
       });
 
       it("Illegal Charaters in Last Name", function(){
         $$("last").setValue("&&*/&Test<");
-        expect(signupHandler.submitHandler()).toBe(false);
+        expect(signupHandler.validateSignupForm()).toBe(false);
       });
 
     });
@@ -48,12 +48,12 @@ describe("signup_script", function(){
 
       it("Empty User Name", function() {
         $$("user").setValue("");
-        expect(signupHandler.submitHandler()).toBe(false);
+        expect(signupHandler.validateSignupForm()).toBe(false);
       });
 
       it("Illegal Charaters in User Name", function(){
         $$("user").setValue("&&*/&Test<");
-        expect(signupHandler.submitHandler()).toBe(false);
+        expect(signupHandler.validateSignupForm()).toBe(false);
       });
 
     });
@@ -62,17 +62,17 @@ describe("signup_script", function(){
 
       it("Empty Password", function() {
         $$("pass").setValue("");
-        expect(signupHandler.submitHandler()).toBe(false);
+        expect(signupHandler.validateSignupForm()).toBe(false);
       });
 
       it("Illegal Charaters in Password", function(){
         $$("pass").setValue("&&*/&Test<");
-        expect(signupHandler.submitHandler()).toBe(false);
+        expect(signupHandler.validateSignupForm()).toBe(false);
       });
 
       it("Confirmation Password does not match", function(){
         $$("passConfirm").setValue("notpass");
-        expect(signupHandler.submitHandler()).toBe(false);
+        expect(signupHandler.validateSignupForm()).toBe(false);
       });
 
     });
@@ -81,27 +81,32 @@ describe("signup_script", function(){
 
       it("Empty Email", function() {
         $$("email").setValue("");
-        expect(signupHandler.submitHandler()).toBe(false);
+        expect(signupHandler.validateSignupForm()).toBe(false);
       });
 
       it("Illegal Email structure", function(){
         $$("email").setValue("test.test");
-        expect(signupHandler.submitHandler()).toBe(false);
+        expect(signupHandler.validateSignupForm()).toBe(false);
 
         $$("email").setValue("test@test");
-        expect(signupHandler.submitHandler()).toBe(false);
+        expect(signupHandler.validateSignupForm()).toBe(false);
 
         $$("email").setValue("test@test.");
-        expect(signupHandler.submitHandler()).toBe(false);
+        expect(signupHandler.validateSignupForm()).toBe(false);
 
         $$("email").setValue("@test.test");
-        expect(signupHandler.submitHandler()).toBe(false);
+        expect(signupHandler.validateSignupForm()).toBe(false);
       });
 
     });
 
-    // describe("Valid Entries", function(){
-    //   expect(signupHandler.submitHandler()).toBe(true);
-    // });
+    it("Valid Entries", function(){
+      expect(signupHandler.validateSignupForm()).toBeTruthy();
+    });
+
+    it("Success Handling", function(){
+      signupHandler.successHandler('{"userName":"testing", "email":"test@test.test"}');
+      expect($$("signup_result").getValue()).toBe(signupHandler.strings.success);
+    });
 
 });
