@@ -55,7 +55,7 @@ editPage.handler.setContent = function(dataString) {
 };
 
 editPage.getContent = function() {
-    var params = generalPages.getUrlContent(location.href);
+    var params = pageUtil.getUrlContent(location.href);
     if(params.id !== undefined) {
         webix.ajax().get("/retrieveWikiPage?id=" + params.id, {
             error:editPage.handler.errorHandler,

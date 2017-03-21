@@ -22,7 +22,7 @@ searchPage.handler.error = function() {
 };
 
 searchPage.searchForPages = function() {
-    var searchString = generalPages.getUrlContent(location.href);
+    var searchString = pageUtil.getUrlContent(location.href);
     if( searchString.text === undefined ){
         return;
     }

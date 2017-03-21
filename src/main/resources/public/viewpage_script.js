@@ -42,7 +42,7 @@ viewPage.handler.setContent = function(dataString) {
 
 viewPage.getContent = function() {
 
-    var params = generalPages.getUrlContent(location.href);
+    var params = pageUtil.getUrlContent(location.href);
 
     webix.ajax().get("/retrieveWikiPage?id=" + params.id, {
         error:viewPage.handler.errorHandler,
