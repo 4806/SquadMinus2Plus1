@@ -1,5 +1,5 @@
 /**
- * Created by david on 05/03/17.
+ * Created by david on 21/03/17.
  */
 
 function searchPage(){}
@@ -28,31 +28,36 @@ searchPage.searchForPages = function() {
     }
     webix.ajax().get("/searchWikiPage?title=" + searchString.text, {
         error:searchPage.handler.error,
-        success:function(dataString){
-            if(dataString === null) {
-                loginHandler.errorHandler();
-            }
-            var items = JSON.parse(dataString);
-
-            if( items.length === 0 ){
-                //Show no results
-
-                $$("infostatus").setValue("No results were found.");
-                $$("resultlist").hide();
-                $$("infostatus").show();
-            } else {
-                //Repopulate list if results
-
-                $$("resultlist").clearAll();
-                for( var i = 0; i < items.length; i++){
-                    items[i].creationDate = new Date(items[i].creationDate);
-                    $$("resultlist").add(items[i]);
-                }
-                $$("resultlist").refresh();
-            }
-
-        }
+        success:searchPage.handler.success
     });
+};
+
+searchPage.handler.success = function(dataString) {
+  if(dataString === null) {
+      loginHandler.errorHandler();
+  }
+  var items = JSON.parse(dataString);
+
+  if( items.length === 0 ){
+      //Show no results
+
+      $$("infostatus").setValue("No results were found.");
+      $$("resultlist").hide();
+      $$("infostatus").show();
+  } else {
+      //Repopulate list if results
+
+      $$("infostatus").setValue("");
+      $$("resultlist").show();
+      $$("infostatus").hide();
+
+      $$("resultlist").clearAll();
+      for( var i = 0; i < items.length; i++){
+          items[i].creationDate = new Date(items[i].creationDate);
+          $$("resultlist").add(items[i]);
+      }
+      $$("resultlist").refresh();
+  }
 };
 
 searchPage.onReady = function() {
