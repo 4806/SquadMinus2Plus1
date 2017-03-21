@@ -30,7 +30,7 @@ describe("editwiki_page", function(){
         expect($$("title").getValue()).toBe("Test");
       });
 
-      it("Raw Text is empty", function(){
+      it("Raw Text is not empty", function(){
         expect($$("rawtext").getValue()).toBe("#Testing!");
       });
 
@@ -38,7 +38,7 @@ describe("editwiki_page", function(){
         expect(editPage.pageContent).not.toBeNull();
       });
 
-      it("Editing Existing - Page has parent", function(){
+      it("Page has parent", function(){
         expect(editPage.pageContent.parentID).toBe(0);
       });
     });
