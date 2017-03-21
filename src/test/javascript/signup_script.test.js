@@ -3,8 +3,6 @@
  */
 describe("signup_script", function(){
 
-    // jasmine.DEFAULT_TIMEOUT_INTERVAL = 50000;
-
     signupHandler.onReady();
 
     beforeEach(function(){

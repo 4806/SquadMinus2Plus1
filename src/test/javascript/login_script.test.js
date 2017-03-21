@@ -4,7 +4,10 @@
 describe("login_script", function(){
 
     loginHandler.onReady();
-    $$("user").setValue("test");
+
+    beforeEach(function(){
+      $$("user").setValue("test");
+    });
 
     // Testing the proper user being returned
     it("Successful login", function(){
