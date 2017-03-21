@@ -33,7 +33,34 @@ public interface WikiPageRepository extends JpaRepository<ConcreteWikiPage, Long
     WikiPageWithAuthorAndContentProxy findById(@Param("id") Long id);
 
     /**
-     * Find all WikiPages that match the query string
+     * Finds the descendants of source WikiPage
+     * Need to make native query to access recursive capabilities of PostgreSQL.
+     * @param sourceId - The id of source WikiPage
+     * @return Descendant WikiPages
+     */
+    @Query(name = "ConcreteWikiPage.findDescendantsById") //calls the NamedNativeQuery defined in the ConcreteWikiPage Class
+    List<ConcreteWikiPage> findDescendantsById(@Param("source") Long sourceId);
+
+    /**
+     * Finds the ancestors of source WikiPage
+     * Need to make native query to access recursive capabilities of PostgreSQL.
+     * @param sourceId - The id of source WikiPage
+     * @return Ancestor WikiPages
+     */
+    @Query(name = "ConcreteWikiPage.findAncestorsById") //calls the NamedNativeQuery defined in the ConcreteWikiPage Class
+    List<ConcreteWikiPage> findAncestorsById(@Param("source") Long sourceId);
+
+    /**
+     * Finds the root WikiPage of source WikiPage
+     * Need to make native query to access recursive capabilities of PostgreSQL.
+     * @param sourceId - The id of source WikiPage
+     * @return Root WikiPages
+     */
+    @Query(name = "ConcreteWikiPage.findRootById") //calls the NamedNativeQuery defined in the ConcreteWikiPage Class
+    ConcreteWikiPage findRootById(@Param("source") Long sourceId);
+
+    /**
+     * Find all WikiPages that match the query string. Cannot accept NULL parameters
      * @param title - The title of the ConcreteWikiPage (Can be a substring of full title or ConcreteWikiPage content, or null)
      * @param username - The author username of the ConcreteWikiPage (Can be a substring of full username, or null)
      * @param content - The content of the ConcreteWikiPage (Can be a substring of full content, or null)
@@ -41,13 +68,11 @@ public interface WikiPageRepository extends JpaRepository<ConcreteWikiPage, Long
      */
     @Query("SELECT NEW SocialWiki.WikiPages.WikiPageWithAuthorProxy(page) " +
             "FROM ConcreteWikiPage page LEFT JOIN page.author author " +
-                "WHERE (:title IS NULL OR " +
-                    "UPPER(page.title) LIKE UPPER(CONCAT('%',:title,'%')) OR " +
-                    "UPPER(page.content) LIKE UPPER(CONCAT('%',:title,'%')) ) AND " +
-                "(:username IS NULL OR " +
-                    "UPPER(author.userName) LIKE UPPER(CONCAT('%',:username,'%'))) AND " +
-                "(:content IS NULL OR " +
-                    "UPPER(page.content) LIKE UPPER(CONCAT('%',:content,'%')))")
-    List<WikiPageWithAuthorProxy> findByTitleAndAuthorAndContent(@Param("title") String title, @Param("username") String username, @Param("content") String content);
+            "WHERE (" +
+            "(UPPER(page.title) LIKE ('%' || UPPER(:title) || '%') OR  UPPER(page.content) LIKE ('%' || UPPER(:title) || '%') ) AND " +
+            "(UPPER(author.userName) LIKE ('%' || UPPER(:username) || '%') ) AND " +
+            "(UPPER(page.content) LIKE ('%' || UPPER(:pageContent) || '%') )" +
+            ")")
+    List<WikiPageWithAuthorProxy> findByTitleAndAuthorAndContent(@Param("title") String title, @Param("username") String username, @Param("pageContent") String content);
 
 }

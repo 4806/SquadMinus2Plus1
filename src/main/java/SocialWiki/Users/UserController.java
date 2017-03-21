@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,7 +28,7 @@ public class UserController {
     /**
      * Authenticate a User's login information and return a version of the User to be used in the session
      * @param request - an HTTP request that contains the login information
-     * @param response - am HTTP response that will be used to provide the user cookie on successful login
+     * @param response - an HTTP response that will be used to provide the user cookie on successful login
      * @return an HTTP response that contains the User for the session, or an error response
      */
     @PostMapping("/login")
@@ -74,7 +75,7 @@ public class UserController {
     /**
      * Create a new User in the system, add it to the user repository, and return a version of the User to be used in the session
      * @param request - an HTTP request that contains the new User's information
-     * @param response - am HTTP response that will be used to provide the user cookie on successful User creation
+     * @param response - an HTTP response that will be used to provide the user cookie on successful User creation
      * @return an HTTP response that contains the new User for the session, or an error response
      */
     @PostMapping("/signup")
@@ -131,7 +132,7 @@ public class UserController {
     /**
      * Log the user out of their current session
      * @param request - an HTTP request that contains the session's cookie information
-     * @param response - am HTTP response that will be used to clear the user cookie on successful log out
+     * @param response - an HTTP response that will be used to clear the user cookie on successful log out
      * @return an HTTP response that signifies whether the log out was successful
      */
     @PostMapping("/logout")
@@ -149,6 +150,39 @@ public class UserController {
         response.addCookie(CookieManager.getClearUserCookie());
 
         // send an HTTP 204 response to signify successful logout
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+    }
+
+    /**
+     * Remove a user account from the system
+     * @param request - an HTTP request that contains the session's cookie information
+     * @param response - an HTTP response that will be used to clear the user cookie on successful delete
+     * @return an HTTP response that signifies whether the deletion was successful
+     */
+    @DeleteMapping("/deleteUser")
+    public ResponseEntity<String> deleteUser(HttpServletRequest request, HttpServletResponse response) {
+        // send an HTTP 403 response if there is currently not a session
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+
+        // get the logged in user from the current session
+        User user = (User) session.getAttribute("user");
+
+        // remove the user's sensitive info and mark as deleted
+        user.delete();
+
+        // save the deletion of the account into the repository
+        userRepo.save(user);
+
+        // invalidate the user session, since the user no longer exists
+        session.invalidate();
+
+        // add the clearUser cookie so that it deletes the browsers cookie
+        response.addCookie(CookieManager.getClearUserCookie());
+
+        // send an HTTP 204 response to signify successful deletion
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
     }
 

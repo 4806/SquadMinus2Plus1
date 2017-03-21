@@ -13,8 +13,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Created by Chris on 2/25/2017.
@@ -78,26 +77,10 @@ public class WikiPageRepositoryTest {
 
         WikiPageWithAuthorProxy testResult1 = WikiPageWithAuthorProxy.getResult(testConcreteWikiPage1);
 
-        //Test when parameters are null or blank
+        //Test when parameters are blank
 
         List<WikiPageWithAuthorProxy> pages = wikiPageRepository.findByTitleAndAuthorAndContent("","","");
         assertEquals("Failure - Number of pages found by findByTitleAndAuthorAndContent('','','') should be 4", 4, pages.size());
-        pages.clear();
-
-        pages = wikiPageRepository.findByTitleAndAuthorAndContent(null,"","");
-        assertEquals("Failure - Number of pages found by findByTitleAndAuthorAndContent(null,'','') should be 4", 4, pages.size());
-        pages.clear();
-
-        pages = wikiPageRepository.findByTitleAndAuthorAndContent("",null,"");
-        assertEquals("Failure - Number of pages found by findByTitleAndAuthorAndContent('',null,'') should be 4", 4, pages.size());
-        pages.clear();
-
-        pages = wikiPageRepository.findByTitleAndAuthorAndContent("","",null);
-        assertEquals("Failure - Number of pages found by findByTitleAndAuthorAndContent('','',null) should be 4", 4, pages.size());
-        pages.clear();
-
-        pages = wikiPageRepository.findByTitleAndAuthorAndContent(null,null,null);
-        assertEquals("Failure - Number of pages found by findByTitleAndAuthorAndContent(null,null,null) should be 4", 4, pages.size());
         pages.clear();
 
         //Test finding single page by 1 parameter
@@ -177,6 +160,50 @@ public class WikiPageRepositoryTest {
         page = wikiPageRepository.findById(-1L);
         assertEquals("Failure - Page found by findById(-1L) is not correct", null, page);
 
+    }
+
+    @Test
+    public void findDescendantsById() throws Exception {
+
+        List<ConcreteWikiPage> pages = wikiPageRepository.findDescendantsById(testConcreteWikiPage1.getId());
+        assertEquals("Failure - Number of pages found by findDescendantsById(testConcreteWikiPage1.getId()) is not correct", 2, pages.size());
+        assertEquals("Failure - First page found by findDescendantsById(testConcreteWikiPage1.getId()) is not correct", testConcreteWikiPage1.getId(), pages.get(0).getId());
+        assertEquals("Failure - Second page found by findDescendantsById(testConcreteWikiPage1.getId()) is not correct", testConcreteWikiPage2.getId(), pages.get(1).getId());
+
+        pages = wikiPageRepository.findDescendantsById(testConcreteWikiPage4.getId());
+        assertEquals("Failure - Number of pages found by findDescendantsById(testConcreteWikiPage4.getId()) is not correct", 1, pages.size());
+        assertEquals("Failure - Page found by findDescendantsById(testConcreteWikiPage4.getId()) is not correct", testConcreteWikiPage4.getId(), pages.get(0).getId());
+
+        pages = wikiPageRepository.findDescendantsById(-1L);
+        assertEquals("Failure - Number of pages found by findDescendantsById(-1L) is not correct", 0, pages.size());
+    }
+
+    @Test
+    public void findAncestorsById() throws Exception {
+
+        List<ConcreteWikiPage> pages = wikiPageRepository.findAncestorsById(testConcreteWikiPage1.getId());
+        assertEquals("Failure - Number of pages found by findAncestorsById(testConcreteWikiPage1.getId()) is not correct", 1, pages.size());
+        assertEquals("Failure - Page found by findAncestorsById(testConcreteWikiPage1.getId()) is not correct", testConcreteWikiPage1.getId(), pages.get(0).getId());
+
+        pages = wikiPageRepository.findAncestorsById(testConcreteWikiPage4.getId());
+        assertEquals("Failure - Number of pages found by findAncestorsById(testConcreteWikiPage4.getId()) is not correct", 2, pages.size());
+        assertEquals("Failure - First page found by findAncestorsById(testConcreteWikiPage4.getId()) is not correct", testConcreteWikiPage3.getId(), pages.get(0).getId());
+        assertEquals("Failure - Second page found by findAncestorsById(testConcreteWikiPage4.getId()) is not correct", testConcreteWikiPage4.getId(), pages.get(1).getId());
+
+        pages = wikiPageRepository.findAncestorsById(-1L);
+        assertEquals("Failure - Number of pages found by findAncestorsById(-1L) is not correct", 0, pages.size());
+    }
+
+    @Test
+    public void findRootById() throws Exception {
+        ConcreteWikiPage page = wikiPageRepository.findRootById(testConcreteWikiPage1.getId());
+        assertEquals("Failure -page found by findRootById(testConcreteWikiPage1.getId()) is not correct", testConcreteWikiPage1.getId(), page.getId());
+
+        page = wikiPageRepository.findRootById(testConcreteWikiPage2.getId());
+        assertEquals("Failure -page found by findRootById(testConcreteWikiPage2.getId()) is not correct", testConcreteWikiPage1.getId(), page.getId());
+
+        page = wikiPageRepository.findRootById(-1L);
+        assertNull("Failure - page found by findRootById(-1L) should be null", page);
     }
 
     @Before
