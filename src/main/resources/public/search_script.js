@@ -21,6 +21,18 @@ searchPage.handler.error = function() {
     $$("infostatus").show();
 };
 
+searchPage.handler.advancedFilter = function () {
+
+    webix.ajax().get("/searchWikiPage?" +
+                    "title=" + $$("titleTextArea").getValue() +
+                    "&user=" +  $$("usernameTextArea").getValue() +
+                    "&content=" + $$("contentTextArea").getValue()
+        , {
+        error:searchPage.handler.error,
+        success:searchPage.handler.success
+    });
+}
+
 searchPage.searchForPages = function() {
     var searchString = pageUtil.getUrlContent(location.href);
     if( searchString.text === undefined ){
@@ -67,7 +79,7 @@ searchPage.onReady = function() {
           toolBar,
           { height:50 },
           { cols:[
-              { },
+              { width:10 },
               { view:"label",
                   id:"infostatus",
                   label:"",
@@ -77,6 +89,7 @@ searchPage.onReady = function() {
               {
                   view:"list",
                   id:"resultlist",
+                  align:"center",
                   template:"#title# <div> Created By: #author# on #creationDate#</div>",
                   type:{
                       height:62
@@ -86,7 +99,25 @@ searchPage.onReady = function() {
                   },
                   data:searchPage.results
               },
-              { },
+              { width:50 },
+              {
+                  rows:[
+                      {
+                          width:500,
+                          height:275,
+                          margin:5,
+                          rows:[
+                              {view:"template", template:"Advanced Filters", type:"header", align:"left"},
+                              {view:"text", id:"titleTextArea", label:"Title:", height:40, inputWidth:500, align:"right", labelAlign:"right", placeholder:"Page title", tooltip:"Filters search by the pages title", labelWidth:130},
+                              {view:"text", id:"usernameTextArea", label:"Username:", height:40, inputWidth:500, align:"right", labelAlign:"right", placeholder:"Authors username", tooltip:"Filters search by the pages author",labelWidth:130},
+                              {view:"text", id:"contentTextArea", label:"Content:", height:40, inputWidth:500, align:"right", labelAlign:"right", placeholder:"Page content snippet", tooltip:"Filters search by the content of the page",labelWidth:130},
+                              {cols:[ { }, {view:"button", id:"advancedFilter", autowidth:true, label:"Apply Filter", on:{onItemClick:searchPage.handler.advancedFilter}, tooltip:"Apply filters to search"} ]}
+                          ]
+                      },
+                      { }
+                  ]
+              },
+              { width:10 }
           ]},
           { height:50 },
           { view:"label", label:'<img src="img/flame_blue.png" height="50%"/>', height:100, align:"center"}
