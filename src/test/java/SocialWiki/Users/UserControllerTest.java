@@ -1,5 +1,7 @@
 package SocialWiki.Users;
 
+import SocialWiki.WikiPages.ConcreteWikiPage;
+import SocialWiki.WikiPages.WikiPageRepository;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,16 +38,21 @@ public class UserControllerTest {
     @Autowired
     private UserRepository userRepo;
 
+    @Autowired
+    private WikiPageRepository pageRepo;
+
     private User user1;
+    private ConcreteWikiPage page1;
 
     @Before
     public void setUp() throws Exception {
-        user1 = new User("testUserName1", "testFirstName1", "testLastName1", "testEmail1", "testPassword1");
-        userRepo.save(user1);
+        user1 = userRepo.save(new User("testUserName1", "testFirstName1", "testLastName1", "testEmail1", "testPassword1"));
+        page1 = pageRepo.save(new ConcreteWikiPage("testTitle1", "testContent1", user1));
     }
 
     @After
     public void tearDown() throws Exception {
+        pageRepo.deleteAll();
         userRepo.deleteAll();
     }
 
@@ -385,5 +392,149 @@ public class UserControllerTest {
                 .contentType("application/x-www-form-urlencoded"))
                 .andExpect(cookie().doesNotExist("user"))
                 .andExpect(status().isConflict());
+    }
+
+    @Test
+    public void likePage() throws Exception {
+        // perform login to get session
+        MvcResult result = mockMvc.perform(post("/login")
+                .content("login=testUserName1&pass=testPassword1")
+                .contentType("application/x-www-form-urlencoded"))
+                .andReturn();
+
+        MockHttpSession session = (MockHttpSession) result.getRequest().getSession(false);
+
+        // perform successful liking of page
+        mockMvc.perform(post("/likePage")
+                .content("id=" + page1.getId())
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isNoContent());
+
+        // check that the page is now in the User's liked pages list
+        User testUser = userRepo.findByUserName("testUserName1");
+        assertTrue("Failure - wiki page is not in the User's liked pages list", testUser.getLikedPages().contains(page1));
+
+        // perform unsuccessful liking of page that is already liked
+        mockMvc.perform(post("/likePage")
+                .content("id=" + page1.getId())
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isForbidden());
+
+        // perform unsuccessful liking of page that does not exist
+        mockMvc.perform(post("/likePage")
+                .content("id=-1")
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isUnprocessableEntity());
+
+        // perform unsuccessful liking of page with id parameter that is not a Long
+        mockMvc.perform(post("/likePage")
+                .content("id=test")
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isUnprocessableEntity());
+
+        // perform unsuccessful liking of page with empty id parameter
+        mockMvc.perform(post("/likePage")
+                .content("id=")
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isUnprocessableEntity());
+
+        // perform unsuccessful liking of page with no parameters
+        mockMvc.perform(post("/likePage")
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isUnprocessableEntity());
+
+        // perform unsuccessful liking of page with invalidated session
+        session.invalidate();
+        mockMvc.perform(post("/likePage")
+                .content("id=" + page1.getId())
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isForbidden());
+
+        // perform unsuccessful liking of page with no session
+        mockMvc.perform(post("/likePage")
+                .content("id=" + page1.getId())
+                .contentType("application/x-www-form-urlencoded"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void unlikePage() throws Exception {
+        // like the page
+        user1.likePage(page1);
+        user1 = userRepo.save(user1);
+
+        // perform login to get session
+        MvcResult result = mockMvc.perform(post("/login")
+                .content("login=testUserName1&pass=testPassword1")
+                .contentType("application/x-www-form-urlencoded"))
+                .andReturn();
+
+        MockHttpSession session = (MockHttpSession) result.getRequest().getSession(false);
+
+        // perform successful unliking of page
+        mockMvc.perform(post("/unlikePage")
+                .content("id=" + page1.getId())
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isNoContent());
+
+        // check that the page is not in the User's liked pages list
+        User testUser = userRepo.findByUserName("testUserName1");
+        assertFalse("Failure - wiki page is not in the User's liked pages list", testUser.getLikedPages().contains(page1));
+
+        // perform unsuccessful unliking of page that is already unliked
+        mockMvc.perform(post("/unlikePage")
+                .content("id=" + page1.getId())
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isForbidden());
+
+        // perform unsuccessful unliking of page that does not exist
+        mockMvc.perform(post("/unlikePage")
+                .content("id=-1")
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isUnprocessableEntity());
+
+        // perform unsuccessful unliking of page with id parameter that is not a Long
+        mockMvc.perform(post("/unlikePage")
+                .content("id=test")
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isUnprocessableEntity());
+
+        // perform unsuccessful unliking of page with empty id parameter
+        mockMvc.perform(post("/unlikePage")
+                .content("id=")
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isUnprocessableEntity());
+
+        // perform unsuccessful unliking of page with no parameters
+        mockMvc.perform(post("/unlikePage")
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isUnprocessableEntity());
+
+        // perform unsuccessful unliking of page with invalidated session
+        session.invalidate();
+        mockMvc.perform(post("/unlikePage")
+                .content("id=" + page1.getId())
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isForbidden());
+
+        // perform unsuccessful unliking of page with no session
+        mockMvc.perform(post("/unlikePage")
+                .content("id=" + page1.getId())
+                .contentType("application/x-www-form-urlencoded"))
+                .andExpect(status().isForbidden());
     }
 }

@@ -1,8 +1,9 @@
 package SocialWiki.Users;
 
 import SocialWiki.Cookies.CookieManager;
+import SocialWiki.WikiPages.ConcreteWikiPage;
+import SocialWiki.WikiPages.WikiPageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,6 +25,12 @@ public class UserController {
      */
     @Autowired
     private UserRepository userRepo;
+
+    /**
+     * Repository for all of the Wiki Pages
+     */
+    @Autowired
+    private WikiPageRepository pageRepo;
 
     /**
      * Authenticate a User's login information and return a version of the User to be used in the session
@@ -115,8 +122,7 @@ public class UserController {
         }
 
         // create the new User and save it in the user repository
-        User newUser = new User(user, first, last, email, pass);
-        userRepo.save(newUser);
+        User newUser = userRepo.save(new User(user, first, last, email, pass));
 
         // create a new session for the new User
         session = request.getSession();
@@ -186,4 +192,94 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
     }
 
+    /**
+     * Add a wiki page to the list of pages that a User currently likes
+     * @param request - an HTTP request that contains the session's cookie information
+     * @return an HTTP response that signifies whether the liking of the page was successful
+     */
+    @PostMapping("/likePage")
+    public ResponseEntity<String> likePage(HttpServletRequest request) {
+        // send an HTTP 403 response if there is currently not a session
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+
+        // get the pageId parameter from the post request
+        Long pageId;
+        try {
+            pageId = Long.parseLong(request.getParameter("id"));
+        } catch (NumberFormatException e) {
+            return ResponseEntity.unprocessableEntity().body(null); // send an HTTP 422 response if parameter cannot be cast as a Long
+        }
+
+        // get the wiki page from the page repo
+        ConcreteWikiPage page = pageRepo.findOne(pageId);
+
+        // send an HTTP 422 response if there is no page with pageId
+        if (page == null) {
+            return ResponseEntity.unprocessableEntity().body(null);
+        }
+
+        // get the logged in user from the current session
+        User user = (User) session.getAttribute("user");
+
+        // send an HTTP 403 response if the User already likes the page
+        if (user.getLikedPages().contains(page)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+
+        // add the page to the User's liked pages
+        user.likePage(page);
+
+        // save the update to the user in the database and session
+        user = userRepo.save(user);
+        session.setAttribute("user", user);
+
+        // send an HTTP 204 response to signify the page was successfully liked
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+    }
+
+    @PostMapping("/unlikePage")
+    public ResponseEntity<String> unlikePage(HttpServletRequest request) {
+        // send an HTTP 403 response if there is currently not a session
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+
+        // get the pageId parameter from the post request
+        Long pageId;
+        try {
+            pageId = Long.parseLong(request.getParameter("id"));
+        } catch (NumberFormatException e) {
+            return ResponseEntity.unprocessableEntity().body(null); // send an HTTP 422 response if parameter cannot be cast as a Long
+        }
+
+        // get the wiki page from the page repo
+        ConcreteWikiPage page = pageRepo.findOne(pageId);
+
+        // send an HTTP 422 response if there is no page with pageId
+        if (page == null) {
+            return ResponseEntity.unprocessableEntity().body(null);
+        }
+
+        // get the logged in user from the current session
+        User user = (User) session.getAttribute("user");
+
+        // send an HTTP 403 response if the User does not like the page
+        if (!user.getLikedPages().contains(page)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+
+        // remove the page from the User's liked pages
+        user.unlikePage(page);
+
+        // save the update to the user in the database and session
+        user = userRepo.save(user);
+        session.setAttribute("user", user);
+
+        // send an HTTP 204 response to signify the page was successfully unliked
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+    }
 }
