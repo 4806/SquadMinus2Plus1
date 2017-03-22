@@ -1,10 +1,13 @@
 package SocialWiki.Users;
 
+import SocialWiki.WikiPages.ConcreteWikiPage;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by connor on 2/23/17.
@@ -61,10 +64,19 @@ public class User {
     private boolean isDeleted;
 
     /**
+     * The list of pages that the User likes
+     */
+    @Getter
+    @OneToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+    @JoinColumn(name="liked_page_id")
+    private List<ConcreteWikiPage> likedPages;
+
+    /**
      * Default constructor
      */
     public User() {
         this.isDeleted = false;
+        this.likedPages = new ArrayList<>();
     }
 
     /**
@@ -82,6 +94,7 @@ public class User {
         this.email = email;
         this.password = password;
         this.isDeleted = false;
+        this.likedPages = new ArrayList<>();
     }
 
     /**
@@ -99,6 +112,7 @@ public class User {
         this.lastName = lastName;
         this.email = email;
         this.isDeleted = false;
+        this.likedPages = new ArrayList<>();
     }
 
     /**
@@ -155,5 +169,22 @@ public class User {
         this.lastName = null;
         this.email = null;
         this.password = null;
+        this.likedPages = null;
+    }
+
+    /**
+     * Add a wiki page to the User's liked pages
+     * @param page - the wiki page that the User likes
+     */
+    public void likePage(ConcreteWikiPage page) {
+        this.likedPages.add(page);
+    }
+
+    /**
+     * Remove a wiki page from the User's liked pages
+     * @param page - the wiki page that the User no longer likes
+     */
+    public void unlikePage(ConcreteWikiPage page) {
+        this.likedPages.remove(page);
     }
 }
