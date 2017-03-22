@@ -34,7 +34,7 @@ generalPages.handler.searchClick = function() {
 };
 
 generalPages.handler.userClick = function() {
-    //TODO: Implement
+    location.href = "/profile?user=" + generalPages.getCookie("user");
 };
 
 generalPages.handler.addPageClick = function() {
