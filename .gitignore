@@ -42,3 +42,8 @@ hs_err_pid*
 # IntelliJ
 /out/
 /target/
+
+##Node files:
+/node/*
+/node_modules/*
+/reports/*
