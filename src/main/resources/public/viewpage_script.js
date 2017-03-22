@@ -48,6 +48,7 @@ viewPage.handler.unlikeClick = function() {
         error: viewPage.handler.likeErrorHandler,
         success: viewPage.handler.unlikeSuccessHandler
     });
+
 };
 
 viewPage.handler.setContent = function(dataString) {
