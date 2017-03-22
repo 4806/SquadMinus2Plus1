@@ -46,11 +46,8 @@ public class UserControllerTest {
 
     @Before
     public void setUp() throws Exception {
-        user1 = new User("testUserName1", "testFirstName1", "testLastName1", "testEmail1", "testPassword1");
-        userRepo.save(user1);
-
-        page1 = new ConcreteWikiPage("testTitle1", "testContent1", user1);
-        pageRepo.save(page1);
+        user1 = userRepo.save(new User("testUserName1", "testFirstName1", "testLastName1", "testEmail1", "testPassword1"));
+        page1 = pageRepo.save(new ConcreteWikiPage("testTitle1", "testContent1", user1));
     }
 
     @After
@@ -471,7 +468,7 @@ public class UserControllerTest {
     public void unlikePage() throws Exception {
         // like the page
         user1.likePage(page1);
-        userRepo.save(user1);
+        user1 = userRepo.save(user1);
 
         // perform login to get session
         MvcResult result = mockMvc.perform(post("/login")

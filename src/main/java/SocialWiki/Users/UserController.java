@@ -122,8 +122,7 @@ public class UserController {
         }
 
         // create the new User and save it in the user repository
-        User newUser = new User(user, first, last, email, pass);
-        userRepo.save(newUser);
+        User newUser = userRepo.save(new User(user, first, last, email, pass));
 
         // create a new session for the new User
         session = request.getSession();
@@ -234,7 +233,7 @@ public class UserController {
         user.likePage(page);
 
         // save the update to the user in the database and session
-        userRepo.save(user);
+        user = userRepo.save(user);
         session.setAttribute("user", user);
 
         // send an HTTP 204 response to signify the page was successfully liked
@@ -277,7 +276,7 @@ public class UserController {
         user.unlikePage(page);
 
         // save the update to the user in the database and session
-        userRepo.save(user);
+        user = userRepo.save(user);
         session.setAttribute("user", user);
 
         // send an HTTP 204 response to signify the page was successfully unliked

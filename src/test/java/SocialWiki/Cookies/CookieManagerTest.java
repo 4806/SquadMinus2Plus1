@@ -59,7 +59,7 @@ public class CookieManagerTest {
     @Test
     public void checkUserCookie() throws Exception {
         User user = new User("testUserName", "testFirstName", "testLastName", "test@email.com", "testPassword");
-        userRepo.save(user);
+        user = userRepo.save(user);
 
         // perform successful check where cookie value matches session value
         MvcResult result = mockMvc.perform(post("/login")
@@ -103,9 +103,9 @@ public class CookieManagerTest {
         // set up user liking a page
         User user1 = new User("testUserName", "testFirstName", "testLastName", "testEmail", "testPassword");
         ConcreteWikiPage page1 = new ConcreteWikiPage("testTitle1", "testContent1", user1);
+        page1 = pageRepo.save(page1);
         user1.likePage(page1);
-        userRepo.save(user1);
-        pageRepo.save(page1);
+        user1 = userRepo.save(user1);
 
         // login to get the request
         MvcResult result = mockMvc.perform(post("/login")
