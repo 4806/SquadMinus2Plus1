@@ -58,4 +58,12 @@ public class PageController {
         return "editwiki";
     }
 
+    @GetMapping("/history")
+    public String history(HttpServletRequest request, HttpServletResponse response){
+        if (!CookieManager.checkUserCookie(request)) {
+            response.addCookie(CookieManager.getClearUserCookie());
+        }
+        return "history";
+    }
+
 }
