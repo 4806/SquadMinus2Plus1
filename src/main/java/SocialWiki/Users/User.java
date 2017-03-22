@@ -67,7 +67,7 @@ public class User {
      * The list of pages that the User likes
      */
     @Getter
-    @OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinColumn(name="liked_page_id")
     private List<ConcreteWikiPage> likedPages;
 

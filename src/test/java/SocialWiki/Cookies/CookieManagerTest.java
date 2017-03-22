@@ -102,10 +102,13 @@ public class CookieManagerTest {
     public void getIsLikedCookie() throws Exception {
         // set up user liking a page
         User user1 = new User("testUserName", "testFirstName", "testLastName", "testEmail", "testPassword");
+        user1 = userRepo.save(user1);
         ConcreteWikiPage page1 = new ConcreteWikiPage("testTitle1", "testContent1", user1);
         page1 = pageRepo.save(page1);
+
         user1.likePage(page1);
         user1 = userRepo.save(user1);
+
 
         // login to get the request
         MvcResult result = mockMvc.perform(post("/login")
