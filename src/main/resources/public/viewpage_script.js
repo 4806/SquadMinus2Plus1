@@ -22,6 +22,10 @@ viewPage.handler.previousVersionClick = function() {
     location.href = "?id=" + viewPage.pageData.parentID;
 };
 
+viewPage.handler.historyClick = function() {
+    location.href = "/history?id=" + viewPage.pageData.id;
+};
+
 viewPage.handler.setContent = function(dataString) {
   if (dataString !== null) {
       viewPage.pageData = JSON.parse(dataString);
@@ -29,7 +33,8 @@ viewPage.handler.setContent = function(dataString) {
       heading += "<h3>Created by " + viewPage.pageData.author + " on " + new Date(viewPage.pageData.creationDate);
 
       if (viewPage.pageData.parentID === -1) { //If the original copy
-          $$("previousversionbutton").hide();
+        $$("previousversionbutton").hide();
+        $$("historybutton").hide();
       }
 
       heading += "</h3>"; //<br/><hr/>
@@ -87,6 +92,13 @@ viewPage.onReady = function() {
                                       id:"previousversionbutton",
                                       value:"Previous Version",
                                       click:viewPage.handler.previousVersionClick,
+                                      autowidth:true
+                                  },
+                                  {
+                                      view:"button",
+                                      id:"historybutton",
+                                      value:"History",
+                                      click:viewPage.handler.historyClick,
                                       autowidth:true
                                   }
                               ]

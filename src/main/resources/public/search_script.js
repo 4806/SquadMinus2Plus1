@@ -26,12 +26,12 @@ searchPage.handler.advancedFilter = function () {
     webix.ajax().get("/searchWikiPage?" +
                     "title=" + $$("titleTextArea").getValue() +
                     "&user=" +  $$("usernameTextArea").getValue() +
-                    "&content=" + $$("contentTextArea").getValue()
-        , {
+                    "&content=" + $$("contentTextArea").getValue(),
+        {
         error:searchPage.handler.error,
         success:searchPage.handler.success
     });
-}
+};
 
 searchPage.searchForPages = function() {
     var searchString = pageUtil.getUrlContent(location.href);
@@ -46,7 +46,7 @@ searchPage.searchForPages = function() {
 
 searchPage.handler.success = function(dataString) {
   if(dataString === null) {
-      loginHandler.errorHandler();
+      searchPage.handler.error();
   }
   var items = JSON.parse(dataString);
 
