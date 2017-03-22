@@ -15,12 +15,25 @@ profilePage.strings.lastNamePre = "Last: ";
 profilePage.strings.emailNamePre = "Email: ";
 
 profilePage.handler.error = function() {
-    $$("content").setHTML("<center>There was an issue receiving the page.</center>");
-    $$("editbutton").hide();
+    $$("status").show();
+
+    //Hide all other components
+    profilePage.hideAll();
+};
+
+profilePage.hideAll = function() {
+  $$("username").hide();
+  $$("first").hide();
+  $$("last").hide();
+  $$("email").hide();
+  $$("likesheader").hide();
+  $$("createdheader").hide();
+  $$("likelist").hide();
+  $$("createdlist").hide();
 };
 
 profilePage.handler.itemClickLikes = function(itemId) {
-    var item = $$("likedlist").getItem(itemId);
+    var item = $$("likelist").getItem(itemId);
     if( item.id !== undefined ) {
         location.href = "/viewpage?id=" + item.id;
     }
@@ -33,38 +46,60 @@ profilePage.handler.itemClickCreated = function(itemId) {
     }
 };
 
-profilePage.handler.setContentUser = function(dataString) {
-  if (dataString !== null) {
-      profilePage.profile = JSON.parse(dataString);
-
-      //User Name
-      if(profilePage.profile.userName !== undefined && profilePage.profile.userName !== null) {
-        $$("username").setValue(profilePage.strings.userNamePre + profilePage.profile.userName);
+profilePage.handler.setContent = function(dataString) {
+  if (dataString) {
+      try {
+        profilePage.profile = JSON.parse(dataString);
+      } catch(e) {
+        profilePage.handler.error();
       }
 
-      //Email
-      if(profilePage.profile.email !== undefined && profilePage.profile.email !== null) {
-        $$("email").setValue(profilePage.strings.emailNamePre + profilePage.profile.email);
+      //User Data
+      if(profilePage.profile.user !== undefined && profilePage.profile.user !== null) {
+
+        //User Name
+        if(profilePage.profile.user.userName !== undefined && profilePage.profile.user.userName !== null) {
+          $$("username").setValue(profilePage.strings.userNamePre + profilePage.profile.user.userName);
+        }
+
+        //Email
+        if(profilePage.profile.user.email !== undefined && profilePage.profile.user.email !== null) {
+          $$("email").setValue(profilePage.strings.emailNamePre + profilePage.profile.user.email);
+        }
+
+        //First Name
+        if(profilePage.profile.user.first !== undefined && profilePage.profile.user.first !== null) {
+          $$("first").setValue(profilePage.strings.firstNamePre + profilePage.profile.user.first);
+        }
+
+        //Last Name
+        if(profilePage.profile.user.last !== undefined && profilePage.profile.user.last !== null) {
+          $$("last").setValue(profilePage.strings.lastNamePre + profilePage.profile.user.last);
+        }
+
+        $$("username").show();
+        $$("first").show();
+        $$("last").show();
+        $$("email").show();
+        $$("status").hide();
       }
 
-      //First Name
-      if(profilePage.profile.first !== undefined && profilePage.profile.first !== null) {
-        $$("first").setValue(profilePage.strings.firstNamePre + profilePage.profile.first);
+      //Liked Pages - should be already in the object, just refresh the table
+      if( profilePage.profile.likes !== undefined && profilePage.profile.likes !== null ) {
+        $$("likelist").show();
+        $$("likesheader").show();
+        $$("likelist").refresh();
       }
 
-      //Last Name
-      if(profilePage.profile.last !== undefined && profilePage.profile.last !== null) {
-        $$("last").setValue(profilePage.strings.lastNamePre + profilePage.profile.last);
+      //Created Pages - should be already in the object, just refresh the table
+      if( profilePage.profile.created !== undefined && profilePage.profile.created !== null ) {
+        $$("createdlist").show();
+        $$("createdheader").show();
+        $$("createdlist").refresh();
       }
+  } else {
+    profilePage.handler.error();
   }
-};
-
-profilePage.handler.setContentLikes = function(dataString) {
-
-};
-
-profilePage.handler.setContentCreated = function(dataString) {
-
 };
 
 profilePage.getContent = function() {
@@ -77,19 +112,7 @@ profilePage.getContent = function() {
     //Get user information
     // webix.ajax().get("/retrieveUser?user=" + params.user, {
     //     error:profilePage.handler.error,
-    //     success:profilePage.handler.setContentUser
-    // });
-
-    //Get liked pages
-    // webix.ajax().get("/retrieveUserLikes?user=" + params.user, {
-    //     error:profilePage.handler.error,
-    //     success:profilePage.handler.setContentLikes
-    // });
-
-    //Get pages created
-    // webix.ajax().get("/retrieveUserPages?user=" + params.user, {
-    //     error:profilePage.handler.error,
-    //     success:profilePage.handler.setContentCreated
+    //     success:profilePage.handler.setContent
     // });
 };
 
@@ -136,7 +159,7 @@ profilePage.onReady = function() {
             { width:30 },
             {
                 rows:[
-                    {view:"template", template:"Likes", type:"header", align:"left"},
+                    {view:"template", id:"likesheader", template:"Likes", type:"header", align:"left"},
                     {
                         view:"list",
                         id:"likelist",
@@ -155,7 +178,7 @@ profilePage.onReady = function() {
             { width:30 },
             {
                 rows:[
-                    {view:"template", template:"Pages Created", type:"header", align:"left"},
+                    {view:"template", id:"createdheader", template:"Pages Created", type:"header", align:"left"},
                     {
                         view:"list",
                         id:"createdlist",
@@ -180,6 +203,7 @@ profilePage.onReady = function() {
   $$("likelist").clearAll();
   $$("createdlist").clearAll();
   $$("status").hide();
+  profilePage.hideAll();
   profilePage.getContent();
 };
 
