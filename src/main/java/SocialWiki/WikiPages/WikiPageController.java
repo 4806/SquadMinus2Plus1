@@ -1,5 +1,6 @@
 package SocialWiki.WikiPages;
 
+import SocialWiki.Cookies.CookieManager;
 import SocialWiki.Users.User;
 import SocialWiki.Users.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
@@ -140,7 +142,7 @@ public class WikiPageController {
      * @return the WikiPages found
      */
     @GetMapping("/retrieveWikiPage")
-    public ResponseEntity<WikiPageWithAuthorAndContentProxy> retrieveWikiPage(HttpServletRequest request) {
+    public ResponseEntity<WikiPageWithAuthorAndContentProxy> retrieveWikiPage(HttpServletRequest request, HttpServletResponse response) {
 
         Long id;
 
@@ -154,10 +156,10 @@ public class WikiPageController {
 
         if (page == null) {
             return ResponseEntity.unprocessableEntity().body(null);
-        } else {
-            return ResponseEntity.ok(page);
         }
 
+        response.addCookie(CookieManager.getIsLikedCookie(request, id));
+        return ResponseEntity.ok(page);
     }
 
     /**

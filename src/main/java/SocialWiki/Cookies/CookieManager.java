@@ -1,6 +1,7 @@
 package SocialWiki.Cookies;
 
 import SocialWiki.Users.User;
+import SocialWiki.WikiPages.ConcreteWikiPage;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -66,5 +67,40 @@ public class CookieManager {
 
         // the cookie doesn't exist, so it doesn't need to be cleared
         return true;
+    }
+
+    /**
+     * Get a cookie that signifies if the user likes the current page or not
+     * @param request - an HTTP request that contains the session cookie used to identify the current user
+     * @param id - the Id of the page that the user does or does not like
+     * @return a cookie that signifies if the user likes the page, they do not, or clears the cookie
+     */
+    public static Cookie getIsLikedCookie(HttpServletRequest request, Long id) {
+        Cookie c;
+
+        // check that the session exists, if not, return a clearing cookie
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            c = new Cookie("isLiked", "");
+            c.setMaxAge(0);
+            return c;
+        }
+
+        // get the user from the session
+        User user = (User) session.getAttribute("user");
+
+        // if the page id is within the liked page list, return true cookie
+        for (ConcreteWikiPage page : user.getLikedPages()) {
+            if (page.getId().equals(id)) {
+                c = new Cookie("isLiked", "true");
+                c.setMaxAge(86400);
+                return c;
+            }
+        }
+
+        // the page is not liked, so return false cookie
+        c = new Cookie("isLiked", "false");
+        c.setMaxAge(86400);
+        return c;
     }
 }

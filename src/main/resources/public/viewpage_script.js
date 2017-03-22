@@ -22,6 +22,34 @@ viewPage.handler.previousVersionClick = function() {
     location.href = "?id=" + viewPage.pageData.parentID;
 };
 
+viewPage.handler.likeSuccessHandler = function() {
+    $$("unlikebutton").show();
+    $$("likebutton").hide();
+};
+
+viewPage.handler.likeErrorHandler = function() {
+    webix.alert("There was an error with the last request, please try again");
+};
+
+viewPage.handler.likeClick = function() {
+    webix.ajax().post("/likePage", "id=" + viewPage.pageData.id, {
+        error: viewPage.handler.likeErrorHandler,
+        success: viewPage.handler.likeSuccessHandler
+    });
+};
+
+viewPage.handler.unlikeSuccessHandler = function() {
+    $$("likebutton").show();
+    $$("unlikebutton").hide();
+};
+
+viewPage.handler.unlikeClick = function() {
+    webix.ajax().post("/unlikePage", "id=" + viewPage.pageData.id, {
+        error: viewPage.handler.likeErrorHandler,
+        success: viewPage.handler.unlikeSuccessHandler
+    });
+};
+
 viewPage.handler.setContent = function(dataString) {
   if (dataString !== null) {
       viewPage.pageData = JSON.parse(dataString);
@@ -37,6 +65,7 @@ viewPage.handler.setContent = function(dataString) {
 
       var content = viewPage.converter.makeHtml(viewPage.pageData.content);
       $$("content").setHTML(content);
+      viewPage.setLikeButton();
   }
 };
 
@@ -48,6 +77,21 @@ viewPage.getContent = function() {
         error:viewPage.handler.errorHandler,
         success:viewPage.handler.setContent
     });
+};
+
+viewPage.setLikeButton = function() {
+    var isLiked = generalPages.getCookie("isLiked");
+    if (isLiked === null) {
+        return;
+    }
+    if (isLiked === "true") {
+        $$("unlikebutton").show();
+        $$("likebutton").hide();
+    } else {
+        $$("likebutton").show();
+        $$("unlikebutton").hide();
+    }
+    return viewPage.likeButton;
 };
 
 viewPage.onReady = function() {
@@ -75,6 +119,22 @@ viewPage.onReady = function() {
                           { },
                           {
                               cols:[
+                                  {
+                                      view: "button",
+                                      id: "likebutton",
+                                      value: "Like",
+                                      click: viewPage.handler.likeClick,
+                                      autowidth: true,
+                                      hidden: true
+                                  },
+                                  {
+                                      view: "button",
+                                      id: "unlikebutton",
+                                      value: "Unlike",
+                                      click: viewPage.handler.unlikeClick,
+                                      autowidth: true,
+                                      hidden: true
+                                  },
                                   {
                                       view:"button",
                                       id:"editbutton",
