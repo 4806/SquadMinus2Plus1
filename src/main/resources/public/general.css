@@ -11,6 +11,10 @@
     font-weight: 800;
     font-size: xx-large;
 }
+.label_medium {
+    font-weight: 800;
+    font-size: x-large;
+}
 .label_indexNorm {
     font-weight: 500;
     font-size: large;
