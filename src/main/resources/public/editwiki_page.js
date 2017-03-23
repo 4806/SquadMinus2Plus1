@@ -86,10 +86,9 @@ editPage.handler.previewToggle = function() {
 };
 
 editPage.onReady = function() {
-  var toolBar = (generalPages.getCookie("user") === null) ? generalPages.toolbarLogInSignUp : generalPages.toolbarHomeUserLogOut;
   webix.ui({
       rows:[
-          toolBar,
+          generalPages.toolbar,
           { margin:10, cols:[
               {
                   view:"text",
@@ -131,6 +130,8 @@ editPage.onReady = function() {
           { view:"label", label:'<img src="img/flame_blue.png" height="50%"/>', height:100, align:"center"}
       ]
   });
+
+  generalPages.formatToolbar();
 
   //Don't show the preview page at start
   $$("preview").hide();

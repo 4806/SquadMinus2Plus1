@@ -73,10 +73,9 @@ searchPage.handler.success = function(dataString) {
 };
 
 searchPage.onReady = function() {
-  var toolBar = (generalPages.getCookie("user") === null) ? generalPages.toolbarHomeLogin : generalPages.toolbarHomeUserLogOut;
   webix.ui({
       rows:[
-          toolBar,
+          generalPages.toolbar,
           { height:50 },
           { cols:[
               { width:10 },
@@ -123,6 +122,8 @@ searchPage.onReady = function() {
           { view:"label", label:'<img src="img/flame_blue.png" height="50%"/>', height:100, align:"center"}
       ]
   });
+  
+  generalPages.formatToolbar();
   $$("infostatus").hide();
   searchPage.searchForPages();
 };

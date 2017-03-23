@@ -116,11 +116,10 @@ profilePage.getContent = function() {
 };
 
 profilePage.onReady = function() {
-  var toolBar = (generalPages.getCookie("user") === null) ? generalPages.toolbarLogInSignUp : generalPages.toolbarHomeUserLogOut;
   webix.ui({
       type:"clean",
       rows:[
-          toolBar,
+          generalPages.toolbar,
           { height:20 },
           { cols:[
             { width:30 },
@@ -197,6 +196,8 @@ profilePage.onReady = function() {
           { view:"label", label:'<img src="img/flame_blue.png" height="50%"/>', height:100, align:"center"}
       ]
   });
+
+  generalPages.formatToolbar();
   $$("likelist").clearAll();
   $$("createdlist").clearAll();
   $$("status").hide();

@@ -11,10 +11,9 @@ indexHandler.strings.aboutTheTeam = "We are a team of fourth year software engin
 
 
 webix.ready(function() {
-    var toolBar = (generalPages.getCookie("user") === null) ? generalPages.toolbarLogInSignUp : generalPages.toolbarUserLogOut;
     webix.ui({
         rows:[
-            toolBar,
+            generalPages.toolbar,
             { height:50 },
             { view:"label", label:indexHandler.strings.welcomeText, css:"label_big", align:"center"},
             { height:50 },
@@ -33,6 +32,8 @@ webix.ready(function() {
             { view:"label", label:'<img src="img/flame_blue.png" height="50%"/>', height:100, align:"center"}
         ]
     });
+
+    generalPages.formatToolbar();
 
     if (generalPages.getCookie("user") !== null) {
       $$("signupbutton").hide();
