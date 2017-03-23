@@ -99,11 +99,10 @@ viewPage.setLikeButton = function() {
 };
 
 viewPage.onReady = function() {
-  var toolBar = (generalPages.getCookie("user") === null) ? generalPages.toolbarLogInSignUp : generalPages.toolbarHomeUserLogOut;
   webix.ui({
       type:"clean",
       rows:[
-          toolBar,
+          generalPages.toolbar,
           {
               autoheight:true,
               type:"clean",
@@ -175,6 +174,8 @@ viewPage.onReady = function() {
           { view:"label", label:'<img src="img/flame_blue.png" height="50%"/>', height:100, align:"center"}
       ]
   });
+  
+  generalPages.formatToolbar();
   viewPage.getContent();
 };
 

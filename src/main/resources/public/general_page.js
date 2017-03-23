@@ -53,65 +53,29 @@ generalPages.getCookie = function (name) {
     return (value !== null) ? value[1] : null;
 };
 
-generalPages.elements = {};
-generalPages.elements.toolbarFlame = { view:"label", label:'<img src="img/flame_white.png" width="50%" onclick="generalPages.handler.homeClick()" style="cursor: pointer;"/>', width:50, align:"left" };
-generalPages.elements.toolbarSearch = {view:"search", id:"searchbox", placeholder:"Search Pages", align:"right", width:200, on:{onSearchIconClick:generalPages.handler.searchClick, onKeyPress:generalPages.handler.searchEnterPressed}};
+generalPages.toolbar = {
+  view:"toolbar", elements: [
+    //Left
+    {view:"label", label:'<img src="img/flame_white.png" width="50%" onclick="generalPages.handler.homeClick()" style="cursor: pointer;"/>', width:50, align:"left"},
+    {view:"label", label:"Social Wiki", align:"left"},
+    {view:"search", id:"searchbox", placeholder:"Search Pages", align:"right", width:200, on:{onSearchIconClick:generalPages.handler.searchClick, onKeyPress:generalPages.handler.searchEnterPressed}},
 
-generalPages.toolbarUserAdd = {
-    view:"toolbar", elements: [
-        generalPages.elements.toolbarFlame,
-        {view:"label", label:"Social Wiki", align:"left"},
-        generalPages.elements.toolbarSearch,
-        {view:"button", value:"User", align:"right", width:100, click:generalPages.handler.userClick}
-    ]
+    //Right
+    {view:"button", id:"toolbarnewpage", value:"New Page", align:"right", width:100, click:generalPages.handler.addPageClick},
+    {view:"button", id:"toolbaruserbutton", value:generalPages.getCookie("user"), align:"right", width:100, click:generalPages.handler.userClick},
+    {view:"button", id:"toolbarlogin", value:"Login", align:"right", width:100, click:generalPages.handler.loginClick},
+    {view:"button", id:"toolbarlogout", value:"Logout", align:"right", width:100, click:generalPages.handler.logoutClick},
+    {view:"button", id:"toolbarsignup", value:"Sign Up", align:"right", width:100, click:generalPages.handler.signupClick}
+  ]
 };
 
-generalPages.toolbarHomeSignUp = {
-    view:"toolbar", container:"header", elements: [
-        generalPages.elements.toolbarFlame,
-        {view:"label", label:"Social Wiki", align:"left"},
-        generalPages.elements.toolbarSearch,
-        {view:"button", value:"Sign Up", align:"right", width:100, click:generalPages.handler.signupClick}
-    ]
-};
-
-generalPages.toolbarLogInSignUp = {
-    view:"toolbar", container:"header", elements: [
-        generalPages.elements.toolbarFlame,
-        {view:"label", label:"Social Wiki", align:"left"},
-        generalPages.elements.toolbarSearch,
-        {view:"button", value:"Login", align:"right", width:100, click:generalPages.handler.loginClick},
-        {view:"button", value:"Sign Up", align:"right", width:100, click:generalPages.handler.signupClick}
-    ]
-};
-
-generalPages.toolbarHomeUserLogOut = {
-    view:"toolbar", container:"header", elements: [
-        generalPages.elements.toolbarFlame,
-        {view:"label", label:"Social Wiki", align:"left"},
-        generalPages.elements.toolbarSearch,
-        {view:"button", value:"New Page", align:"right", width:100, click:generalPages.handler.addPageClick},
-        {view:"button", value:generalPages.getCookie("user"), align:"right", width:100, click:generalPages.handler.userClick},
-        {view:"button", value:"Logout", align:"right", width:100, click:generalPages.handler.logoutClick}
-    ]
-};
-
-generalPages.toolbarUserLogOut = {
-    view:"toolbar", container:"header", elements: [
-        generalPages.elements.toolbarFlame,
-        {view:"label", label:"Social Wiki", align:"left"},
-        generalPages.elements.toolbarSearch,
-        {view:"button", value:"New Page", align:"right", width:100, click:generalPages.handler.addPageClick},
-        {view:"button", value:generalPages.getCookie("user"), align:"right", width:100, click:generalPages.handler.userClick},
-        {view:"button", value:"Logout", align:"right", width:100, click:generalPages.handler.logoutClick}
-    ]
-};
-
-generalPages.toolbarHomeLogin = {
-    view:"toolbar", elements: [
-        generalPages.elements.toolbarFlame,
-        {view:"label", label:"Social Wiki", align:"left"},
-        generalPages.elements.toolbarSearch,
-        {view:"button", value:"Login", align:"right", width:100, click:generalPages.handler.loginClick}
-    ]
+generalPages.formatToolbar = function() {
+  if(generalPages.getCookie("user") === null) {
+    $$("toolbaruserbutton").hide();
+    $$("toolbarlogout").hide();
+    $$("toolbarnewpage").hide();
+  } else {
+    $$("toolbarsignup").hide();
+    $$("toolbarlogin").hide();
+  }
 };
