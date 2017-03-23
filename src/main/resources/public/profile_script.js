@@ -81,7 +81,7 @@ profilePage.handler.setContent = function(dataString) {
         $$("likelist").show();
         $$("likelist").clearAll();
         for( var i = 0; i < profile.likedProxyPages.length; i++){
-            profile.likedProxyPages[i].creationDate = new Date(profile.likedProxyPages[i].creationDate);
+            profile.likedProxyPages[i].creationDate = pageUtil.getFormattedDate(profile.likedProxyPages[i].creationDate);
             $$("likelist").add(profile.likedProxyPages[i]);
         }
         $$("likesheader").show();
@@ -93,7 +93,7 @@ profilePage.handler.setContent = function(dataString) {
         $$("createdlist").show();
         $$("createdlist").clearAll();
         for( var n = 0; n < profile.createdPages.length; n++){
-            profile.createdPages[n].creationDate = new Date(profile.createdPages[n].creationDate);
+            profile.createdPages[n].creationDate = pageUtil.getFormattedDate(profile.createdPages[n].creationDate);
             $$("likelist").add(profile.createdPages[n]);
         }
         $$("createdheader").show();

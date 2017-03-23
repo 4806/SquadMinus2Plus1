@@ -58,7 +58,7 @@ viewPage.handler.setContent = function(dataString) {
   if (dataString !== null) {
       viewPage.pageData = JSON.parse(dataString);
       var heading = "<h1>" + viewPage.pageData.title + "</h1>";
-      heading += '<h3>Created by <a href="/profile?user=' + viewPage.pageData.author + '">' + viewPage.pageData.author + "</a> on " + new Date(viewPage.pageData.creationDate);
+      heading += '<h3>Created by <a href="/profile?user=' + viewPage.pageData.author + '">' + viewPage.pageData.author + "</a> on " + pageUtil.getFormattedDate(viewPage.pageData.creationDate);
 
       if (viewPage.pageData.parentID === -1) { //If the original copy
         $$("previousversionbutton").hide();

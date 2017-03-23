@@ -58,7 +58,7 @@ historyPage.handler.success = function(dataString) {
 
       $$("resultlist").clearAll();
       for( var i = 0; i < items.length; i++){
-          items[i].creationDate = new Date(items[i].creationDate);
+          items[i].creationDate = pageUtil.getFormattedDate(items[i].creationDate);
           $$("resultlist").add(items[i]);
       }
       $$("resultlist").refresh();
