@@ -130,7 +130,7 @@ public class WikiPageController {
         }
         //Note this still allows for parameters to be NULL if at least one is not null. In these cases, null parameters will be treated as empty string by the query.
 
-        List<WikiPageWithAuthorProxy> pages = wikiPageRepo.findByTitleAndAuthorAndContent(title, username, content);
+        List<WikiPageWithAuthorProxy> pages = wikiPageRepo.findByTitleAndAuthorAndContent(title.trim(), username.trim(), content.trim());
 
         return ResponseEntity.ok(pages);
 
