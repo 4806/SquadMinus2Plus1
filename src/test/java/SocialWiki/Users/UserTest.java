@@ -4,6 +4,8 @@ import SocialWiki.WikiPages.ConcreteWikiPage;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
+
 import static org.junit.Assert.*;
 
 /**
@@ -16,7 +18,7 @@ public class UserTest {
 
     @Before
     public void setUp() throws Exception {
-        user1 = new User(1L, "testUserName1", "testFirstName1", "testLastName1", "testEmail1");
+        user1 = new User(1L, "testUserName1", "testFirstName1", "testLastName1", "testEmail1", false, new ArrayList<>());
         user1.setPassword("testPassword1");
         page1 = new ConcreteWikiPage("testTitle1", "testContent1", user1);
     }
@@ -30,11 +32,13 @@ public class UserTest {
         assertEquals("Failure - lastName for asSessionUser()", "testLastName1", sessionUser.getLastName());
         assertEquals("Failure - email for asSessionUser()", "testEmail1", sessionUser.getEmail());
         assertEquals("Failure - password for asSessionUser()", null, sessionUser.getPassword());
+        assertFalse("Failure - isDeleted for asSessionUser()", sessionUser.isDeleted());
+        assertEquals("Failure - email for asSessionUser()", new ArrayList<ConcreteWikiPage>(), sessionUser.getLikedPages());
     }
 
     @Test
     public void equals() throws Exception {
-        User testUser = new User(1L, "testUserName1", "testFirstName1", "testLastName1", "testEmail1");
+        User testUser = new User(1L, "testUserName1", "testFirstName1", "testLastName1", "testEmail1", false, new ArrayList<>());
         assertTrue("Failure - User.equals()", testUser.equals(user1));
     }
 

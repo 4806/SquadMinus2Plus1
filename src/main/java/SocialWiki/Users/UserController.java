@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -281,5 +282,26 @@ public class UserController {
 
         // send an HTTP 204 response to signify the page was successfully unliked
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+    }
+
+    @GetMapping("/retrieveUser")
+    public ResponseEntity<User> retrieveUser(HttpServletRequest request) {
+        // get userName from request
+        String userName = request.getParameter("user");
+
+        // send an HTTP 422 response if user parameter is missing or empty
+        if (userName == null || userName.isEmpty()) {
+            return ResponseEntity.unprocessableEntity().body(null);
+        }
+
+        // get the user from the user repository
+        User user = userRepo.findByUserName(userName);
+
+        // send an HTTP 422 response if there is no user with userName
+        if (user == null) {
+            return ResponseEntity.unprocessableEntity().body(null);
+        }
+
+        return ResponseEntity.ok(user.asSessionUser());
     }
 }
