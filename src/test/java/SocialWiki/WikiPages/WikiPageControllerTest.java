@@ -237,7 +237,7 @@ public class WikiPageControllerTest {
     }
 
     @Test
-    public void searchWikiPage() throws Exception {
+    public void advancedSearchWikiPage() throws Exception {
 
         ConcreteWikiPage testConcreteWikiPage1 = new ConcreteWikiPage("testTitle1", "testContent1",testUser1);
         ConcreteWikiPage testConcreteWikiPage2 = new ConcreteWikiPage("testTitlePair", "testContent2",testUser2);
@@ -253,13 +253,13 @@ public class WikiPageControllerTest {
         MultiValueMap<String, String> params = new HttpHeaders();
 
         //Check for unsuccessful search due to no parameters
-        this.mockMvc.perform(get("/searchWikiPage").params(params))
+        this.mockMvc.perform(get("/advancedSearchWikiPage").params(params))
                 .andDo(print())
                 .andExpect(status().isUnprocessableEntity());
 
         //Check for successful search using title parameter
         params.add("title", "testTitle1");
-        this.mockMvc.perform(get("/searchWikiPage").params(params))
+        this.mockMvc.perform(get("/advancedSearchWikiPage").params(params))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0].id", is(testConcreteWikiPage1.getId().intValue())));
@@ -267,7 +267,7 @@ public class WikiPageControllerTest {
 
         //Check for successful search using user parameter
         params.add("user", testUser1.getUserName());
-        this.mockMvc.perform(get("/searchWikiPage").params(params))
+        this.mockMvc.perform(get("/advancedSearchWikiPage").params(params))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0].id", is(testConcreteWikiPage1.getId().intValue())));
@@ -275,7 +275,7 @@ public class WikiPageControllerTest {
 
         //Check for successful search using content parameter
         params.add("content", "testContent1");
-        this.mockMvc.perform(get("/searchWikiPage").params(params))
+        this.mockMvc.perform(get("/advancedSearchWikiPage").params(params))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0].id", is(testConcreteWikiPage1.getId().intValue())));
@@ -284,7 +284,7 @@ public class WikiPageControllerTest {
         //Check for successful search using title and user parameters
         params.add("title", "testTitle1");
         params.add("user", testUser1.getUserName());
-        this.mockMvc.perform(get("/searchWikiPage").params(params))
+        this.mockMvc.perform(get("/advancedSearchWikiPage").params(params))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0].id", is(testConcreteWikiPage1.getId().intValue())));
@@ -293,7 +293,7 @@ public class WikiPageControllerTest {
         //Check for successful search using title and content parameters
         params.add("title", "testTitle1");
         params.add("content", "testContent1");
-        this.mockMvc.perform(get("/searchWikiPage").params(params))
+        this.mockMvc.perform(get("/advancedSearchWikiPage").params(params))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0].id", is(testConcreteWikiPage1.getId().intValue())));
@@ -302,7 +302,7 @@ public class WikiPageControllerTest {
         //Check for successful search using user and content parameters
         params.add("user", testUser1.getUserName());
         params.add("content", "testContent1");
-        this.mockMvc.perform(get("/searchWikiPage").params(params))
+        this.mockMvc.perform(get("/advancedSearchWikiPage").params(params))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0].id", is(testConcreteWikiPage1.getId().intValue())));
@@ -312,7 +312,7 @@ public class WikiPageControllerTest {
         params.add("title", "testTitle1");
         params.add("user", testUser1.getUserName());
         params.add("content", "testContent1");
-        this.mockMvc.perform(get("/searchWikiPage").params(params))
+        this.mockMvc.perform(get("/advancedSearchWikiPage").params(params))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0].id", is(testConcreteWikiPage1.getId().intValue())));
@@ -320,7 +320,7 @@ public class WikiPageControllerTest {
 
         //Check for successful search resulting in multiple WikiPages found
         params.add("title", "testTitlePair");
-        this.mockMvc.perform(get("/searchWikiPage").params(params))
+        this.mockMvc.perform(get("/advancedSearchWikiPage").params(params))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0].id", is(testConcreteWikiPage2.getId().intValue())))
@@ -331,7 +331,7 @@ public class WikiPageControllerTest {
         params.add("title", " testTitle1 \t");
         params.add("user", " " + testUser1.getUserName() + " \n");
         params.add("content", " testContent1 \r");
-        this.mockMvc.perform(get("/searchWikiPage").params(params))
+        this.mockMvc.perform(get("/advancedSearchWikiPage").params(params))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0].id", is(testConcreteWikiPage1.getId().intValue())));
@@ -449,6 +449,61 @@ public class WikiPageControllerTest {
         params.clear();
     }
 
+    @Test
+    public void searchWikiPage() throws Exception {
+
+        ConcreteWikiPage testConcreteWikiPage1 = new ConcreteWikiPage("testTitle1", "testContent1",testUser1);
+        ConcreteWikiPage testConcreteWikiPage2 = new ConcreteWikiPage("testTitlePair", "testContent2",testUser2);
+
+        testConcreteWikiPage1 = wikiPageRepository.save(testConcreteWikiPage1);
+        testConcreteWikiPage2 = wikiPageRepository.save(testConcreteWikiPage2);
+
+        ConcreteWikiPage testConcreteWikiPage3 = new ConcreteWikiPage("testTitlePair", "testContent3", testConcreteWikiPage2.getId(),testUser2);
+
+        testConcreteWikiPage2 = wikiPageRepository.save(testConcreteWikiPage2);
+        testConcreteWikiPage3 = wikiPageRepository.save(testConcreteWikiPage3);
+
+        MultiValueMap<String, String> params = new HttpHeaders();
+
+        //Check for unsuccessful search due to no parameter
+        this.mockMvc.perform(get("/searchWikiPage").params(params))
+                .andDo(print())
+                .andExpect(status().isUnprocessableEntity());
+
+        //Check for successful search
+        params.add("title", "testTitle1");
+        this.mockMvc.perform(get("/searchWikiPage").params(params))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0].id", is(testConcreteWikiPage1.getId().intValue())));
+        params.clear();
+
+        //Check for successful search with content substring parameter
+        params.add("title", "content1");
+        this.mockMvc.perform(get("/searchWikiPage").params(params))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0].id", is(testConcreteWikiPage1.getId().intValue())));
+        params.clear();
+
+        //Check for successful search resulting in multiple WikiPages found
+        params.add("title", "testTitlePair");
+        this.mockMvc.perform(get("/advancedSearchWikiPage").params(params))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0].id", is(testConcreteWikiPage2.getId().intValue())))
+                .andExpect(jsonPath("$.[1].id", is(testConcreteWikiPage3.getId().intValue())));
+        params.clear();
+
+        //Check for successful search when parameter has surrounding whitespace
+        params.add("title", "\n \r testTitle1 \t");
+        this.mockMvc.perform(get("/advancedSearchWikiPage").params(params))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0].id", is(testConcreteWikiPage1.getId().intValue())));
+        params.clear();
+
+    }
 
 
 }
