@@ -1,6 +1,8 @@
 package SocialWiki.Users;
 
 import SocialWiki.WikiPages.ConcreteWikiPage;
+import SocialWiki.WikiPages.WikiPageWithAuthorProxy;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
@@ -69,6 +71,7 @@ public class User {
     @Getter
     @OneToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinColumn(name="liked_page_id")
+    @JsonIgnore
     private List<ConcreteWikiPage> likedPages;
 
     /**
@@ -188,5 +191,17 @@ public class User {
      */
     public void unlikePage(ConcreteWikiPage page) {
         this.likedPages.remove(page);
+    }
+
+    /**
+     * Get a list of liked pages to display in user profile
+     * @return the list of liked proxy pages
+     */
+    public List<WikiPageWithAuthorProxy> getLikedProxyPages() {
+        List<WikiPageWithAuthorProxy> list = new ArrayList<>();
+        for(ConcreteWikiPage page : this.likedPages) {
+            list.add(new WikiPageWithAuthorProxy(page));
+        }
+        return list;
     }
 }
