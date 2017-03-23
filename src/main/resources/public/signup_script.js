@@ -101,8 +101,7 @@ signupHandler.loginHandler = function( ) {
 };
 
 signupHandler.signupSuccessHandler = function( ) {
-    location.href = "/";
-    //location.href = "/profile";
+    location.href = "/profile?user=" + $$("user").getValue();
 };
 
 signupHandler.onReady = function( ) {
