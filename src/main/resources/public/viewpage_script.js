@@ -58,14 +58,14 @@ viewPage.handler.setContent = function(dataString) {
   if (dataString !== null) {
       viewPage.pageData = JSON.parse(dataString);
       var heading = "<h1>" + viewPage.pageData.title + "</h1>";
-      heading += "<h3>Created by " + viewPage.pageData.author + " on " + new Date(viewPage.pageData.creationDate);
+      heading += '<h3>Created by <a href="/profile?user=' + viewPage.pageData.author + '">' + viewPage.pageData.author + "</a> on " + new Date(viewPage.pageData.creationDate);
 
       if (viewPage.pageData.parentID === -1) { //If the original copy
         $$("previousversionbutton").hide();
         $$("historybutton").hide();
       }
 
-      heading += "</h3>"; //<br/><hr/>
+      heading += "</h3>";
       $$("heading").setHTML(heading);
 
       var content = viewPage.converter.makeHtml(viewPage.pageData.content);

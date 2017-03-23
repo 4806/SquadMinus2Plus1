@@ -34,8 +34,7 @@ loginHandler.errorHandler = function( ) {
 };
 
 loginHandler.loginSuccessHandler = function( ) {
-    location.href = "/";
-    //location.href = "/profile";
+    location.href = "/profile?user=" + $$("user").getValue();
 };
 
 loginHandler.onReady = function() {
