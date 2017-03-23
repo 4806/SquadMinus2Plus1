@@ -49,6 +49,6 @@ describe("util", function(){
     });
 
     it("Date Format", function(){
-      expect(pageUtil.getFormattedDate(1490129540864)).toBe("2/2/2017 at 16:52 EDT");
+      expect(pageUtil.getFormattedDate(1490129540864).indexOf("2/2/2017 at 16:52 ")).not.toBe(-1);
     });
 });
