@@ -5,9 +5,6 @@ function profilePage(){}
 
 profilePage.handler = {};
 
-profilePage.profile = null;
-profilePage.likes = {};
-profilePage.created = {};
 profilePage.strings = {};
 profilePage.strings.userNamePre = "";
 profilePage.strings.firstNamePre = "First: ";
@@ -26,10 +23,6 @@ profilePage.hideAll = function() {
   $$("first").hide();
   $$("last").hide();
   $$("email").hide();
-  $$("likesheader").hide();
-  $$("createdheader").hide();
-  $$("likelist").hide();
-  $$("createdlist").hide();
 };
 
 profilePage.handler.itemClickLikes = function(itemId) {
@@ -48,52 +41,61 @@ profilePage.handler.itemClickCreated = function(itemId) {
 
 profilePage.handler.setContent = function(dataString) {
   if (dataString) {
+      var profile = {};
       try {
-        profilePage.profile = JSON.parse(dataString);
+        profile = JSON.parse(dataString);
       } catch(e) {
         profilePage.handler.error();
       }
 
       //User Data
-      if(profilePage.profile.user !== undefined && profilePage.profile.user !== null) {
 
-        //User Name
-        if(profilePage.profile.user.userName !== undefined && profilePage.profile.user.userName !== null) {
-          $$("username").setValue(profilePage.strings.userNamePre + profilePage.profile.user.userName);
-        }
-
-        //Email
-        if(profilePage.profile.user.email !== undefined && profilePage.profile.user.email !== null) {
-          $$("email").setValue(profilePage.strings.emailNamePre + profilePage.profile.user.email);
-        }
-
-        //First Name
-        if(profilePage.profile.user.first !== undefined && profilePage.profile.user.first !== null) {
-          $$("first").setValue(profilePage.strings.firstNamePre + profilePage.profile.user.first);
-        }
-
-        //Last Name
-        if(profilePage.profile.user.last !== undefined && profilePage.profile.user.last !== null) {
-          $$("last").setValue(profilePage.strings.lastNamePre + profilePage.profile.user.last);
-        }
-
+      //User Name
+      if(profile.userName !== undefined && profile.userName !== null) {
+        $$("username").setValue(profilePage.strings.userNamePre + profile.userName);
         $$("username").show();
-        $$("first").show();
-        $$("last").show();
-        $$("email").show();
-        $$("status").hide();
       }
 
+      //Email
+      if(profile.email !== undefined && profile.email !== null) {
+        $$("email").setValue(profilePage.strings.emailNamePre + profile.email);
+        $$("email").show();
+      }
+
+      //First Name
+      if(profile.firstName !== undefined && profile.firstName !== null) {
+        $$("first").setValue(profilePage.strings.firstNamePre + profile.firstName);
+        $$("first").show();
+      }
+
+      //Last Name
+      if(profile.lastName !== undefined && profile.lastName !== null) {
+        $$("last").setValue(profilePage.strings.lastNamePre + profile.lastName);
+        $$("last").show();
+      }
+
+      $$("status").hide();
+
       //Liked Pages - should be already in the object, just refresh the table
-      if( profilePage.profile.likes !== undefined && profilePage.profile.likes !== null ) {
+      if( profile.likedPages !== undefined && profile.likedPages !== null && profile.likedPages.length > 0 ) {
         $$("likelist").show();
+        $$("likelist").clearAll();
+        for( var i = 0; i < profile.likedPages.length; i++){
+            profile.likedPages[i].creationDate = new Date(profile.likedPages[i].creationDate);
+            $$("likelist").add(profile.likedPages[i]);
+        }
         $$("likesheader").show();
         $$("likelist").refresh();
       }
 
       //Created Pages - should be already in the object, just refresh the table
-      if( profilePage.profile.created !== undefined && profilePage.profile.created !== null ) {
+      if( profile.createdPages !== undefined && profile.createdPages !== null && profile.createdPages.length > 0 ) {
         $$("createdlist").show();
+        $$("createdlist").clearAll();
+        for( var n = 0; n < profile.createdPages.length; n++){
+            profile.createdPages[n].creationDate = new Date(profile.createdPages[n].creationDate);
+            $$("likelist").add(profile.createdPages[n]);
+        }
         $$("createdheader").show();
         $$("createdlist").refresh();
       }
@@ -106,14 +108,11 @@ profilePage.getContent = function() {
 
     var params = pageUtil.getUrlContent(location.href);
 
-    //TODO: ONLY FOR TESTING
-    // profilePage.handler.setContent("{\"userName\":\"David\", \"email\":\"davidsemail@email.com\", \"first\":\"David\", \"last\":\"Briglio\"}");
-
     //Get user information
-    // webix.ajax().get("/retrieveUser?user=" + params.user, {
-    //     error:profilePage.handler.error,
-    //     success:profilePage.handler.setContent
-    // });
+    webix.ajax().get("/retrieveUser?user=" + params.user, {
+        error:profilePage.handler.error,
+        success:profilePage.handler.setContent
+    });
 };
 
 profilePage.onReady = function() {
@@ -164,14 +163,13 @@ profilePage.onReady = function() {
                         view:"list",
                         id:"likelist",
                         align:"center",
-                        template:"#title# <div> Created By: #author# on #creationDate#</div>",
+                        template:"#title# <div> Created on #creationDate#</div>",
                         type:{
                             height:62
                         },
                         on:{
                             onItemClick:profilePage.handler.itemClickLikes
-                        },
-                        data:profilePage.likes
+                        }
                     }
                 ]
             },
@@ -183,14 +181,13 @@ profilePage.onReady = function() {
                         view:"list",
                         id:"createdlist",
                         align:"center",
-                        template:"#title# <div> Created By: #author# on #creationDate#</div>",
+                        template:"#title# <div> Created on #creationDate#</div>",
                         type:{
                             height:62
                         },
                         on:{
                             onItemClick:profilePage.handler.itemClickCreated
-                        },
-                        data:profilePage.created
+                        }
                     }
                 ]
             },
