@@ -569,7 +569,6 @@ public class UserControllerTest {
                 .andExpect(content().string(containsString("\"email\":\"testEmail1\"")))
                 .andExpect(content().string(containsString("\"password\":null")))
                 .andExpect(content().string(containsString("\"title\":\"testTitle1\"")))
-                .andExpect(content().string(containsString("\"content\":\"testContent1\"")))
                 .andExpect(status().isOk());
 
         // perform unsuccessful retrieval of user with empty parameter
