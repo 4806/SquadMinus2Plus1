@@ -62,7 +62,6 @@ viewPage.handler.setContent = function(dataString) {
 
       if (viewPage.pageData.parentID === -1) { //If the original copy
         $$("previousversionbutton").hide();
-        $$("historybutton").hide();
       }
 
       heading += "</h3>";
