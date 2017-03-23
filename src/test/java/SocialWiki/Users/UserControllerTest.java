@@ -21,6 +21,7 @@ import java.util.List;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -466,10 +467,6 @@ public class UserControllerTest {
 
     @Test
     public void unlikePage() throws Exception {
-        // like the page
-        user1.likePage(page1);
-        user1 = userRepo.save(user1);
-
         // perform login to get session
         MvcResult result = mockMvc.perform(post("/login")
                 .content("login=testUserName1&pass=testPassword1")
@@ -477,6 +474,13 @@ public class UserControllerTest {
                 .andReturn();
 
         MockHttpSession session = (MockHttpSession) result.getRequest().getSession(false);
+
+        // perform successful liking of page
+        mockMvc.perform(post("/likePage")
+                .content("id=" + page1.getId())
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isNoContent());
 
         // perform successful unliking of page
         mockMvc.perform(post("/unlikePage")
@@ -536,5 +540,51 @@ public class UserControllerTest {
                 .content("id=" + page1.getId())
                 .contentType("application/x-www-form-urlencoded"))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void retrieveUser() throws Exception {
+        // perform login to get session
+        MvcResult result = mockMvc.perform(post("/login")
+                .content("login=testUserName1&pass=testPassword1")
+                .contentType("application/x-www-form-urlencoded"))
+                .andReturn();
+
+        MockHttpSession session = (MockHttpSession) result.getRequest().getSession(false);
+
+        // perform successful liking of page
+        mockMvc.perform(post("/likePage")
+                .content("id=" + page1.getId())
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isNoContent());
+
+        // perform successful retrieval of user
+        mockMvc.perform(get("/retrieveUser?user=" + user1.getUserName())
+                .contentType("application/x-www-form-urlencoded"))
+                .andExpect(content().string(containsString("\"id\":")))
+                .andExpect(content().string(containsString("\"userName\":\"testUserName1\"")))
+                .andExpect(content().string(containsString("\"firstName\":\"testFirstName1\"")))
+                .andExpect(content().string(containsString("\"lastName\":\"testLastName1\"")))
+                .andExpect(content().string(containsString("\"email\":\"testEmail1\"")))
+                .andExpect(content().string(containsString("\"password\":null")))
+                .andExpect(content().string(containsString("\"title\":\"testTitle1\"")))
+                .andExpect(content().string(containsString("\"content\":\"testContent1\"")))
+                .andExpect(status().isOk());
+
+        // perform unsuccessful retrieval of user with empty parameter
+        mockMvc.perform(get("/retrieveUser?user=")
+                .contentType("application/x-www-form-urlencoded"))
+                .andExpect(status().isUnprocessableEntity());
+
+        // perform unsuccessful retrieval of user with no parameter
+        mockMvc.perform(get("/retrieveUser")
+                .contentType("application/x-www-form-urlencoded"))
+                .andExpect(status().isUnprocessableEntity());
+
+        // perform unsuccessful retrieval of user with userName that does not exist
+        mockMvc.perform(get("/retrieveUser?user=testUserName5")
+                .contentType("application/x-www-form-urlencoded"))
+                .andExpect(status().isUnprocessableEntity());
     }
 }

@@ -1,6 +1,7 @@
 package SocialWiki.WikiPages;
 
 import SocialWiki.Users.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
@@ -71,6 +72,7 @@ public class ConcreteWikiPage implements WikiPage {
      * The authoring User of the WikiPage
      */
     @ManyToOne
+    @JsonIgnore
     private User author;
 
     /**

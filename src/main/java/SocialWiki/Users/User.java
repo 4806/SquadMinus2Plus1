@@ -105,14 +105,14 @@ public class User {
      * @param lastName - the last name of the User
      * @param email - the email address of the User
      */
-    public User(Long id, String userName, String firstName, String lastName, String email) {
+    public User(Long id, String userName, String firstName, String lastName, String email, boolean isDeleted, List<ConcreteWikiPage> likedPages) {
         this.id = id;
         this.userName = userName;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
-        this.isDeleted = false;
-        this.likedPages = new ArrayList<>();
+        this.isDeleted = isDeleted;
+        this.likedPages = likedPages;
     }
 
     /**
@@ -157,7 +157,9 @@ public class User {
                 this.userName,
                 this.firstName,
                 this.lastName,
-                this.email);
+                this.email,
+                this.isDeleted,
+                this.likedPages);
     }
 
     /**
