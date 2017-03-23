@@ -67,7 +67,7 @@ public class PageController {
     }
 
     @GetMapping("/profile")
-    public String profule(HttpServletRequest request, HttpServletResponse response){
+    public String profile(HttpServletRequest request, HttpServletResponse response){
         if (!CookieManager.checkUserCookie(request)) {
             response.addCookie(CookieManager.getClearUserCookie());
         }

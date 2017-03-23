@@ -26,11 +26,15 @@ webix.ready(function() {
             { height:50 },
             { cols:[
                 { },
-                { view:"button", value:"Sign Up Now!", align:"center", click:generalPages.handler.signupClick},
+                { view:"button", id:"signupbutton", value:"Sign Up Now!", align:"center", click:generalPages.handler.signupClick},
                 { }
             ]},
             { },
             { view:"label", label:'<img src="img/flame_blue.png" height="50%"/>', height:100, align:"center"}
         ]
     });
+
+    if (generalPages.getCookie("user") !== null) {
+      $$("signupbutton").hide();
+    }
 });
