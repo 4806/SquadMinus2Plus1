@@ -3,6 +3,8 @@ package SocialWiki.Users;
 import SocialWiki.WikiPages.ConcreteWikiPage;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
@@ -67,9 +69,18 @@ public class User {
      * The list of pages that the User likes
      */
     @Getter
-    @OneToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.MERGE)
+    @Fetch(FetchMode.SELECT)
     @JoinColumn(name="liked_page_id")
     private List<ConcreteWikiPage> likedPages;
+
+    /**
+     * The list of pages that the User has created
+     */
+    @Getter
+    @OneToMany(cascade = CascadeType.MERGE, mappedBy = "author")
+    @Fetch(FetchMode.SELECT)
+    private List<ConcreteWikiPage> createdPages;
 
     /**
      * Default constructor
@@ -77,6 +88,7 @@ public class User {
     public User() {
         this.isDeleted = false;
         this.likedPages = new ArrayList<>();
+        this.createdPages = new ArrayList<>();
     }
 
     /**
@@ -95,6 +107,7 @@ public class User {
         this.password = password;
         this.isDeleted = false;
         this.likedPages = new ArrayList<>();
+        this.createdPages = new ArrayList<>();
     }
 
     /**
@@ -113,6 +126,7 @@ public class User {
         this.email = email;
         this.isDeleted = false;
         this.likedPages = new ArrayList<>();
+        this.createdPages = new ArrayList<>();
     }
 
     /**
@@ -186,5 +200,13 @@ public class User {
      */
     public void unlikePage(ConcreteWikiPage page) {
         this.likedPages.remove(page);
+    }
+
+    /**
+     * Add a wiki page to the User's created pages
+     * @param page - the wiki page that the User created
+     */
+    public void addCreatedPage(ConcreteWikiPage page) {
+        this.createdPages.add(page);
     }
 }

@@ -224,6 +224,8 @@ public class UserController {
         // get the logged in user from the current session
         User user = (User) session.getAttribute("user");
 
+        user.getLikedPages().size();
+
         // send an HTTP 403 response if the User already likes the page
         if (user.getLikedPages().contains(page)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
@@ -266,6 +268,8 @@ public class UserController {
 
         // get the logged in user from the current session
         User user = (User) session.getAttribute("user");
+
+        user.getLikedPages().size();
 
         // send an HTTP 403 response if the User does not like the page
         if (!user.getLikedPages().contains(page)) {

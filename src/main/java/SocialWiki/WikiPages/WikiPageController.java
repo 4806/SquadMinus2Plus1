@@ -49,9 +49,6 @@ public class WikiPageController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
 
-        // get the logged in user from the current session
-        User user = (User) session.getAttribute("user");
-
         //Retrieve parameters from request
         String title = request.getParameter("title");
         String content = request.getParameter("content");
@@ -75,6 +72,9 @@ public class WikiPageController {
             return ResponseEntity.unprocessableEntity().body(null);
         }
 
+        // get the logged in user from the current session
+        User user = (User) session.getAttribute("user");
+
         ConcreteWikiPage newPage;
 
         //If the ConcreteWikiPage being created has no predecessor and is original then use specific constructor
@@ -94,6 +94,17 @@ public class WikiPageController {
         //Save the ConcreteWikiPage
         try {
             newPage = wikiPageRepo.save(newPage);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+
+        user.getCreatedPages().size();
+
+        // add the page to the User's list of created pages and save it in the repository and session
+        user.addCreatedPage(newPage);
+        try {
+            user = userRepo.save(user);
+            session.setAttribute("user", user);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
