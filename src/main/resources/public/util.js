@@ -32,3 +32,15 @@ pageUtil.getUrlContent = function(url) {
     }
     return params;
 };
+
+pageUtil.getFormattedDate = function(epoch) {
+  var date = new Date(epoch);
+  var year = date.getFullYear();
+  var month = date.getMonth();
+  var day = date.getDay();
+  var hour = date.getHours();
+  var minute = date.getMinutes();
+  var timezone = date.toString().match(/\(([A-Za-z\s].*)\)/)[1];
+
+  return day + "/" + month + "/" + year + " at " + hour + ":" + minute + " " + timezone;
+};
