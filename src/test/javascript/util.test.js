@@ -47,4 +47,8 @@ describe("util", function(){
       expect(output.y).toBe("test2");
 
     });
+
+    it("Date Format", function(){
+      expect(pageUtil.getFormattedDate(1490129540864)).toBe("2/2/2017 at 16:52 EDT");
+    });
 });
