@@ -77,12 +77,12 @@ profilePage.handler.setContent = function(dataString) {
       $$("status").hide();
 
       //Liked Pages - should be already in the object, just refresh the table
-      if( profile.likedPages !== undefined && profile.likedPages !== null && profile.likedPages.length > 0 ) {
+      if( profile.likedProxyPages !== undefined && profile.likedProxyPages !== null && profile.likedProxyPages.length > 0 ) {
         $$("likelist").show();
         $$("likelist").clearAll();
-        for( var i = 0; i < profile.likedPages.length; i++){
-            profile.likedPages[i].creationDate = new Date(profile.likedPages[i].creationDate);
-            $$("likelist").add(profile.likedPages[i]);
+        for( var i = 0; i < profile.likedProxyPages.length; i++){
+            profile.likedProxyPages[i].creationDate = new Date(profile.likedProxyPages[i].creationDate);
+            $$("likelist").add(profile.likedProxyPages[i]);
         }
         $$("likesheader").show();
         $$("likelist").refresh();
@@ -163,7 +163,7 @@ profilePage.onReady = function() {
                         view:"list",
                         id:"likelist",
                         align:"center",
-                        template:"#title# <div> Created on #creationDate#</div>",
+                        template:"#title# <div> Created by #author# on #creationDate#</div>",
                         type:{
                             height:62
                         },
@@ -181,7 +181,7 @@ profilePage.onReady = function() {
                         view:"list",
                         id:"createdlist",
                         align:"center",
-                        template:"#title# <div> Created on #creationDate#</div>",
+                        template:"#title# <div> Created by #author# on #creationDate#</div>",
                         type:{
                             height:62
                         },
