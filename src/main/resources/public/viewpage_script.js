@@ -168,7 +168,8 @@ viewPage.onReady = function() {
           {
               view: "template",
               template: "<p></p>",
-              id: "content"
+              id: "content",
+              scroll:"xy"
           },
           { },
           { view:"label", label:'<img src="img/flame_blue.png" height="50%"/>', height:100, align:"center"}

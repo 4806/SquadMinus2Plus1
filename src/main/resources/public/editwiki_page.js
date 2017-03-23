@@ -108,7 +108,7 @@ editPage.onReady = function() {
               view:"textarea",
               id:"rawtext",
               height:600,
-              scroll:true,
+              scroll:"xy",
               placeholder:"Enter Your Wiki Content Here!"
           },
           {
@@ -116,7 +116,7 @@ editPage.onReady = function() {
               template:"<p>Preview</p>",
               id:"preview",
               height:600,
-              scroll:true
+              scroll:"xy"
           },
           { },
           { margin:10,
