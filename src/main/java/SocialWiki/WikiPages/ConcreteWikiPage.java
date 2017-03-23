@@ -66,6 +66,7 @@ public class ConcreteWikiPage implements WikiPage {
     /**
      * The contents of the WikiPage in Markdown
      */
+    @Column(columnDefinition = "text")
     private String content;
 
     /**
