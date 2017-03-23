@@ -101,8 +101,7 @@ signupHandler.loginHandler = function( ) {
 };
 
 signupHandler.signupSuccessHandler = function( ) {
-    location.href = "/";
-    //location.href = "/profile";
+    location.href = "/profile?user=" + $$("user").getValue();
 };
 
 signupHandler.onReady = function( ) {
@@ -124,7 +123,7 @@ signupHandler.onReady = function( ) {
 
   webix.ui({
       rows:[
-          generalPages.toolbarHomeLogin,
+          generalPages.toolbar,
           { view:"label", id:"signup_top_label", css:"label_text", label:"Please enter your information.", align:"center"},
           { view: "form",
               cols: [
@@ -137,6 +136,8 @@ signupHandler.onReady = function( ) {
           {view:"label", label:'<img src="img/flame_blue.png" height="50%"/>', height:100, align:"center"}
       ]
   });
+
+  generalPages.formatToolbar();
 };
 
 webix.ready(signupHandler.onReady);

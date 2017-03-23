@@ -342,6 +342,16 @@ public class WikiPageControllerTest {
                 .andExpect(jsonPath("$.[1].id", is(testConcreteWikiPage3.getId().intValue())));
         params.clear();
 
+        //Check for successful search using all parameters with surrounding whitespace
+        params.add("title", " testTitle1 \t");
+        params.add("user", " " + testUser1.getUserName() + " \n");
+        params.add("content", " testContent1 \r");
+        this.mockMvc.perform(get("/searchWikiPage").params(params))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0].id", is(testConcreteWikiPage1.getId().intValue())));
+        params.clear();
+
     }
 
     @Test

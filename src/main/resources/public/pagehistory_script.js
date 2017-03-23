@@ -66,10 +66,9 @@ historyPage.handler.success = function(dataString) {
 };
 
 historyPage.onReady = function() {
-  var toolBar = (generalPages.getCookie("user") === null) ? generalPages.toolbarHomeLogin : generalPages.toolbarHomeUserLogOut;
   webix.ui({
       rows:[
-          toolBar,
+          generalPages.toolbar,
           { height:10 },
           { view:"label",
             id:"resultlabel",
@@ -99,6 +98,8 @@ historyPage.onReady = function() {
           { view:"label", label:'<img src="img/flame_blue.png" height="50%"/>', height:100, align:"center"}
       ]
   });
+  
+  generalPages.formatToolbar();
   historyPage.getHistory();
 };
 
