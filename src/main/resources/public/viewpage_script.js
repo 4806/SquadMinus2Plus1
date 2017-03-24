@@ -169,13 +169,14 @@ viewPage.onReady = function() {
               view: "template",
               template: "<p></p>",
               id: "content",
-              scroll:"xy"
+              scroll:true,
+              css:"page_content"
           },
           { },
           { view:"label", label:'<img src="img/flame_blue.png" height="50%"/>', height:100, align:"center"}
       ]
   });
-  
+
   generalPages.formatToolbar();
   viewPage.getContent();
 };

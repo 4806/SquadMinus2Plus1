@@ -116,7 +116,8 @@ editPage.onReady = function() {
               template:"<p>Preview</p>",
               id:"preview",
               height:600,
-              scroll:"xy"
+              scroll:true,
+              css:"page_content"
           },
           { },
           { margin:10,
