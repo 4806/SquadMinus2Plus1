@@ -125,6 +125,21 @@ public class WikiPageControllerTest {
                 .andExpect(jsonPath("$.parentID", is(Integer.parseInt(parentid))));
         params.clear();
 
+        //Check for successful creation with long content string > 255 length
+        params.add("title", "long content");
+        params.add("content", "EzNFYkoP4Pk3vNkNENzWgAWANXVPSAkUORyz3ygTjADIXCMmdZDA7IGASMSfa24agfi9kj4Nw6sPCDUV3P9LKiZ6oFLo5Fj2FJ5EXbYmfYUdVKakZIts0R1kiEc799e0IEiIQZmlERkox6KLNRpOfEY8nTnrq9xjg2eJf0CojoGlKxgIp1stQZzikybuv6ng5OnnMDhFS5JLjiKM0P08gxDu4htYeUzSk90WxVEVDlAzfaeKKhfXjphctopZukFY");
+        params.add("parentID", "-1");
+        result = this.mockMvc.perform(post("/createWikiPage")
+                .params(params)
+                .session(session))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title", is("long content")))
+                .andExpect(jsonPath("$.content", is("EzNFYkoP4Pk3vNkNENzWgAWANXVPSAkUORyz3ygTjADIXCMmdZDA7IGASMSfa24agfi9kj4Nw6sPCDUV3P9LKiZ6oFLo5Fj2FJ5EXbYmfYUdVKakZIts0R1kiEc799e0IEiIQZmlERkox6KLNRpOfEY8nTnrq9xjg2eJf0CojoGlKxgIp1stQZzikybuv6ng5OnnMDhFS5JLjiKM0P08gxDu4htYeUzSk90WxVEVDlAzfaeKKhfXjphctopZukFY")))
+                .andExpect(jsonPath("$.parentID", is(-1)))
+                .andReturn();
+        params.clear();
+
         //Check for unsuccessful edit due to same title and content
         params.add("title", "testTitle");
         params.add("content", "testContent");
