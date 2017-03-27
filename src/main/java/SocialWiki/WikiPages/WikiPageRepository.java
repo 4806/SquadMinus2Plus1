@@ -61,18 +61,30 @@ public interface WikiPageRepository extends JpaRepository<ConcreteWikiPage, Long
 
     /**
      * Find all WikiPages that match the query string. Cannot accept NULL parameters
-     * @param title - The title of the ConcreteWikiPage (Can be a substring of full title or ConcreteWikiPage content, or null)
-     * @param username - The author username of the ConcreteWikiPage (Can be a substring of full username, or null)
-     * @param content - The content of the ConcreteWikiPage (Can be a substring of full content, or null)
+     * @param title - The title of the ConcreteWikiPage (Can be a substring of full title)
+     * @param username - The author username of the ConcreteWikiPage (Can be a substring of full username)
+     * @param content - The content of the ConcreteWikiPage (Can be a substring of full content)
      * @return all WikiPages matching query
      */
     @Query("SELECT NEW SocialWiki.WikiPages.WikiPageWithAuthorProxy(page) " +
             "FROM ConcreteWikiPage page LEFT JOIN page.author author " +
             "WHERE (" +
-            "(UPPER(page.title) LIKE ('%' || UPPER(:title) || '%') OR  UPPER(page.content) LIKE ('%' || UPPER(:title) || '%') ) AND " +
+            "(UPPER(page.title) LIKE ('%' || UPPER(:title) || '%')  ) AND " +
             "(UPPER(author.userName) LIKE ('%' || UPPER(:username) || '%') ) AND " +
             "(UPPER(page.content) LIKE ('%' || UPPER(:pageContent) || '%') )" +
             ")")
     List<WikiPageWithAuthorProxy> findByTitleAndAuthorAndContent(@Param("title") String title, @Param("username") String username, @Param("pageContent") String content);
+
+    /**
+     * Find all WikiPages that match the query string. Cannot accept NULL parameters
+     * @param titleOrContent - The title of the ConcreteWikiPage (Can be a substring of full title or ConcreteWikiPage content)
+     * @return all WikiPages matching query
+     */
+    @Query("SELECT NEW SocialWiki.WikiPages.WikiPageWithAuthorProxy(page) " +
+            "FROM ConcreteWikiPage page LEFT JOIN page.author author " +
+            "WHERE " +
+            "(UPPER(page.title) LIKE ('%' || UPPER(:title) || '%') OR  UPPER(page.content) LIKE ('%' || UPPER(:title) || '%') ) ")
+    List<WikiPageWithAuthorProxy> findByTitleAndContent(@Param("title") String titleOrContent);
+
 
 }
