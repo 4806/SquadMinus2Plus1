@@ -70,6 +70,7 @@ viewPage.handler.setContent = function(dataString) {
       var content = viewPage.converter.makeHtml(viewPage.pageData.content);
       $$("content").setHTML(content);
       viewPage.setLikeButton();
+      viewPage.setEditButton();
   }
 };
 
@@ -96,6 +97,12 @@ viewPage.setLikeButton = function() {
         $$("unlikebutton").hide();
     }
     return viewPage.likeButton;
+};
+
+viewPage.setEditButton = function () {
+    if (generalPages.getCookie("user") !== null) {
+        $$("editbutton").show();
+    }
 };
 
 viewPage.onReady = function() {
@@ -143,7 +150,8 @@ viewPage.onReady = function() {
                                       id:"editbutton",
                                       value:"Edit Page",
                                       click:viewPage.handler.editClick,
-                                      autowidth:true
+                                      autowidth:true,
+                                      hidden: true
                                   },
                                   {
                                       view:"button",
