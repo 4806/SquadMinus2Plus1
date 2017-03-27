@@ -23,7 +23,7 @@ searchPage.handler.error = function() {
 
 searchPage.handler.advancedFilter = function () {
 
-    webix.ajax().get("/searchWikiPage?" +
+    webix.ajax().get("/advancedSearchWikiPage?" +
                     "title=" + $$("titleTextArea").getValue() +
                     "&user=" +  $$("usernameTextArea").getValue() +
                     "&content=" + $$("contentTextArea").getValue(),
