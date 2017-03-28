@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpSession;
+import javax.transaction.Transactional;
 import java.util.List;
 
 import static org.hamcrest.Matchers.containsString;
@@ -31,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
+@Transactional
 public class UserControllerTest {
 
     @Autowired
@@ -43,11 +45,13 @@ public class UserControllerTest {
     private WikiPageRepository pageRepo;
 
     private User user1;
+    private User user2;
     private ConcreteWikiPage page1;
 
     @Before
     public void setUp() throws Exception {
         user1 = userRepo.save(new User("testUserName1", "testFirstName1", "testLastName1", "testEmail1", "testPassword1"));
+        user2 = userRepo.save(new User("testUserName3", "testFirstName3", "testLastName3", "testEmail3", "testPassword3"));
         page1 = pageRepo.save(new ConcreteWikiPage("testTitle1", "testContent1", user1));
     }
 
@@ -585,5 +589,159 @@ public class UserControllerTest {
         mockMvc.perform(get("/retrieveUser?user=testUserName5")
                 .contentType("application/x-www-form-urlencoded"))
                 .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    public void followUser() throws Exception {
+        // perform login to get session
+        MvcResult result = mockMvc.perform(post("/login")
+                .content("login=testUserName1&pass=testPassword1")
+                .contentType("application/x-www-form-urlencoded"))
+                .andReturn();
+
+        MockHttpSession session = (MockHttpSession) result.getRequest().getSession(false);
+
+        // perform successful following of user
+        mockMvc.perform(post("/followUser")
+                .content("id=" + user2.getId())
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isNoContent());
+
+        // check that the user is now in the User's followed users list
+        User testUser = userRepo.findByUserName("testUserName1");
+        assertTrue("Failure - user is not in the User's followed users list", testUser.getFollowedUsers().contains(user2));
+
+        // perform unsuccessful following of user that is already followed
+        mockMvc.perform(post("/followUser")
+                .content("id=" + user2.getId())
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isForbidden());
+
+        // perform unsuccessful following of user where user is one making request
+        mockMvc.perform(post("/followUser")
+                .content("id=" + user1.getId())
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isForbidden());
+
+        // perform unsuccessful following of user that does not exist
+        mockMvc.perform(post("/followUser")
+                .content("id=-1")
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isUnprocessableEntity());
+
+        // perform unsuccessful following of user with id parameter that is not a Long
+        mockMvc.perform(post("/followUser")
+                .content("id=test")
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isUnprocessableEntity());
+
+        // perform unsuccessful following of user with empty id parameter
+        mockMvc.perform(post("/followUser")
+                .content("id=")
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isUnprocessableEntity());
+
+        // perform unsuccessful following of user with no parameters
+        mockMvc.perform(post("/followUser")
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isUnprocessableEntity());
+
+        // perform unsuccessful following of user with invalidated session
+        session.invalidate();
+        mockMvc.perform(post("/followUser")
+                .content("id=" + user2.getId())
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isForbidden());
+
+        // perform unsuccessful following of user with no session
+        mockMvc.perform(post("/followUser")
+                .content("id=" + user2.getId())
+                .contentType("application/x-www-form-urlencoded"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void unfollowUser() throws Exception {
+        // perform login to get session
+        MvcResult result = mockMvc.perform(post("/login")
+                .content("login=testUserName1&pass=testPassword1")
+                .contentType("application/x-www-form-urlencoded"))
+                .andReturn();
+
+        MockHttpSession session = (MockHttpSession) result.getRequest().getSession(false);
+
+        // perform successful following of user
+        mockMvc.perform(post("/followUser")
+                .content("id=" + user2.getId())
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isNoContent());
+
+        // perform successful unfollowing of user
+        mockMvc.perform(post("/unfollowUser")
+                .content("id=" + user2.getId())
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isNoContent());
+
+        // check that the user is not in the User's followed users list
+        User testUser = userRepo.findByUserName("testUserName1");
+        assertFalse("Failure - user is in the User's followed users list", testUser.getFollowedUsers().contains(user2));
+
+        // perform unsuccessful unfollowing of user that is already unfollowed
+        mockMvc.perform(post("/unfollowUser")
+                .content("id=" + user2.getId())
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isForbidden());
+
+        // perform unsuccessful unfollowing of user that does not exist
+        mockMvc.perform(post("/unfollowUser")
+                .content("id=-1")
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isUnprocessableEntity());
+
+        // perform unsuccessful unfollowing of user with id parameter that is not a Long
+        mockMvc.perform(post("/unfollowUser")
+                .content("id=test")
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isUnprocessableEntity());
+
+        // perform unsuccessful unfollowing of user with empty id parameter
+        mockMvc.perform(post("/unfollowUser")
+                .content("id=")
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isUnprocessableEntity());
+
+        // perform unsuccessful unfollowing of user with no parameters
+        mockMvc.perform(post("/unfollowUser")
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isUnprocessableEntity());
+
+        // perform unsuccessful unfollowing of user with invalidated session
+        session.invalidate();
+        mockMvc.perform(post("/unfollowUser")
+                .content("id=" + user2.getId())
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isForbidden());
+
+        // perform unsuccessful unfollowing of user with no session
+        mockMvc.perform(post("/unfollowUser")
+                .content("id=" + user2.getId())
+                .contentType("application/x-www-form-urlencoded"))
+                .andExpect(status().isForbidden());
     }
 }
