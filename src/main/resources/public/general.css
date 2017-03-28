@@ -23,3 +23,6 @@
 body.webix_full_screen{
     overflow: scroll;
 }
+.page_content{
+  word-wrap: break-word;
+}
