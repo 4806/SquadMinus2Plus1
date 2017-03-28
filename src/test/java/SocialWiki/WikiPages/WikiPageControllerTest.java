@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.MultiValueMap;
 
 import javax.servlet.http.Cookie;
+import javax.transaction.Transactional;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -35,6 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest()
 @AutoConfigureMockMvc
+@Transactional
 public class WikiPageControllerTest {
 
     @Autowired

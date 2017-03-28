@@ -70,7 +70,7 @@ public class ConcreteWikiPage implements WikiPage {
     /**
      * The authoring User of the WikiPage
      */
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     @JoinColumn(name = "author_id")
     private User author;
 

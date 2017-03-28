@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.*;
+import javax.transaction.Transactional;
 import java.util.List;
 
 /**
@@ -18,6 +19,7 @@ import java.util.List;
  */
 
 @RestController
+@Transactional
 public class UserController {
 
     /**

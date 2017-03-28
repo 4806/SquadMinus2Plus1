@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpSession;
+import javax.transaction.Transactional;
 import java.util.List;
 
 import static org.hamcrest.Matchers.containsString;
@@ -30,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
+@Transactional
 public class UserControllerTest {
 
     @Autowired
