@@ -78,7 +78,7 @@ public class User {
      * The list of Users that the User follows
      */
     @Getter
-    @OneToMany(cascade = CascadeType.MERGE)
+    @ManyToMany(cascade = CascadeType.MERGE)
     @JsonIgnore
     private List<User> followedUsers;
 
@@ -88,6 +88,7 @@ public class User {
     public User() {
         this.isDeleted = false;
         this.likedPages = new ArrayList<>();
+        this.followedUsers = new ArrayList<>();
     }
 
     /**
