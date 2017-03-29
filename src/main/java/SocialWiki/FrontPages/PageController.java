@@ -66,4 +66,12 @@ public class PageController {
         return "history";
     }
 
+    @GetMapping("/profile")
+    public String profile(HttpServletRequest request, HttpServletResponse response){
+        if (!CookieManager.checkUserCookie(request)) {
+            response.addCookie(CookieManager.getClearUserCookie());
+        }
+        return "profile";
+    }
+
 }

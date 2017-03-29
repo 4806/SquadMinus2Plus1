@@ -86,10 +86,9 @@ editPage.handler.previewToggle = function() {
 };
 
 editPage.onReady = function() {
-  var toolBar = (generalPages.getCookie("user") === null) ? generalPages.toolbarLogInSignUp : generalPages.toolbarHomeUserLogOut;
   webix.ui({
       rows:[
-          toolBar,
+          generalPages.toolbar,
           { margin:10, cols:[
               {
                   view:"text",
@@ -109,7 +108,7 @@ editPage.onReady = function() {
               view:"textarea",
               id:"rawtext",
               height:600,
-              scroll:true,
+              scroll:"xy",
               placeholder:"Enter Your Wiki Content Here!"
           },
           {
@@ -117,7 +116,8 @@ editPage.onReady = function() {
               template:"<p>Preview</p>",
               id:"preview",
               height:600,
-              scroll:true
+              scroll:true,
+              css:"page_content"
           },
           { },
           { margin:10,
@@ -131,6 +131,8 @@ editPage.onReady = function() {
           { view:"label", label:'<img src="img/flame_blue.png" height="50%"/>', height:100, align:"center"}
       ]
   });
+
+  generalPages.formatToolbar();
 
   //Don't show the preview page at start
   $$("preview").hide();

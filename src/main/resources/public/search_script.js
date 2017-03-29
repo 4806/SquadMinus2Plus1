@@ -23,7 +23,7 @@ searchPage.handler.error = function() {
 
 searchPage.handler.advancedFilter = function () {
 
-    webix.ajax().get("/searchWikiPage?" +
+    webix.ajax().get("/advancedSearchWikiPage?" +
                     "title=" + $$("titleTextArea").getValue() +
                     "&user=" +  $$("usernameTextArea").getValue() +
                     "&content=" + $$("contentTextArea").getValue(),
@@ -65,7 +65,7 @@ searchPage.handler.success = function(dataString) {
 
       $$("resultlist").clearAll();
       for( var i = 0; i < items.length; i++){
-          items[i].creationDate = new Date(items[i].creationDate);
+          items[i].creationDate = pageUtil.getFormattedDate(items[i].creationDate);
           $$("resultlist").add(items[i]);
       }
       $$("resultlist").refresh();
@@ -73,10 +73,9 @@ searchPage.handler.success = function(dataString) {
 };
 
 searchPage.onReady = function() {
-  var toolBar = (generalPages.getCookie("user") === null) ? generalPages.toolbarHomeLogin : generalPages.toolbarHomeUserLogOut;
   webix.ui({
       rows:[
-          toolBar,
+          generalPages.toolbar,
           { height:50 },
           { cols:[
               { width:10 },
@@ -123,6 +122,8 @@ searchPage.onReady = function() {
           { view:"label", label:'<img src="img/flame_blue.png" height="50%"/>', height:100, align:"center"}
       ]
   });
+  
+  generalPages.formatToolbar();
   $$("infostatus").hide();
   searchPage.searchForPages();
 };

@@ -1,6 +1,8 @@
 package SocialWiki.Users;
 
 import SocialWiki.WikiPages.ConcreteWikiPage;
+import SocialWiki.WikiPages.WikiPageWithAuthorProxy;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Fetch;
@@ -72,6 +74,7 @@ public class User {
     @OneToMany(cascade = CascadeType.MERGE)
     @Fetch(FetchMode.SELECT)
     @JoinColumn(name="liked_page_id")
+    @JsonIgnore
     private List<ConcreteWikiPage> likedPages;
 
     /**
@@ -83,11 +86,20 @@ public class User {
     private List<ConcreteWikiPage> createdPages;
 
     /**
+     * The list of Users that the User follows
+     */
+    @Getter
+    @ManyToMany(cascade = CascadeType.MERGE)
+    @JsonIgnore
+    private List<User> followedUsers;
+
+    /**
      * Default constructor
      */
     public User() {
         this.isDeleted = false;
         this.likedPages = new ArrayList<>();
+        this.followedUsers = new ArrayList<>();
         this.createdPages = new ArrayList<>();
     }
 
@@ -107,6 +119,7 @@ public class User {
         this.password = password;
         this.isDeleted = false;
         this.likedPages = new ArrayList<>();
+        this.followedUsers = new ArrayList<>();
         this.createdPages = new ArrayList<>();
     }
 
@@ -117,8 +130,11 @@ public class User {
      * @param firstName - the first name of the User
      * @param lastName - the last name of the User
      * @param email - the email address of the User
+     * @param isDeleted - boolean as to whether or not the user is deleted
+     * @param likedPages - list of pages the User likes
+     * @param followedUsers - list of users the User follows
      */
-    public User(Long id, String userName, String firstName, String lastName, String email) {
+    public User(Long id, String userName, String firstName, String lastName, String email, boolean isDeleted, List<ConcreteWikiPage> likedPages, List<User> followedUsers) {
         this.id = id;
         this.userName = userName;
         this.firstName = firstName;
@@ -127,6 +143,9 @@ public class User {
         this.isDeleted = false;
         this.likedPages = new ArrayList<>();
         this.createdPages = new ArrayList<>();
+        this.isDeleted = isDeleted;
+        this.likedPages = likedPages;
+        this.followedUsers = followedUsers;
     }
 
     /**
@@ -171,7 +190,10 @@ public class User {
                 this.userName,
                 this.firstName,
                 this.lastName,
-                this.email);
+                this.email,
+                this.isDeleted,
+                this.likedPages,
+                this.followedUsers);
     }
 
     /**
@@ -184,6 +206,7 @@ public class User {
         this.email = null;
         this.password = null;
         this.likedPages = null;
+        this.followedUsers = null;
     }
 
     /**
@@ -208,5 +231,33 @@ public class User {
      */
     public void addCreatedPage(ConcreteWikiPage page) {
         this.createdPages.add(page);
+    }
+
+    /**
+     * Get a list of liked pages to display in user profile
+     * @return the list of liked proxy pages
+     */
+    public List<WikiPageWithAuthorProxy> getLikedProxyPages() {
+        List<WikiPageWithAuthorProxy> list = new ArrayList<>();
+        for(ConcreteWikiPage page : this.likedPages) {
+            list.add(new WikiPageWithAuthorProxy(page));
+        }
+        return list;
+    }
+
+    /**
+     * Add a user to the User's followed users
+     * @param user - the user that the User followed
+     */
+    public void followUser(User user) {
+        this.followedUsers.add(user);
+    }
+
+    /**
+     * Remove a user from the User's followed users
+     * @param user - the user that the User no longer follows
+     */
+    public void unfollowUser(User user) {
+        this.followedUsers.remove(user);
     }
 }

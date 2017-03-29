@@ -34,8 +34,7 @@ loginHandler.errorHandler = function( ) {
 };
 
 loginHandler.loginSuccessHandler = function( ) {
-    location.href = "/";
-    //location.href = "/profile";
+    location.href = "/profile?user=" + $$("user").getValue();
 };
 
 loginHandler.onReady = function() {
@@ -53,7 +52,7 @@ loginHandler.onReady = function() {
 
   webix.ui({
       rows:[
-          generalPages.toolbarHomeSignUp,
+          generalPages.toolbar,
           { view:"label", id:"login_top_label", css:"label_text", label:"Please enter your login information.", align:"center"},
           { view: "form",
               cols: [
@@ -66,6 +65,9 @@ loginHandler.onReady = function() {
           {view:"label", label:'<img src="img/flame_blue.png" height="50%"/>', height:100, align:"center"}
       ]
   });
+
+  generalPages.formatToolbar();
+  
 };
 
 webix.ready(loginHandler.onReady);

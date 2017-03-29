@@ -4,6 +4,8 @@ import SocialWiki.WikiPages.ConcreteWikiPage;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
+
 import static org.junit.Assert.*;
 
 /**
@@ -12,12 +14,15 @@ import static org.junit.Assert.*;
 public class UserTest {
 
     private User user1;
+    private User user2;
     private ConcreteWikiPage page1;
 
     @Before
     public void setUp() throws Exception {
-        user1 = new User(1L, "testUserName1", "testFirstName1", "testLastName1", "testEmail1");
+        user1 = new User(1L, "testUserName1", "testFirstName1", "testLastName1", "testEmail1", false, new ArrayList<>(), new ArrayList<>());
+        user2 = new User(2L, "testUserName2", "testFirstName2", "testLastName2", "testEmail2", false, new ArrayList<>(), new ArrayList<>());
         user1.setPassword("testPassword1");
+        user2.setPassword("testPassword2");
         page1 = new ConcreteWikiPage("testTitle1", "testContent1", user1);
     }
 
@@ -30,11 +35,13 @@ public class UserTest {
         assertEquals("Failure - lastName for asSessionUser()", "testLastName1", sessionUser.getLastName());
         assertEquals("Failure - email for asSessionUser()", "testEmail1", sessionUser.getEmail());
         assertEquals("Failure - password for asSessionUser()", null, sessionUser.getPassword());
+        assertFalse("Failure - isDeleted for asSessionUser()", sessionUser.isDeleted());
+        assertEquals("Failure - email for asSessionUser()", new ArrayList<ConcreteWikiPage>(), sessionUser.getLikedPages());
     }
 
     @Test
     public void equals() throws Exception {
-        User testUser = new User(1L, "testUserName1", "testFirstName1", "testLastName1", "testEmail1");
+        User testUser = new User(1L, "testUserName1", "testFirstName1", "testLastName1", "testEmail1", false, new ArrayList<>(), new ArrayList<>());
         assertTrue("Failure - User.equals()", testUser.equals(user1));
     }
 
@@ -62,5 +69,21 @@ public class UserTest {
         user1.likePage(page1);
         user1.unlikePage(page1);
         assertFalse("Failure - the newly unliked page is in the user's liked pages", user1.getLikedPages().contains(page1));
+    }
+
+    @Test
+    public void followUser() throws Exception {
+        user1.followUser(user2);
+        assertTrue("Failure - the newly followed user is not in the user's followed users", user1.getFollowedUsers().contains(user2));
+
+        user1.followUser(user1);
+        assertTrue("Failure - User following itself is not in the user's followed users", user1.getFollowedUsers().contains(user1));
+    }
+
+    @Test
+    public void unfollowUser() throws Exception {
+        user1.followUser(user2);
+        user1.unfollowUser(user2);
+        assertFalse("Failure -the newly unfollowed user is in the user's followed users", user1.getFollowedUsers().contains(user2));
     }
 }

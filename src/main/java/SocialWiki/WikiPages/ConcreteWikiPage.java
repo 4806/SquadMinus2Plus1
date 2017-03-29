@@ -1,6 +1,7 @@
 package SocialWiki.WikiPages;
 
 import SocialWiki.Users.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
@@ -65,6 +66,7 @@ public class ConcreteWikiPage implements WikiPage {
     /**
      * The contents of the WikiPage in Markdown
      */
+    @Column(columnDefinition = "text")
     private String content;
 
     /**
@@ -72,6 +74,8 @@ public class ConcreteWikiPage implements WikiPage {
      */
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     @JoinColumn(name = "author_id")
+    @ManyToOne
+    @JsonIgnore
     private User author;
 
     /**

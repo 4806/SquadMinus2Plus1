@@ -123,6 +123,27 @@ public class WikiPageController {
     public ResponseEntity<List<WikiPageWithAuthorProxy>> searchWikiPage(HttpServletRequest request) {
 
         //Retrieve parameters from request
+        String searchText = request.getParameter("title");
+
+        if (searchText == null) {    //If no parameter was provided
+            return ResponseEntity.unprocessableEntity().body(null);
+        }
+
+        List<WikiPageWithAuthorProxy> pages = wikiPageRepo.findByTitleAndContent(searchText.trim());
+
+        return ResponseEntity.ok(pages);
+
+    }
+
+    /**
+     * Method to handle searching for list of WikiPages. Will return all WikiPages if all parameters are blank
+     * @param request - contains the parameters of the WikiPages being searched for
+     * @return the list of WikiPages found
+     */
+    @GetMapping("/advancedSearchWikiPage")
+    public ResponseEntity<List<WikiPageWithAuthorProxy>> advancedSearchWikiPage(HttpServletRequest request) {
+
+        //Retrieve parameters from request
         String title = request.getParameter("title");
         String username = request.getParameter("user");
         String content = request.getParameter("content");
@@ -143,7 +164,7 @@ public class WikiPageController {
         }
         //Note this still allows for parameters to be NULL if at least one is not null. In these cases, null parameters will be treated as empty string by the query.
 
-        List<WikiPageWithAuthorProxy> pages = wikiPageRepo.findByTitleAndAuthorAndContent(title, username, content);
+        List<WikiPageWithAuthorProxy> pages = wikiPageRepo.findByTitleAndAuthorAndContent(title.trim(), username.trim(), content.trim());
 
         return ResponseEntity.ok(pages);
 

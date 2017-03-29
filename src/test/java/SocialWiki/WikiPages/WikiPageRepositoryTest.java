@@ -113,7 +113,7 @@ public class WikiPageRepositoryTest {
         pages = wikiPageRepository.findByTitleAndAuthorAndContent("",testUser3.getUserName().substring(4,testUser3.getUserName().length()).toUpperCase(),"");
         assertEquals("Failure - Number of pages found by findByTitleAndAuthorAndContent('',testUser3.getUserName().substring(4,testUser3.getUserName().length()).toUpperCase(),'') should be 2", 2, pages.size());
         assertTrue("Failure - Page 1 found by findByTitleAndAuthorAndContent('',testUser3.getUserName().substring(4,testUser3.getUserName().length()).toUpperCase(),'') is not correct", testList.contains(pages.get(0)));
-        assertTrue("Failure - Page 2 found by findByTitleAndAuthorAndContent('',testUser3.getUserName().substring(4,testUser3.getUserName().length()).toUpperCase(),'') is not correct", testList.contains(pages.get(0)));
+        assertTrue("Failure - Page 2 found by findByTitleAndAuthorAndContent('',testUser3.getUserName().substring(4,testUser3.getUserName().length()).toUpperCase(),'') is not correct", testList.contains(pages.get(1)));
         pages.clear();
 
         pages = wikiPageRepository.findByTitleAndAuthorAndContent("","","testConTENT");
@@ -140,13 +140,6 @@ public class WikiPageRepositoryTest {
         pages = wikiPageRepository.findByTitleAndAuthorAndContent("testTitle1", testUser1.getUserName(),"testContent1");
         assertEquals("Failure - Number of pages found by findByTitleAndAuthorAndContent('testTitle1','testUser1.getUserName()','testContent1') should be 1", 1, pages.size());
         assertEquals("Failure - Page found by findByTitleAndAuthorAndContent('testTitle1','testUser1.getUserName()','testContent1') is not correct", testResult1, pages.get(0));
-        pages.clear();
-
-        //Test finding single page using title value that is within content
-
-        pages = wikiPageRepository.findByTitleAndAuthorAndContent("testContent1","","");
-        assertEquals("Failure - Number of pages found by findByTitleAndAuthorAndContent('testContent1','','') should be 1", 1, pages.size());
-        assertEquals("Failure - Page found by findByTitleAndAuthorAndContent('testContent1','','') is not correct", testResult1, pages.get(0));
         pages.clear();
 
     }
@@ -206,6 +199,54 @@ public class WikiPageRepositoryTest {
 
         page = wikiPageRepository.findRootById(-1L);
         assertNull("Failure - page found by findRootById(-1L) should be null", page);
+    }
+
+    @Test
+    public void findByTitleAndContent() throws Exception {
+
+        List<WikiPageWithAuthorProxy> testList = new ArrayList<>();
+        testList.add(WikiPageWithAuthorProxy.getResult(testConcreteWikiPage3));
+        testList.add(WikiPageWithAuthorProxy.getResult(testConcreteWikiPage4));
+
+        WikiPageWithAuthorProxy testResult1 = WikiPageWithAuthorProxy.getResult(testConcreteWikiPage1);
+
+        //Test when parameter is blank
+
+        List<WikiPageWithAuthorProxy> pages = wikiPageRepository.findByTitleAndContent("");
+        assertEquals("Failure - Number of pages found by findByTitleAndContent('') should be 4", 4, pages.size());
+        pages.clear();
+
+        //Test with valid title
+
+        pages = wikiPageRepository.findByTitleAndContent("testTitle1");
+        assertEquals("Failure - Number of pages found by findByTitleAndContent('testTitle1') should be 1", 1, pages.size());
+        assertEquals("Failure - Page found by findByTitleAndContent('testTitle1') is not correct", testResult1, pages.get(0));
+        pages.clear();
+
+        //Test with valid title substring with mixed case
+
+        pages = wikiPageRepository.findByTitleAndContent("STTitle1");
+        assertEquals("Failure - Number of pages found by findByTitleAndContent('tESTTitle1') should be 1", 1, pages.size());
+        assertEquals("Failure - Page found by findByTitleAndContent('STTitle1') is not correct", testResult1, pages.get(0));
+        pages.clear();
+
+        //Test with valid title which returns multiple pages
+
+        pages = wikiPageRepository.findByTitleAndContent("testTitlePair");
+        assertEquals("Failure - Number of pages found by findByTitleAndContent('tESTTitle1') should be 2", 2, pages.size());
+        assertTrue("Failure - Page 1 found by findByTitleAndContent('testTitlePair') is not correct", testList.contains(pages.get(0)));
+        assertTrue("Failure - Page 2 found by findByTitleAndContent('testTitlePair') is not correct", testList.contains(pages.get(1)));
+
+        pages.clear();
+
+        //Test with valid paramter that is content sub string
+
+        pages = wikiPageRepository.findByTitleAndContent("cONtent1");
+        assertEquals("Failure - Number of pages found by findByTitleAndContent('testTitle1') should be 1", 1, pages.size());
+        assertEquals("Failure - Page found by findByTitleAndContent('testTitle1') is not correct", testResult1, pages.get(0));
+        pages.clear();
+
+
     }
 
     @Before

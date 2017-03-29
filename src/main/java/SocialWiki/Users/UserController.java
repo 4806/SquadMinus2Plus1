@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -286,6 +287,132 @@ public class UserController {
         session.setAttribute("user", user);
 
         // send an HTTP 204 response to signify the page was successfully unliked
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+    }
+
+    @GetMapping("/retrieveUser")
+    public ResponseEntity<User> retrieveUser(HttpServletRequest request) {
+        // get userName from request
+        String userName = request.getParameter("user");
+
+        // send an HTTP 422 response if user parameter is missing or empty
+        if (userName == null || userName.isEmpty()) {
+            return ResponseEntity.unprocessableEntity().body(null);
+        }
+
+        // get the user from the user repository
+        User user = userRepo.findByUserName(userName);
+
+        // send an HTTP 422 response if there is no user with userName
+        if (user == null) {
+            return ResponseEntity.unprocessableEntity().body(null);
+        }
+
+        return ResponseEntity.ok(user.asSessionUser());
+    }
+
+    /**
+     * Add a user to the list of users that a User currently follows
+     * @param request - an HTTP request that contains the session's cookie information
+     * @return an HTTP response that signifies whether the following of the user was successful
+     */
+    @PostMapping("/followUser")
+    public ResponseEntity<String> followUser(HttpServletRequest request) {
+        // send an HTTP 403 response if there is currently not a session
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+
+        // get the userId parameter from the post request
+        Long userId;
+        try {
+            userId = Long.parseLong(request.getParameter("id"));
+        } catch (NumberFormatException e) {
+            return ResponseEntity.unprocessableEntity().body(null); // send an HTTP 422 response if parameter cannot be cast as a Long
+        }
+
+        // get the user from the user repo
+        User followinguser = userRepo.findOne(userId);
+
+        // send an HTTP 422 response if there is no user with userId
+        if (followinguser == null) {
+            return ResponseEntity.unprocessableEntity().body(null);
+        }
+
+        // get the logged in user from the current session
+        User user = (User) session.getAttribute("user");
+
+        // send an HTTP 403 response if the User already follows the user or the following user is the user behind the request
+        if (user.getFollowedUsers().contains(followinguser) || followinguser.equals(user)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+
+        // add the user to the User's followed users
+        user.followUser(followinguser);
+
+        // save the update to the user in the database and session
+        user = userRepo.save(user);
+        session.setAttribute("user", user);
+
+        // send an HTTP 204 response to signify the user was successfully followed
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+    }
+
+    /**
+     * Remove a user from the list of users that a User currently follows
+     * @param request - an HTTP request that contains the session's cookie information
+     * @return an HTTP response that signifies whether the user was removed successfully
+     */
+    @PostMapping("/unfollowUser")
+    public ResponseEntity<String> unfollowPage(HttpServletRequest request) {
+        // send an HTTP 403 response if there is currently not a session
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+
+        // get the pageId parameter from the post request
+        Long pageId;
+        try {
+            pageId = Long.parseLong(request.getParameter("id"));
+        } catch (NumberFormatException e) {
+            return ResponseEntity.unprocessableEntity().body(null); // send an HTTP 422 response if parameter cannot be cast as a Long
+        }
+
+        // get the userId parameter from the post request
+        Long userId;
+        try {
+            userId = Long.parseLong(request.getParameter("id"));
+        } catch (NumberFormatException e) {
+            return ResponseEntity.unprocessableEntity().body(null); // send an HTTP 422 response if parameter cannot be cast as a Long
+        }
+
+        // get the user from the user repo
+        User followinguser = userRepo.findOne(userId);
+
+        // send an HTTP 422 response if there is no user with userId
+        if (followinguser == null) {
+            return ResponseEntity.unprocessableEntity().body(null);
+        }
+
+        // get the logged in user from the current session
+        User user = (User) session.getAttribute("user");
+
+        // send an HTTP 403 response if the User doesn't follow the user
+        if (!user.getFollowedUsers().contains(followinguser)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+
+
+        // remove the user from the User's followed users
+        user.unfollowUser(followinguser);
+
+        // save the update to the user in the database and session
+        user = userRepo.save(user);
+        session.setAttribute("user", user);
+
+        // send an HTTP 204 response to signify the user was successfully unfollowed
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
     }
 }
