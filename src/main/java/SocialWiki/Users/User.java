@@ -75,11 +75,20 @@ public class User {
     private List<ConcreteWikiPage> likedPages;
 
     /**
+     * The list of Users that the User follows
+     */
+    @Getter
+    @ManyToMany(cascade = CascadeType.MERGE)
+    @JsonIgnore
+    private List<User> followedUsers;
+
+    /**
      * Default constructor
      */
     public User() {
         this.isDeleted = false;
         this.likedPages = new ArrayList<>();
+        this.followedUsers = new ArrayList<>();
     }
 
     /**
@@ -98,6 +107,7 @@ public class User {
         this.password = password;
         this.isDeleted = false;
         this.likedPages = new ArrayList<>();
+        this.followedUsers = new ArrayList<>();
     }
 
     /**
@@ -107,8 +117,11 @@ public class User {
      * @param firstName - the first name of the User
      * @param lastName - the last name of the User
      * @param email - the email address of the User
+     * @param isDeleted - boolean as to whether or not the user is deleted
+     * @param likedPages - list of pages the User likes
+     * @param followedUsers - list of users the User follows
      */
-    public User(Long id, String userName, String firstName, String lastName, String email, boolean isDeleted, List<ConcreteWikiPage> likedPages) {
+    public User(Long id, String userName, String firstName, String lastName, String email, boolean isDeleted, List<ConcreteWikiPage> likedPages, List<User> followedUsers) {
         this.id = id;
         this.userName = userName;
         this.firstName = firstName;
@@ -116,6 +129,7 @@ public class User {
         this.email = email;
         this.isDeleted = isDeleted;
         this.likedPages = likedPages;
+        this.followedUsers = followedUsers;
     }
 
     /**
@@ -162,7 +176,8 @@ public class User {
                 this.lastName,
                 this.email,
                 this.isDeleted,
-                this.likedPages);
+                this.likedPages,
+                this.followedUsers);
     }
 
     /**
@@ -175,6 +190,7 @@ public class User {
         this.email = null;
         this.password = null;
         this.likedPages = null;
+        this.followedUsers = null;
     }
 
     /**
@@ -203,5 +219,21 @@ public class User {
             list.add(new WikiPageWithAuthorProxy(page));
         }
         return list;
+    }
+
+    /**
+     * Add a user to the User's followed users
+     * @param user - the user that the User followed
+     */
+    public void followUser(User user) {
+        this.followedUsers.add(user);
+    }
+
+    /**
+     * Remove a user from the User's followed users
+     * @param user - the user that the User no longer follows
+     */
+    public void unfollowUser(User user) {
+        this.followedUsers.remove(user);
     }
 }
