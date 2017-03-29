@@ -74,7 +74,6 @@ public class ConcreteWikiPage implements WikiPage {
      */
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     @JoinColumn(name = "author_id")
-    @ManyToOne
     @JsonIgnore
     private User author;
 

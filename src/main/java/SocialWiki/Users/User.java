@@ -5,8 +5,6 @@ import SocialWiki.WikiPages.WikiPageWithAuthorProxy;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
@@ -71,8 +69,7 @@ public class User {
      * The list of pages that the User likes
      */
     @Getter
-    @OneToMany(cascade = CascadeType.MERGE)
-    @Fetch(FetchMode.SELECT)
+    @ManyToMany(cascade = CascadeType.MERGE)
     @JoinColumn(name="liked_page_id")
     @JsonIgnore
     private List<ConcreteWikiPage> likedPages;
@@ -82,7 +79,6 @@ public class User {
      */
     @Getter
     @OneToMany(cascade = CascadeType.MERGE, mappedBy = "author")
-    @Fetch(FetchMode.SELECT)
     private List<ConcreteWikiPage> createdPages;
 
     /**
