@@ -22,7 +22,6 @@ import java.util.List;
  * ConcreteWikiPage controller provides a REST API interface that gives access to functionality allowing the creation, retrieval, and searching of WikiPages
  */
 @RestController
-@Transactional
 public class WikiPageController {
 
     /**
@@ -43,6 +42,7 @@ public class WikiPageController {
      * @return the new ConcreteWikiPage
      */
     @PostMapping("/createWikiPage")
+    @Transactional
     public ResponseEntity<WikiPageWithAuthorAndContentProxy> createWikiPage(HttpServletRequest request) {
 
         // send an HTTP 403 response if there is currently not a session
@@ -76,6 +76,9 @@ public class WikiPageController {
 
         // get the logged in user from the current session
         User user = (User) session.getAttribute("user");
+
+        // TODO: find way to reset transaction on session user, instead of querying for the same one again
+        user = userRepo.findByUserName(user.getUserName());
 
         ConcreteWikiPage newPage;
 
@@ -190,6 +193,14 @@ public class WikiPageController {
 
         if (page == null) {
             return ResponseEntity.unprocessableEntity().body(null);
+        }
+
+        // TODO: find a better way to do this
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            User user = (User) session.getAttribute("user");
+            user = userRepo.findByUserName(user.getUserName());
+            session.setAttribute("user", user);
         }
 
         response.addCookie(CookieManager.getIsLikedCookie(request, id));

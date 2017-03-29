@@ -8,6 +8,7 @@ import lombok.Setter;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,7 +70,7 @@ public class User {
      * The list of pages that the User likes
      */
     @Getter
-    @ManyToMany(cascade = CascadeType.MERGE)
+    @ManyToMany(cascade = CascadeType.PERSIST)
     @JoinColumn(name="liked_page_id")
     @JsonIgnore
     private List<ConcreteWikiPage> likedPages;
@@ -78,7 +79,8 @@ public class User {
      * The list of pages that the User has created
      */
     @Getter
-    @OneToMany(cascade = CascadeType.MERGE, mappedBy = "author")
+    @OneToMany(cascade = CascadeType.PERSIST, mappedBy = "author")
+    @JsonIgnore
     private List<ConcreteWikiPage> createdPages;
 
     /**
@@ -130,15 +132,14 @@ public class User {
      * @param likedPages - list of pages the User likes
      * @param followedUsers - list of users the User follows
      */
-    public User(Long id, String userName, String firstName, String lastName, String email, boolean isDeleted, List<ConcreteWikiPage> likedPages, List<User> followedUsers) {
+    public User(Long id, String userName, String firstName, String lastName, String email, boolean isDeleted, List<ConcreteWikiPage> likedPages, List<User> followedUsers, List<ConcreteWikiPage> createdPages) {
         this.id = id;
         this.userName = userName;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.isDeleted = false;
-        this.likedPages = new ArrayList<>();
-        this.createdPages = new ArrayList<>();
+        this.createdPages = createdPages;
         this.isDeleted = isDeleted;
         this.likedPages = likedPages;
         this.followedUsers = followedUsers;
@@ -189,7 +190,8 @@ public class User {
                 this.email,
                 this.isDeleted,
                 this.likedPages,
-                this.followedUsers);
+                this.followedUsers,
+                this.createdPages);
     }
 
     /**
@@ -236,6 +238,18 @@ public class User {
     public List<WikiPageWithAuthorProxy> getLikedProxyPages() {
         List<WikiPageWithAuthorProxy> list = new ArrayList<>();
         for(ConcreteWikiPage page : this.likedPages) {
+            list.add(new WikiPageWithAuthorProxy(page));
+        }
+        return list;
+    }
+
+    /**
+     * Get a list of created pages to display in user profile
+     * @return the list of created proxy pages
+     */
+    public List<WikiPageWithAuthorProxy> getCreatedProxyPages() {
+        List<WikiPageWithAuthorProxy> list = new ArrayList<>();
+        for(ConcreteWikiPage page : this.createdPages) {
             list.add(new WikiPageWithAuthorProxy(page));
         }
         return list;

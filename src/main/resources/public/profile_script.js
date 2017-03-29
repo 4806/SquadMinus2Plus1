@@ -89,12 +89,12 @@ profilePage.handler.setContent = function(dataString) {
       }
 
       //Created Pages - should be already in the object, just refresh the table
-      if( profile.createdPages !== undefined && profile.createdPages !== null && profile.createdPages.length > 0 ) {
+      if( profile.createdProxyPages !== undefined && profile.createdProxyPages !== null && profile.createdProxyPages.length > 0 ) {
         $$("createdlist").show();
         $$("createdlist").clearAll();
-        for( var n = 0; n < profile.createdPages.length; n++){
-            profile.createdPages[n].creationDate = pageUtil.getFormattedDate(profile.createdPages[n].creationDate);
-            $$("likelist").add(profile.createdPages[n]);
+        for( var n = 0; n < profile.createdProxyPages.length; n++){
+            profile.createdProxyPages[n].creationDate = pageUtil.getFormattedDate(profile.createdProxyPages[n].creationDate);
+            $$("createdlist").add(profile.createdProxyPages[n]);
         }
         $$("createdheader").show();
         $$("createdlist").refresh();

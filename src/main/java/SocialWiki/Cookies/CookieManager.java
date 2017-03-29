@@ -6,6 +6,7 @@ import SocialWiki.WikiPages.ConcreteWikiPage;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.transaction.Transactional;
 
 /**
  * Created by Connor on 2017-03-08.
@@ -75,6 +76,7 @@ public class CookieManager {
      * @param id - the Id of the page that the user does or does not like
      * @return a cookie that signifies if the user likes the page, they do not, or clears the cookie
      */
+    @Transactional
     public static Cookie getIsLikedCookie(HttpServletRequest request, Long id) {
         Cookie c;
 

@@ -201,6 +201,7 @@ public class UserController {
      * @return an HTTP response that signifies whether the liking of the page was successful
      */
     @PostMapping("/likePage")
+    @Transactional
     public ResponseEntity<String> likePage(HttpServletRequest request) {
         // send an HTTP 403 response if there is currently not a session
         HttpSession session = request.getSession(false);
@@ -227,7 +228,8 @@ public class UserController {
         // get the logged in user from the current session
         User user = (User) session.getAttribute("user");
 
-        user.getLikedPages().size();
+        // TODO: find way to reset transaction on session user, instead of querying for the same one again
+        user = userRepo.findByUserName(user.getUserName());
 
         // send an HTTP 403 response if the User already likes the page
         if (user.getLikedPages().contains(page)) {
@@ -246,6 +248,7 @@ public class UserController {
     }
 
     @PostMapping("/unlikePage")
+    @Transactional
     public ResponseEntity<String> unlikePage(HttpServletRequest request) {
         // send an HTTP 403 response if there is currently not a session
         HttpSession session = request.getSession(false);
@@ -272,7 +275,8 @@ public class UserController {
         // get the logged in user from the current session
         User user = (User) session.getAttribute("user");
 
-        user.getLikedPages().size();
+        // TODO: find way to reset transaction on session user, instead of querying for the same one again
+        user = userRepo.findByUserName(user.getUserName());
 
         // send an HTTP 403 response if the User does not like the page
         if (!user.getLikedPages().contains(page)) {
@@ -317,6 +321,7 @@ public class UserController {
      * @return an HTTP response that signifies whether the following of the user was successful
      */
     @PostMapping("/followUser")
+    @Transactional
     public ResponseEntity<String> followUser(HttpServletRequest request) {
         // send an HTTP 403 response if there is currently not a session
         HttpSession session = request.getSession(false);
@@ -343,6 +348,9 @@ public class UserController {
         // get the logged in user from the current session
         User user = (User) session.getAttribute("user");
 
+        // TODO: find way to reset transaction on session user, instead of querying for the same one again
+        user = userRepo.findByUserName(user.getUserName());
+
         // send an HTTP 403 response if the User already follows the user or the following user is the user behind the request
         if (user.getFollowedUsers().contains(followinguser) || followinguser.equals(user)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
@@ -365,6 +373,7 @@ public class UserController {
      * @return an HTTP response that signifies whether the user was removed successfully
      */
     @PostMapping("/unfollowUser")
+    @Transactional
     public ResponseEntity<String> unfollowPage(HttpServletRequest request) {
         // send an HTTP 403 response if there is currently not a session
         HttpSession session = request.getSession(false);
@@ -398,6 +407,9 @@ public class UserController {
 
         // get the logged in user from the current session
         User user = (User) session.getAttribute("user");
+
+        // TODO: find way to reset transaction on session user, instead of querying for the same one again
+        user = userRepo.findByUserName(user.getUserName());
 
         // send an HTTP 403 response if the User doesn't follow the user
         if (!user.getFollowedUsers().contains(followinguser)) {

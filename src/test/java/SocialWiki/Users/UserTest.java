@@ -19,8 +19,8 @@ public class UserTest {
 
     @Before
     public void setUp() throws Exception {
-        user1 = new User(1L, "testUserName1", "testFirstName1", "testLastName1", "testEmail1", false, new ArrayList<>(), new ArrayList<>());
-        user2 = new User(2L, "testUserName2", "testFirstName2", "testLastName2", "testEmail2", false, new ArrayList<>(), new ArrayList<>());
+        user1 = new User(1L, "testUserName1", "testFirstName1", "testLastName1", "testEmail1", false, new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+        user2 = new User(2L, "testUserName2", "testFirstName2", "testLastName2", "testEmail2", false, new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
         user1.setPassword("testPassword1");
         user2.setPassword("testPassword2");
         page1 = new ConcreteWikiPage("testTitle1", "testContent1", user1);
@@ -41,7 +41,7 @@ public class UserTest {
 
     @Test
     public void equals() throws Exception {
-        User testUser = new User(1L, "testUserName1", "testFirstName1", "testLastName1", "testEmail1", false, new ArrayList<>(), new ArrayList<>());
+        User testUser = new User(1L, "testUserName1", "testFirstName1", "testLastName1", "testEmail1", false, new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
         assertTrue("Failure - User.equals()", testUser.equals(user1));
     }
 
