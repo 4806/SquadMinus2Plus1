@@ -605,7 +605,7 @@ public class UserControllerTest {
 
         // perform successful following of user
         mockMvc.perform(post("/followUser")
-                .content("id=" + user2.getId())
+                .content("user=" + user2.getUserName())
                 .contentType("application/x-www-form-urlencoded")
                 .session(session))
                 .andExpect(status().isNoContent());
@@ -616,35 +616,28 @@ public class UserControllerTest {
 
         // perform unsuccessful following of user that is already followed
         mockMvc.perform(post("/followUser")
-                .content("id=" + user2.getId())
+                .content("user=" + user2.getUserName())
                 .contentType("application/x-www-form-urlencoded")
                 .session(session))
                 .andExpect(status().isForbidden());
 
         // perform unsuccessful following of user where user is one making request
         mockMvc.perform(post("/followUser")
-                .content("id=" + user1.getId())
+                .content("user=" + user1.getUserName())
                 .contentType("application/x-www-form-urlencoded")
                 .session(session))
                 .andExpect(status().isForbidden());
 
         // perform unsuccessful following of user that does not exist
         mockMvc.perform(post("/followUser")
-                .content("id=-1")
-                .contentType("application/x-www-form-urlencoded")
-                .session(session))
-                .andExpect(status().isUnprocessableEntity());
-
-        // perform unsuccessful following of user with id parameter that is not a Long
-        mockMvc.perform(post("/followUser")
-                .content("id=test")
+                .content("user=badName")
                 .contentType("application/x-www-form-urlencoded")
                 .session(session))
                 .andExpect(status().isUnprocessableEntity());
 
         // perform unsuccessful following of user with empty id parameter
         mockMvc.perform(post("/followUser")
-                .content("id=")
+                .content("user=")
                 .contentType("application/x-www-form-urlencoded")
                 .session(session))
                 .andExpect(status().isUnprocessableEntity());
@@ -658,14 +651,14 @@ public class UserControllerTest {
         // perform unsuccessful following of user with invalidated session
         session.invalidate();
         mockMvc.perform(post("/followUser")
-                .content("id=" + user2.getId())
+                .content("user=" + user2.getUserName())
                 .contentType("application/x-www-form-urlencoded")
                 .session(session))
                 .andExpect(status().isForbidden());
 
         // perform unsuccessful following of user with no session
         mockMvc.perform(post("/followUser")
-                .content("id=" + user2.getId())
+                .content("user=" + user2.getUserName())
                 .contentType("application/x-www-form-urlencoded"))
                 .andExpect(status().isForbidden());
 
@@ -679,7 +672,7 @@ public class UserControllerTest {
 
         // perform successful following of user1 by user2 (check if users can follow each other)
         mockMvc.perform(post("/followUser")
-                .content("id=" + user1.getId())
+                .content("user=" + user1.getUserName())
                 .contentType("application/x-www-form-urlencoded")
                 .session(session))
                 .andExpect(status().isNoContent());
@@ -700,7 +693,7 @@ public class UserControllerTest {
 
         // perform successful following of user1 by user3 (Test is more than 1 user can follow same user)
         mockMvc.perform(post("/followUser")
-                .content("id=" + user1.getId())
+                .content("user=" + user1.getUserName())
                 .contentType("application/x-www-form-urlencoded")
                 .session(session))
                 .andExpect(status().isNoContent());
@@ -723,14 +716,14 @@ public class UserControllerTest {
 
         // perform successful following of user
         mockMvc.perform(post("/followUser")
-                .content("id=" + user2.getId())
+                .content("user=" + user2.getUserName())
                 .contentType("application/x-www-form-urlencoded")
                 .session(session))
                 .andExpect(status().isNoContent());
 
         // perform successful unfollowing of user
         mockMvc.perform(post("/unfollowUser")
-                .content("id=" + user2.getId())
+                .content("user=" + user2.getUserName())
                 .contentType("application/x-www-form-urlencoded")
                 .session(session))
                 .andExpect(status().isNoContent());
@@ -741,28 +734,21 @@ public class UserControllerTest {
 
         // perform unsuccessful unfollowing of user that is already unfollowed
         mockMvc.perform(post("/unfollowUser")
-                .content("id=" + user2.getId())
+                .content("user=" + user2.getUserName())
                 .contentType("application/x-www-form-urlencoded")
                 .session(session))
                 .andExpect(status().isForbidden());
 
         // perform unsuccessful unfollowing of user that does not exist
         mockMvc.perform(post("/unfollowUser")
-                .content("id=-1")
-                .contentType("application/x-www-form-urlencoded")
-                .session(session))
-                .andExpect(status().isUnprocessableEntity());
-
-        // perform unsuccessful unfollowing of user with id parameter that is not a Long
-        mockMvc.perform(post("/unfollowUser")
-                .content("id=test")
+                .content("user=badName")
                 .contentType("application/x-www-form-urlencoded")
                 .session(session))
                 .andExpect(status().isUnprocessableEntity());
 
         // perform unsuccessful unfollowing of user with empty id parameter
         mockMvc.perform(post("/unfollowUser")
-                .content("id=")
+                .content("user=")
                 .contentType("application/x-www-form-urlencoded")
                 .session(session))
                 .andExpect(status().isUnprocessableEntity());
@@ -776,14 +762,14 @@ public class UserControllerTest {
         // perform unsuccessful unfollowing of user with invalidated session
         session.invalidate();
         mockMvc.perform(post("/unfollowUser")
-                .content("id=" + user2.getId())
+                .content("user=" + user2.getUserName())
                 .contentType("application/x-www-form-urlencoded")
                 .session(session))
                 .andExpect(status().isForbidden());
 
         // perform unsuccessful unfollowing of user with no session
         mockMvc.perform(post("/unfollowUser")
-                .content("id=" + user2.getId())
+                .content("user=" + user2.getUserName())
                 .contentType("application/x-www-form-urlencoded"))
                 .andExpect(status().isForbidden());
     }

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.*;
+import javax.transaction.Transactional;
 import java.util.List;
 
 /**
@@ -19,6 +20,7 @@ import java.util.List;
  */
 
 @RestController
+@Transactional
 public class UserController {
 
     /**
@@ -285,7 +287,7 @@ public class UserController {
     }
 
     @GetMapping("/retrieveUser")
-    public ResponseEntity<User> retrieveUser(HttpServletRequest request) {
+    public ResponseEntity<User> retrieveUser(HttpServletRequest request, HttpServletResponse response) {
         // get userName from request
         String userName = request.getParameter("user");
 
@@ -302,6 +304,7 @@ public class UserController {
             return ResponseEntity.unprocessableEntity().body(null);
         }
 
+        response.addCookie(CookieManager.getIsFollowedCookie(request, userName));
         return ResponseEntity.ok(user.asSessionUser());
     }
 
@@ -318,16 +321,16 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
 
-        // get the userId parameter from the post request
-        Long userId;
-        try {
-            userId = Long.parseLong(request.getParameter("id"));
-        } catch (NumberFormatException e) {
-            return ResponseEntity.unprocessableEntity().body(null); // send an HTTP 422 response if parameter cannot be cast as a Long
+        // get userName from request
+        String userName = request.getParameter("user");
+
+        // send an HTTP 422 response if user parameter is missing or empty
+        if (userName == null || userName.isEmpty()) {
+            return ResponseEntity.unprocessableEntity().body(null);
         }
 
-        // get the user from the user repo
-        User followinguser = userRepo.findOne(userId);
+        // get the user from the user repository
+        User followinguser = userRepo.findByUserName(userName);
 
         // send an HTTP 422 response if there is no user with userId
         if (followinguser == null) {
@@ -366,24 +369,16 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
 
-        // get the pageId parameter from the post request
-        Long pageId;
-        try {
-            pageId = Long.parseLong(request.getParameter("id"));
-        } catch (NumberFormatException e) {
-            return ResponseEntity.unprocessableEntity().body(null); // send an HTTP 422 response if parameter cannot be cast as a Long
+        // get userName from request
+        String userName = request.getParameter("user");
+
+        // send an HTTP 422 response if user parameter is missing or empty
+        if (userName == null || userName.isEmpty()) {
+            return ResponseEntity.unprocessableEntity().body(null);
         }
 
-        // get the userId parameter from the post request
-        Long userId;
-        try {
-            userId = Long.parseLong(request.getParameter("id"));
-        } catch (NumberFormatException e) {
-            return ResponseEntity.unprocessableEntity().body(null); // send an HTTP 422 response if parameter cannot be cast as a Long
-        }
-
-        // get the user from the user repo
-        User followinguser = userRepo.findOne(userId);
+        // get the user from the user repository
+        User followinguser = userRepo.findByUserName(userName);
 
         // send an HTTP 422 response if there is no user with userId
         if (followinguser == null) {
