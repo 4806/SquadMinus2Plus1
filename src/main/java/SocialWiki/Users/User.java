@@ -91,6 +91,14 @@ public class User {
     private List<User> followedUsers;
 
     /**
+     * The list of notifications the User currently has
+     */
+    @Getter
+    @OneToMany(cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<String> notifications;
+
+    /**
      * Default constructor
      */
     public User() {
@@ -98,6 +106,7 @@ public class User {
         this.likedPages = new ArrayList<>();
         this.followedUsers = new ArrayList<>();
         this.createdPages = new ArrayList<>();
+        this.notifications = new ArrayList<>();
     }
 
     /**
@@ -118,6 +127,7 @@ public class User {
         this.likedPages = new ArrayList<>();
         this.followedUsers = new ArrayList<>();
         this.createdPages = new ArrayList<>();
+        this.notifications = new ArrayList<>();
     }
 
     /**
@@ -131,8 +141,10 @@ public class User {
      * @param likedPages - list of pages the User likes
      * @param followedUsers - list of users the User follows
      * @param createdPages - list of pages the User created
+     * @param notifications - list of notifications the User currently has
      */
-    public User(Long id, String userName, String firstName, String lastName, String email, boolean isDeleted, List<ConcreteWikiPage> likedPages, List<User> followedUsers, List<ConcreteWikiPage> createdPages) {
+    public User(Long id, String userName, String firstName, String lastName, String email, boolean isDeleted,
+                List<ConcreteWikiPage> likedPages, List<User> followedUsers, List<ConcreteWikiPage> createdPages, List<String> notifications) {
         this.id = id;
         this.userName = userName;
         this.firstName = firstName;
@@ -143,6 +155,7 @@ public class User {
         this.isDeleted = isDeleted;
         this.likedPages = likedPages;
         this.followedUsers = followedUsers;
+        this.notifications = notifications;
     }
 
     /**
@@ -191,7 +204,8 @@ public class User {
                 this.isDeleted,
                 this.likedPages,
                 this.followedUsers,
-                this.createdPages);
+                this.createdPages,
+                this.notifications);
     }
 
     /**
@@ -205,6 +219,7 @@ public class User {
         this.password = null;
         this.likedPages = null;
         this.followedUsers = null;
+        this.notifications = null;
     }
 
     /**
@@ -270,4 +285,16 @@ public class User {
     public void unfollowUser(User user) {
         this.followedUsers.remove(user);
     }
+
+    /**
+     * Adds the notification to the list of current notifications for the User
+     * @param notification - the new notification
+     */
+    public void addNotification(String notification) { this.notifications.add(notification); }
+
+    /**
+     * Removes the notification from the list of notifications for the User
+     * @param notification - the notification to remove
+     */
+    public void removeNotification(String notification) { this.notifications.remove(notification); }
 }
