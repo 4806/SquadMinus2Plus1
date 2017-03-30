@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.HtmlUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -73,6 +74,10 @@ public class WikiPageController {
         if (parentID.compareTo(0L) == 0 || parentID.compareTo(-1L) < 0) {  //Parent ID must be > 0 or -1
             return ResponseEntity.unprocessableEntity().body(null);
         }
+
+        //Escape html
+        title = HtmlUtils.htmlEscape(title);
+        content = HtmlUtils.htmlEscape(content);
 
         // get the logged in user from the current session
         String username = (String) session.getAttribute("user");
