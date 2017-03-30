@@ -224,7 +224,7 @@ profilePage.getContent = function() {
     });
 
     //Get following users
-    webix.ajax().post("/getFollowingUsers", {"user":params.user}, {
+    webix.ajax().get("/getFollowingUsers", {"user":params.user}, {
         error:function(){
           $$("followedusers").hide();
           $$("followlist").hide();
@@ -233,7 +233,7 @@ profilePage.getContent = function() {
     });
 
     //Get users following
-    webix.ajax().post("/getUsersFollowing", {"user":params.user}, {
+    webix.ajax().get("/getUsersFollowing", {"user":params.user}, {
         error:function(){
           $$("usersfollowing").hide();
           $$("usersfollowinglist").hide();

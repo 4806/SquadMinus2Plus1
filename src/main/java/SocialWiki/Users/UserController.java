@@ -268,7 +268,7 @@ public class UserController {
      * @param request - an HTTP request that contains the session's cookie information
      * @return an HTTP response that contains users username's
      */
-    @PostMapping("/getFollowingUsers")
+    @GetMapping("/getFollowingUsers")
     @Transactional
     public ResponseEntity<List<String>> getFollowingUsers(HttpServletRequest request) {
 
@@ -295,7 +295,7 @@ public class UserController {
      * @param request - an HTTP request that contains the session's cookie information
      * @return an HTTP response that contains users username's
      */
-    @PostMapping("/getUsersFollowing")
+    @GetMapping("/getUsersFollowing")
     @Transactional
     public ResponseEntity<List<String>> getUsersFollowing(HttpServletRequest request) {
 
