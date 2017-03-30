@@ -10,6 +10,10 @@ profilePage.strings.userNamePre = "";
 profilePage.strings.firstNamePre = "First: ";
 profilePage.strings.lastNamePre = "Last: ";
 profilePage.strings.emailNamePre = "Email: ";
+profilePage.strings.likesLabel = "Likes";
+profilePage.strings.createdLabel = "Created Pages";
+profilePage.strings.followingLabel = "Followed Users";
+profilePage.strings.usersFollowingLabel = "Users Following";
 
 profilePage.handler.error = function() {
     $$("status").show();
@@ -95,6 +99,7 @@ profilePage.handler.setContentLikesCreated = function(dataString) {
             profile.likedProxyPages[i].creationDate = pageUtil.getFormattedDate(profile.likedProxyPages[i].creationDate);
             $$("likelist").add(profile.likedProxyPages[i]);
         }
+        $$("likesheader").setHTML(profilePage.strings.likesLabel + " (" + profile.likedProxyPages.length + ")");
         $$("likesheader").show();
         $$("likelist").refresh();
       }
@@ -107,6 +112,7 @@ profilePage.handler.setContentLikesCreated = function(dataString) {
             profile.createdProxyPages[n].creationDate = pageUtil.getFormattedDate(profile.createdProxyPages[n].creationDate);
             $$("createdlist").add(profile.createdProxyPages[n]);
         }
+        $$("createdheader").setHTML(profilePage.strings.createdLabel + " (" + profile.createdProxyPages.length + ")");
         $$("createdheader").show();
         $$("createdlist").refresh();
       }
@@ -165,6 +171,7 @@ profilePage.handler.setFollowingUsers = function(dataString) {
         $$("followlist").add({"userName":users[i]});
       }
       $$("followlist").show();
+      $$("followedusers").setHTML(profilePage.strings.followingLabel + " (" + users.length + ")");
       $$("followedusers").show();
       $$("followlist").refresh();
   }
@@ -182,14 +189,15 @@ profilePage.handler.setUsersFollowing = function(dataString) {
         $$("usersfollowinglist").add({"userName":users[i]});
       }
       $$("usersfollowinglist").show();
+      $$("usersfollowing").setHTML(profilePage.strings.usersFollowingLabel + " (" + users.length + ")");
       $$("usersfollowing").show();
       $$("usersfollowinglist").refresh();
   }
 };
 
-profilePage.handler.setFollowingUserActivity = function(dataString) {
-
-};
+// profilePage.handler.setFollowingUserActivity = function(dataString) {
+//
+// };
 
 profilePage.handler.itemClickFollowedUser = function(itemId) {
   var item = $$("followlist").getItem(itemId);
@@ -303,7 +311,7 @@ profilePage.onReady = function() {
                     cols:[
                       {
                           rows:[
-                              {view:"template", id:"likesheader", template:"Likes", type:"header", align:"left"},
+                              {view:"template", id:"likesheader", template:profilePage.strings.likesLabel, type:"header", align:"left"},
                               {
                                   view:"list",
                                   id:"likelist",
@@ -322,7 +330,7 @@ profilePage.onReady = function() {
                       { width:30 },
                       {
                           rows:[
-                              {view:"template", id:"createdheader", template:"Pages Created", type:"header", align:"left"},
+                              {view:"template", id:"createdheader", template:profilePage.strings.createdLabel, type:"header", align:"left"},
                               {
                                   view:"list",
                                   id:"createdlist",
@@ -345,7 +353,7 @@ profilePage.onReady = function() {
                     cols:[
                       {
                         rows:[
-                            {view:"template", id:"followedusers", template:"Followed Users", type:"header", align:"left"},
+                            {view:"template", id:"followedusers", template:profilePage.strings.followingLabel, type:"header", align:"left"},
                             {
                                 view:"list",
                                 id:"followlist",
@@ -364,7 +372,7 @@ profilePage.onReady = function() {
                       { width:30 },
                       {
                         rows:[
-                            {view:"template", id:"usersfollowing", template:"Users Following", type:"header", align:"left"},
+                            {view:"template", id:"usersfollowing", template:profilePage.strings.usersFollowingLabel, type:"header", align:"left"},
                             {
                                 view:"list",
                                 id:"usersfollowinglist",
