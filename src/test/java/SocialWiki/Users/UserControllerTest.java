@@ -485,14 +485,14 @@ public class UserControllerTest {
         MockHttpSession session = (MockHttpSession) result.getRequest().getSession(false);
 
         // successfully get list of following user with no user following (blank array)
-        mockMvc.perform(post("/getUsersFollowing")
+        mockMvc.perform(get("/getUsersFollowing")
                 .content("user=" + user1.getUserName())
                 .contentType("application/x-www-form-urlencoded")
                 .session(session))
                 .andExpect(content().string(containsString("[]")));
 
         // successfully get list of following users with no session
-        mockMvc.perform(post("/getUsersFollowing")
+        mockMvc.perform(get("/getUsersFollowing")
                 .content("user=" + user1.getUserName())
                 .contentType("application/x-www-form-urlencoded"))
                 .andExpect(content().string(containsString("[]")));
@@ -505,7 +505,7 @@ public class UserControllerTest {
                 .andExpect(status().isNoContent());
 
         // successfully get list of following user with only 1 user followed
-        mockMvc.perform(post("/getUsersFollowing")
+        mockMvc.perform(get("/getUsersFollowing")
                 .content("user=" + user2.getUserName())
                 .contentType("application/x-www-form-urlencoded")
                 .session(session))
@@ -535,7 +535,7 @@ public class UserControllerTest {
                 .andExpect(status().isNoContent());
 
         // successfully get list of following user with >1 users following
-        mockMvc.perform(post("/getUsersFollowing")
+        mockMvc.perform(get("/getUsersFollowing")
                 .content("user=" + user2.getUserName())
                 .contentType("application/x-www-form-urlencoded")
                 .session(session))
@@ -543,21 +543,21 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.[1]", is(user3.getUserName())));
 
         // unsuccessful query with empty parameter
-        mockMvc.perform(post("/getUsersFollowing")
+        mockMvc.perform(get("/getUsersFollowing")
                 .contentType("application/x-www-form-urlencoded")
                 .content("user=")
                 .session(session))
                 .andExpect(status().isUnprocessableEntity());
 
         // unsuccessful query with invalid parameter
-        mockMvc.perform(post("/getUsersFollowing")
+        mockMvc.perform(get("/getUsersFollowing")
                 .contentType("application/x-www-form-urlencoded")
                 .content("user=badName")
                 .session(session))
                 .andExpect(status().isUnprocessableEntity());
 
         // unsuccessful query with no parameter
-        mockMvc.perform(post("/getUsersFollowing")
+        mockMvc.perform(get("/getUsersFollowing")
                 .contentType("application/x-www-form-urlencoded")
                 .session(session))
                 .andExpect(status().isUnprocessableEntity());
@@ -575,14 +575,14 @@ public class UserControllerTest {
         MockHttpSession session = (MockHttpSession) result.getRequest().getSession(false);
 
         // successfully get list of followed user with no user followed (blank array)
-        mockMvc.perform(post("/getFollowingUsers")
+        mockMvc.perform(get("/getFollowingUsers")
                 .content("user=" + user1.getUserName())
                 .contentType("application/x-www-form-urlencoded")
                 .session(session))
                 .andExpect(content().string(containsString("[]")));
 
         // successfully get list of followed users with no session
-        mockMvc.perform(post("/getFollowingUsers")
+        mockMvc.perform(get("/getFollowingUsers")
                 .content("user=" + user1.getUserName())
                 .contentType("application/x-www-form-urlencoded"))
                 .andExpect(content().string(containsString("[]")));
@@ -595,7 +595,7 @@ public class UserControllerTest {
                 .andExpect(status().isNoContent());
 
         // successfully get list of followed user with only 1 user followed
-        mockMvc.perform(post("/getFollowingUsers")
+        mockMvc.perform(get("/getFollowingUsers")
                 .content("user=" + user1.getUserName())
                 .contentType("application/x-www-form-urlencoded")
                 .session(session))
@@ -610,7 +610,7 @@ public class UserControllerTest {
                 .andExpect(status().isNoContent());
 
         // successfully get list of followed user with >1 users followed
-        mockMvc.perform(post("/getFollowingUsers")
+        mockMvc.perform(get("/getFollowingUsers")
                 .content("user=" + user1.getUserName())
                 .contentType("application/x-www-form-urlencoded")
                 .session(session))
@@ -618,21 +618,21 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.[1]", is(user3.getUserName())));
 
         // unsuccessful query with empty parameter
-        mockMvc.perform(post("/unfollowUser")
+        mockMvc.perform(get("/getFollowingUsers")
                 .contentType("application/x-www-form-urlencoded")
                 .content("user=")
                 .session(session))
                 .andExpect(status().isUnprocessableEntity());
 
-        // unsuccessful query with invalid parameter
-        mockMvc.perform(post("/unfollowUser")
+        // successful query with invalid parameter return empty list
+        mockMvc.perform(get("/getFollowingUsers")
                 .contentType("application/x-www-form-urlencoded")
                 .content("user=badName")
                 .session(session))
-                .andExpect(status().isUnprocessableEntity());
+                .andExpect(content().string(containsString("[]")));
 
         // unsuccessful query with no parameter
-        mockMvc.perform(post("/unfollowUser")
+        mockMvc.perform(get("/getFollowingUsers")
                 .contentType("application/x-www-form-urlencoded")
                 .session(session))
                 .andExpect(status().isUnprocessableEntity());
