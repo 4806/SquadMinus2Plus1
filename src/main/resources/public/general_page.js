@@ -53,11 +53,13 @@ generalPages.getCookie = function (name) {
     return (value !== null) ? value[1] : null;
 };
 
+generalPages.bottomIcon = { view:"label", label:'<img src="img/flame_blue.png" height="50%" onclick="generalPages.handler.homeClick()" style="cursor: pointer;"/>', height:100, align:"center"};
+
 generalPages.toolbar = {
   view:"toolbar", elements: [
     //Left
     {view:"label", label:'<img src="img/flame_white.png" width="50%" onclick="generalPages.handler.homeClick()" style="cursor: pointer;"/>', width:50, align:"left"},
-    {view:"label", label:"Social Wiki", align:"left"},
+    {view:"label", label:"<div onclick=\"generalPages.handler.homeClick()\" style=\"cursor: pointer;\">Social Wiki</div>", align:"left"},
     {view:"search", id:"searchbox", placeholder:"Search Pages", align:"right", width:200, on:{onSearchIconClick:generalPages.handler.searchClick, onKeyPress:generalPages.handler.searchEnterPressed}},
 
     //Right

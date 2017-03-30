@@ -13,6 +13,7 @@ module.exports = function(config) {
         files: [
             'src/main/resources/public/lib/webix.js',
             'src/main/resources/public/lib/showdown.js',
+            'src/main/resources/public/lib/jquery.min.js',
             'src/main/resources/public/*.js',
             'src/test/javascript/**/*.js'
         ],

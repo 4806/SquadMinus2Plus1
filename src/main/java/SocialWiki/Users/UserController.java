@@ -327,7 +327,7 @@ public class UserController {
      */
     @PostMapping("/followUser")
     @Transactional
-    public ResponseEntity<String> followUser(HttpServletRequest request) {
+    public ResponseEntity<String> followUser(HttpServletRequest request, HttpServletResponse response) {
         // send an HTTP 403 response if there is currently not a session
         HttpSession session = request.getSession(false);
         if (session == null) {
@@ -365,6 +365,9 @@ public class UserController {
         // save the update to the user in the database and session
         userRepo.save(user);
 
+        //Respond with isFollowed Cookie
+        response.addCookie(CookieManager.getIsFollowedCookie(user, userName));
+
         // send an HTTP 204 response to signify the user was successfully followed
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
     }
@@ -376,7 +379,7 @@ public class UserController {
      */
     @PostMapping("/unfollowUser")
     @Transactional
-    public ResponseEntity<String> unfollowUser(HttpServletRequest request) {
+    public ResponseEntity<String> unfollowUser(HttpServletRequest request, HttpServletResponse response) {
         // send an HTTP 403 response if there is currently not a session
         HttpSession session = request.getSession(false);
         if (session == null) {
@@ -414,6 +417,9 @@ public class UserController {
 
         // save the update to the user in the database and session
         user = userRepo.save(user);
+
+        //Respond with isFollowed Cookie
+        response.addCookie(CookieManager.getIsFollowedCookie(user, userName));
 
         // send an HTTP 204 response to signify the user was successfully unfollowed
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
