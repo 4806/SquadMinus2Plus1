@@ -51,4 +51,15 @@ public interface UserRepository extends CrudRepository<User, Long> {
      * @return a list of Users that match the userName or email (should be a max of two since userName and email is unique)
      */
     List<User> findByUserNameOrEmail(String userName, String email);
+
+    @Query("SELECT u.followedUsers" +
+                  " FROM SocialWiki.Users.User u " +
+            "WHERE UPPER(u.userName) = UPPER(:userName)")
+    List<User> findFollowedUsersByUsername(@Param("userName") String userName);
+
+    @Query("SELECT u " +
+            "FROM SocialWiki.Users.User u " +
+            "INNER JOIN u.followedUsers f " +
+            "WHERE :user IN (f)")
+    List<User> findUsersFollowingUserByUser(@Param("user") User userName);
 }
