@@ -25,6 +25,12 @@ profilePage.hideAll = function() {
   $$("email").hide();
   $$("unfollowbutton").hide();
   $$("followbutton").hide();
+  $$("usersfollowing").hide();
+  $$("usersfollowinglist").hide();
+  $$("followedusers").hide();
+  $$("followlist").hide();
+  $$("followeduseractivity").hide();
+  $$("followactivitylist").hide();
 };
 
 profilePage.handler.itemClickLikes = function(itemId) {
@@ -148,15 +154,55 @@ profilePage.checkFollow = function() {
 };
 
 profilePage.handler.setFollowingUsers = function(dataString) {
+  if (dataString) {
+      try {
+        users = JSON.parse(dataString);
+      } catch(e) {
+        return;
+      }
 
+      for( var i in users ) {
+        $$("followlist").add({"userName":users[i]});
+      }
+      $$("followlist").show();
+      $$("followedusers").show();
+      $$("followlist").refresh();
+  }
 };
 
 profilePage.handler.setUsersFollowing = function(dataString) {
+  if (dataString) {
+      try {
+        users = JSON.parse(dataString);
+      } catch(e) {
+        return;
+      }
 
+      for( var i in users ) {
+        $$("usersfollowinglist").add({"userName":users[i]});
+      }
+      $$("usersfollowinglist").show();
+      $$("usersfollowing").show();
+      $$("usersfollowinglist").refresh();
+  }
 };
 
 profilePage.handler.setFollowingUserActivity = function(dataString) {
 
+};
+
+profilePage.handler.itemClickFollowedUser = function(itemId) {
+  var item = $$("followlist").getItem(itemId);
+  if(item !== null) {
+    location.href = "/profile?user=" + item.userName;
+  }
+};
+
+profilePage.handler.itemClickUserFollowing = function(itemId) {
+  var item = $$("usersfollowinglist").getItem(itemId);
+  if(item.userName !== undefined) {
+    location.href = "/profile?user=" + item.userName;
+  }
 };
 
 profilePage.getContent = function() {
@@ -164,13 +210,13 @@ profilePage.getContent = function() {
     var params = pageUtil.getUrlContent(location.href);
 
     //Get user information + liked pages + created pages
-    webix.ajax().get("/retrieveUser?user=" + params.user, {
+    webix.ajax().get("/retrieveUser", {"user":params.user}, {
         error:profilePage.handler.error,
         success:profilePage.handler.setContentLikesCreated
     });
 
     //Get following users
-    webix.ajax().get("/following?user=" + params.user, {
+    webix.ajax().post("/getFollowingUsers", {"user":params.user}, {
         error:function(){
           $$("followedusers").hide();
           $$("followlist").hide();
@@ -179,7 +225,7 @@ profilePage.getContent = function() {
     });
 
     //Get users following
-    webix.ajax().get("/usersfollowing?user=" + params.user, {
+    webix.ajax().post("/getUsersFollowing", {"user":params.user}, {
         error:function(){
           $$("usersfollowing").hide();
           $$("usersfollowinglist").hide();
@@ -188,13 +234,13 @@ profilePage.getContent = function() {
     });
 
     //Get following user activity
-    webix.ajax().get("/followactivity?user=" + params.user, {
-        error:function(){
-          $$("followeduseractivity").hide();
-          $$("followactivitylist").hide();
-        },
-        success:profilePage.handler.setFollowingUserActivity
-    });
+    // webix.ajax().post("/followactivity", {"user":params.user}, {
+    //     error:function(){
+    //       // $$("followeduseractivity").hide();
+    //       // $$("followactivitylist").hide();
+    //     },
+    //     success:profilePage.handler.setFollowingUserActivity
+    // });
 };
 
 profilePage.onReady = function() {
@@ -252,7 +298,6 @@ profilePage.onReady = function() {
           { cols:[
               { width:30 },
               {
-                autoheight:true,
                 rows:[
                   {
                     cols:[
@@ -264,6 +309,7 @@ profilePage.onReady = function() {
                                   id:"likelist",
                                   align:"center",
                                   template:"#title# <div> Created by #author# on #creationDate#</div>",
+                                  height:250,
                                   type:{
                                       height:62
                                   },
@@ -282,6 +328,7 @@ profilePage.onReady = function() {
                                   id:"createdlist",
                                   align:"center",
                                   template:"#title# <div> Created by #author# on #creationDate#</div>",
+                                  height:250,
                                   type:{
                                       height:62
                                   },
@@ -304,11 +351,12 @@ profilePage.onReady = function() {
                                 id:"followlist",
                                 align:"center",
                                 template:"#userName#",
+                                height:250,
                                 type:{
                                     height:62
                                 },
                                 on:{
-                                    onItemClick:profilePage.handler.itemClickLikes
+                                    onItemClick:profilePage.handler.itemClickFollowedUser
                                 }
                             }
                         ]
@@ -326,7 +374,7 @@ profilePage.onReady = function() {
                                     height:62
                                 },
                                 on:{
-                                    onItemClick:profilePage.handler.itemClickCreated
+                                    onItemClick:profilePage.handler.itemClickUserFollowing
                                 }
                             }
                         ]
@@ -345,6 +393,7 @@ profilePage.onReady = function() {
                         id:"followactivitylist",
                         align:"center",
                         template:"#title# <div> Created by #author# on #creationDate#</div>",
+                        maxHeight:500,
                         type:{
                             height:62
                         },
