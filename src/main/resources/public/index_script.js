@@ -29,7 +29,7 @@ webix.ready(function() {
                 { }
             ]},
             { },
-            { view:"label", label:'<img src="img/flame_blue.png" height="50%"/>', height:100, align:"center"}
+            generalPages.bottomIcon
         ]
     });
 
