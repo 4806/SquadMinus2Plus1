@@ -20,7 +20,6 @@ import java.util.List;
  */
 
 @RestController
-@Transactional
 public class UserController {
 
     /**
@@ -73,7 +72,7 @@ public class UserController {
 
         // create a new session for the User
         session = request.getSession();
-        session.setAttribute("user", user);
+        session.setAttribute("user", user.getUserName());
 
         // add the user cookie to the response
         response.addCookie(CookieManager.getUserCookie(user.getUserName()));
@@ -129,7 +128,7 @@ public class UserController {
 
         // create a new session for the new User
         session = request.getSession();
-        session.setAttribute("user", newUser);
+        session.setAttribute("user", user);
 
         // add the user cookie to the response
         response.addCookie(CookieManager.getUserCookie(user));
@@ -177,7 +176,8 @@ public class UserController {
         }
 
         // get the logged in user from the current session
-        User user = (User) session.getAttribute("user");
+        String username = (String) session.getAttribute("user");
+        User user = userRepo.findByUserName(username);
 
         // remove the user's sensitive info and mark as deleted
         user.delete();
@@ -226,10 +226,8 @@ public class UserController {
         }
 
         // get the logged in user from the current session
-        User user = (User) session.getAttribute("user");
-
-        // TODO: find way to reset transaction on session user, instead of querying for the same one again
-        user = userRepo.findByUserName(user.getUserName());
+        String username = (String) session.getAttribute("user");
+        User user = userRepo.findByUserName(username);
 
         // send an HTTP 403 response if the User already likes the page
         if (user.getLikedPages().contains(page)) {
@@ -240,8 +238,7 @@ public class UserController {
         user.likePage(page);
 
         // save the update to the user in the database and session
-        user = userRepo.save(user);
-        session.setAttribute("user", user);
+        userRepo.save(user);
 
         // send an HTTP 204 response to signify the page was successfully liked
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
@@ -273,10 +270,8 @@ public class UserController {
         }
 
         // get the logged in user from the current session
-        User user = (User) session.getAttribute("user");
-
-        // TODO: find way to reset transaction on session user, instead of querying for the same one again
-        user = userRepo.findByUserName(user.getUserName());
+        String username = (String) session.getAttribute("user");
+        User user = userRepo.findByUserName(username);
 
         // send an HTTP 403 response if the User does not like the page
         if (!user.getLikedPages().contains(page)) {
@@ -288,7 +283,6 @@ public class UserController {
 
         // save the update to the user in the database and session
         user = userRepo.save(user);
-        session.setAttribute("user", user);
 
         // send an HTTP 204 response to signify the page was successfully unliked
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
@@ -346,10 +340,8 @@ public class UserController {
         }
 
         // get the logged in user from the current session
-        User user = (User) session.getAttribute("user");
-
-        // TODO: find way to reset transaction on session user, instead of querying for the same one again
-        user = userRepo.findByUserName(user.getUserName());
+        String username = (String) session.getAttribute("user");
+        User user = userRepo.findByUserName(username);
 
         // send an HTTP 403 response if the User already follows the user or the following user is the user behind the request
         if (user.getFollowedUsers().contains(followinguser) || followinguser.equals(user)) {
@@ -360,8 +352,7 @@ public class UserController {
         user.followUser(followinguser);
 
         // save the update to the user in the database and session
-        user = userRepo.save(user);
-        session.setAttribute("user", user);
+        userRepo.save(user);
 
         // send an HTTP 204 response to signify the user was successfully followed
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
@@ -406,10 +397,8 @@ public class UserController {
         }
 
         // get the logged in user from the current session
-        User user = (User) session.getAttribute("user");
-
-        // TODO: find way to reset transaction on session user, instead of querying for the same one again
-        user = userRepo.findByUserName(user.getUserName());
+        String username = (String) session.getAttribute("user");
+        User user = userRepo.findByUserName(username);
 
         // send an HTTP 403 response if the User doesn't follow the user
         if (!user.getFollowedUsers().contains(followinguser)) {
@@ -422,7 +411,6 @@ public class UserController {
 
         // save the update to the user in the database and session
         user = userRepo.save(user);
-        session.setAttribute("user", user);
 
         // send an HTTP 204 response to signify the user was successfully unfollowed
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);

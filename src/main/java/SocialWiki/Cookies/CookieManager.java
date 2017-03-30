@@ -51,14 +51,14 @@ public class CookieManager {
         }
 
         // get the user from the session
-        User user = (User) session.getAttribute("user");
+        String username = (String) session.getAttribute("user");
 
         // iterate over the request's cookies and check if the user one exists and matches the session user
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie c : cookies) {
                 if (c.getName().equals("user")) {
-                    if (c.getValue().equals(user.getUserName())) {
+                    if (c.getValue().equals(username)) {
                         return true;
                     }
                     return false;
@@ -72,24 +72,12 @@ public class CookieManager {
 
     /**
      * Get a cookie that signifies if the user likes the current page or not
-     * @param request - an HTTP request that contains the session cookie used to identify the current user
+     * @param user - the user that is currently logged in
      * @param id - the Id of the page that the user does or does not like
-     * @return a cookie that signifies if the user likes the page, they do not, or clears the cookie
+     * @return a cookie that signifies if the user likes the page
      */
-    @Transactional
-    public static Cookie getIsLikedCookie(HttpServletRequest request, Long id) {
+    public static Cookie getIsLikedCookie(User user, Long id) {
         Cookie c;
-
-        // check that the session exists, if not, return a clearing cookie
-        HttpSession session = request.getSession(false);
-        if (session == null) {
-            c = new Cookie("isLiked", "");
-            c.setMaxAge(0);
-            return c;
-        }
-
-        // get the user from the session
-        User user = (User) session.getAttribute("user");
 
         // if the page id is within the liked page list, return true cookie
         for (ConcreteWikiPage page : user.getLikedPages()) {
@@ -103,6 +91,18 @@ public class CookieManager {
         // the page is not liked, so return false cookie
         c = new Cookie("isLiked", "false");
         c.setMaxAge(86400);
+        return c;
+    }
+
+    /**
+     * Get a cookie that effectively clears the client's isLiked cookie
+     * @return the clear isLiked cookie
+     */
+    public static Cookie getClearIsLikedCookie() {
+        // create a cookie that will overwrite the isLiked cookie
+        Cookie c = new Cookie("isLiked", "");
+        c.setMaxAge(0); // expires immediately
+
         return c;
     }
 }

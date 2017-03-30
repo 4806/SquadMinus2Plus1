@@ -75,10 +75,8 @@ public class WikiPageController {
         }
 
         // get the logged in user from the current session
-        User user = (User) session.getAttribute("user");
-
-        // TODO: find way to reset transaction on session user, instead of querying for the same one again
-        user = userRepo.findByUserName(user.getUserName());
+        String username = (String) session.getAttribute("user");
+        User user = userRepo.findByUserName(username);
 
         ConcreteWikiPage newPage;
 
@@ -105,11 +103,10 @@ public class WikiPageController {
 
         user.getCreatedPages().size();
 
-        // add the page to the User's list of created pages and save it in the repository and session
+        // add the page to the User's list of created pages and save it in the repository
         user.addCreatedPage(newPage);
         try {
-            user = userRepo.save(user);
-            session.setAttribute("user", user);
+            userRepo.save(user);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
@@ -179,6 +176,7 @@ public class WikiPageController {
      * @return the WikiPages found
      */
     @GetMapping("/retrieveWikiPage")
+    @Transactional
     public ResponseEntity<WikiPageWithAuthorAndContentProxy> retrieveWikiPage(HttpServletRequest request, HttpServletResponse response) {
 
         Long id;
@@ -195,15 +193,15 @@ public class WikiPageController {
             return ResponseEntity.unprocessableEntity().body(null);
         }
 
-        // TODO: find a better way to do this
         HttpSession session = request.getSession(false);
-        if (session != null) {
-            User user = (User) session.getAttribute("user");
-            user = userRepo.findByUserName(user.getUserName());
-            session.setAttribute("user", user);
+        if (session == null) {
+            response.addCookie(CookieManager.getClearIsLikedCookie());
+        } else {
+            String username = (String) session.getAttribute("user");
+            User user = userRepo.findByUserName(username);
+            response.addCookie(CookieManager.getIsLikedCookie(user, id));
         }
 
-        response.addCookie(CookieManager.getIsLikedCookie(request, id));
         return ResponseEntity.ok(page);
     }
 
