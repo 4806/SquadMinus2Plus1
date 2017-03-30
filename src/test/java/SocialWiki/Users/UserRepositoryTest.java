@@ -53,8 +53,14 @@ public class UserRepositoryTest {
         user = userRepo.findByUserName("");
         assertEquals("Failure - userRepository found a user with a blank userName", null, user);
 
-        user = userRepo.findByUserName(null);
-        assertEquals("Failure - userRepository found a user with a null userName", null, user);
+        user = userRepo.findByUserName("testusername1");
+        assertEquals("Failure - userRepository query by LOWER userName does not return user1", user1, user);
+
+        user = userRepo.findByUserName("TESTUSERNAME1");
+        assertEquals("Failure - userRepository query by UPPER userName does not return user1", user1, user);
+
+        user = userRepo.findByUserName("TeStUsErNaMe1");
+        assertEquals("Failure - userRepository query by MiXeD userName does not return user1", user1, user);
     }
 
     @Test
@@ -71,8 +77,14 @@ public class UserRepositoryTest {
         user = userRepo.findByEmail("");
         assertEquals("Failure - userRepository found a user with a blank email", null, user);
 
-        user = userRepo.findByEmail(null);
-        assertEquals("Failure - userRepository found a user with a null email", null, user);
+        user = userRepo.findByEmail("testemail1");
+        assertEquals("Failure - userRepository query by lower email does not return user1", user1, user);
+
+        user = userRepo.findByEmail("TESTEMAIL1");
+        assertEquals("Failure - userRepository query by UPPER email does not return user1", user1, user);
+
+        user = userRepo.findByEmail("TeStEmAiL1");
+        assertEquals("Failure - userRepository query by MiXeD email does not return user1", user1, user);
     }
 
     @Test
@@ -95,14 +107,14 @@ public class UserRepositoryTest {
         user = userRepo.findByUserNameAndPassword("", "");
         assertEquals("Failure - userRepository found a user with a blank userName and password", null, user);
 
-        user = userRepo.findByUserNameAndPassword(null, "testPassword2");
-        assertEquals("Failure - userRepository found a user with a null userName", null, user);
+        user = userRepo.findByUserNameAndPassword("testusername1", "testPassword1");
+        assertEquals("Failure - userRepository query by LOWER userName does not return user1", user1, user);
 
-        user = userRepo.findByUserNameAndPassword("testUserName2", null);
-        assertEquals("Failure - userRepository found a user with a null password", null, user);
+        user = userRepo.findByUserNameAndPassword("TESTUSERNAME1", "testPassword1");
+        assertEquals("Failure - userRepository query by UPPER userName does not return user1", user1, user);
 
-        user = userRepo.findByUserNameAndPassword(null, null);
-        assertEquals("Failure - userRepository found a user with a null userName and password", null, user);
+        user = userRepo.findByUserNameAndPassword("TeStUsErNaMe1", "testPassword1");
+        assertEquals("Failure - userRepository query by MiXeD userName does not return user1", user1, user);
 
         user = userRepo.findByUserNameAndPassword("testUserName1", "testPassword1");
         user.delete();
@@ -131,14 +143,14 @@ public class UserRepositoryTest {
         user = userRepo.findByEmailAndPassword("", "");
         assertEquals("Failure - userRepository found a user with a blank email and password", null, user);
 
-        user = userRepo.findByEmailAndPassword(null, "testPassword2");
-        assertEquals("Failure - userRepository found a user with a null email", null, user);
+        user = userRepo.findByEmailAndPassword("testemail1", "testPassword1");
+        assertEquals("Failure - userRepository query by lower email does not return user1", user1, user);
 
-        user = userRepo.findByEmailAndPassword("testEmail2", null);
-        assertEquals("Failure - userRepository found a user with a null password", null, user);
+        user = userRepo.findByEmailAndPassword("TESTEMAIL1", "testPassword1");
+        assertEquals("Failure - userRepository query by UPPER email does not return user1", user1, user);
 
-        user = userRepo.findByEmailAndPassword(null, null);
-        assertEquals("Failure - userRepository found a user with a null email and password", null, user);
+        user = userRepo.findByEmailAndPassword("TeStEmAiL1", "testPassword1");
+        assertEquals("Failure - userRepository query by MiXeD email does not return user1", user1, user);
     }
 
     @Test
@@ -163,8 +175,20 @@ public class UserRepositoryTest {
         users = userRepo.findByUserNameOrEmail("", "");
         assertEquals("Failure - userRepository query by userName or email returned users with blank userName or email", 0, users.size());
 
-        users = userRepo.findByUserNameOrEmail(null, null);
-        assertEquals("Failure - userRepository query by userName or email returned users with null userName or email", 0, users.size());
+        users = userRepo.findByUserNameOrEmail("testusername1", "testemail2");
+        assertEquals("Failure - userRepository query with existing lower userName for user1 and lower email for user2 could not find both", 2, users.size());
+        assertEquals("Failure - userRepository query with existing lower userName for user1 could not be found", user1, users.get(0));
+        assertEquals("Failure - userRepository query with existing lower email for user2 could not be found", user2, users.get(1));
+
+        users = userRepo.findByUserNameOrEmail("TESTUSERNAME2", "TESTEMAIL1");
+        assertEquals("Failure - userRepository query with existing UPPER userName for user2 and UPPER email for user1 could not find both", 2, users.size());
+        assertEquals("Failure - userRepository query with existing UPPER userName for user2 could not be found", user1, users.get(0));
+        assertEquals("Failure - userRepository query with existing UPPER email for user1 could not be found", user2, users.get(1));
+
+        users = userRepo.findByUserNameOrEmail("TeStUsErNaMe1", "TeStEmAiL2");
+        assertEquals("Failure - userRepository query with existing MiXeD userName for user1 and MiXeD email for user2 could not find both", 2, users.size());
+        assertEquals("Failure - userRepository query with existing MiXeD userName for user1 could not be found", user1, users.get(0));
+        assertEquals("Failure - userRepository query with existing MiXeD email for user2 could not be found", user2, users.get(1));
     }
 
 }
