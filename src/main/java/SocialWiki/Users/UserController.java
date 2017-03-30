@@ -154,8 +154,11 @@ public class UserController {
         // invalidate the old session, so that one for the new user can be created later
         session.invalidate();
 
-        // add the clearUser cookie so that it deletes the browsers cookie
+        // clear the cookies for the user's session on logout
         response.addCookie(CookieManager.getClearUserCookie());
+        response.addCookie(CookieManager.getClearIsLikedCookie());
+        // TODO: uncomment this when it is added
+        // response.addCookie(CookieManager.getClearIsFollowedCookie());
 
         // send an HTTP 204 response to signify successful logout
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);

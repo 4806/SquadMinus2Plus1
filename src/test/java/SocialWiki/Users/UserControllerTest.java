@@ -331,6 +331,11 @@ public class UserControllerTest {
                 .session(session))
                 .andExpect(cookie().value("user", ""))
                 .andExpect(cookie().maxAge("user", 0))
+                .andExpect(cookie().value("isLiked", ""))
+                .andExpect(cookie().maxAge("isLiked", 0))
+                // TODO: uncomment this when feature added
+//                .andExpect(cookie().value("isFollowed", ""))
+//                .andExpect(cookie().maxAge("isFollowed", 0))
                 .andExpect(status().isNoContent());
 
         // perform login to get session
@@ -347,12 +352,16 @@ public class UserControllerTest {
                 .contentType("application/x-www-form-urlencoded")
                 .session(session))
                 .andExpect(cookie().doesNotExist("user"))
+                .andExpect(cookie().doesNotExist("isLiked"))
+                .andExpect(cookie().doesNotExist("isFollowed"))
                 .andExpect(status().isForbidden());
 
         // perform unsuccessful logout with no session
         mockMvc.perform(post("/logout")
                 .contentType("application/x-www-form-urlencoded"))
                 .andExpect(cookie().doesNotExist("user"))
+                .andExpect(cookie().doesNotExist("isLiked"))
+                .andExpect(cookie().doesNotExist("isFollowed"))
                 .andExpect(status().isForbidden());
     }
 
