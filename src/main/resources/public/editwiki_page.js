@@ -70,7 +70,8 @@ editPage.handler.previewToggle = function() {
 
         $$("rawtext").hide();
         var text = $$("rawtext").getValue();
-        var html = editPage.converter.makeHtml(text);
+        var escaped = $("<div>").text(text).html();
+        var html = editPage.converter.makeHtml(escaped);
         $$("preview").setHTML(html);
         $$("preview").show();
 
