@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -638,4 +639,138 @@ public class UserControllerTest {
                 .andExpect(status().isUnprocessableEntity());
 
     }
+
+    @Test
+    public void getUserNotifications()throws Exception {
+        // perform login to get session
+        MvcResult result = mockMvc.perform(post("/login")
+                .content("login=" + user1.getUserName() + "&pass=" + user1.getPassword())
+                .contentType("application/x-www-form-urlencoded"))
+                .andReturn();
+
+        MockHttpSession session = (MockHttpSession) result.getRequest().getSession(false);
+
+        // successfully get list of notifications with no user notifications present (blank array)
+        mockMvc.perform(get("/getUserNotifications")
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(content().string(containsString("[]")));
+
+        user1.addNotification("N1");
+        user1 = userRepo.save(user1);
+
+        // successfully get list of notifications with 1 user notifications present
+        mockMvc.perform(get("/getUserNotifications")
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(jsonPath("$[0]", is("N1")));
+
+        user1.addNotification("N2");
+        user1 = userRepo.save(user1);
+
+        // successfully get list of notifications with 2 user notifications present
+        mockMvc.perform(get("/getUserNotifications")
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(jsonPath("$[0]", is("N1")))
+                .andExpect(jsonPath("$[1]", is("N2")));
+
+        // perform unsuccessful query with invalidated session
+        session.invalidate();
+        mockMvc.perform(get("/getUserNotifications")
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isForbidden());
+
+        // perform unsuccessful query with no session
+        mockMvc.perform(get("/getUserNotifications")
+                .contentType("application/x-www-form-urlencoded"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void removeUserNotifications()throws Exception {
+
+        // perform login to get session
+        MvcResult result = mockMvc.perform(post("/login")
+                .content("login=" + user1.getUserName() + "&pass=" + user1.getPassword())
+                .contentType("application/x-www-form-urlencoded"))
+                .andReturn();
+
+        MockHttpSession session = (MockHttpSession) result.getRequest().getSession(false);
+
+        user1.addNotification("N1");
+        user1 = userRepo.save(user1);
+
+        // successfully remove notifications with 1 user notifications present
+        mockMvc.perform(post("/removeUserNotifications")
+                .content("notification=N1")
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isNoContent());
+
+        user1.addNotification("N1");
+        user1.addNotification("N2");
+        user1 = userRepo.save(user1);
+
+        // successfully remove notifications with 2 user notifications present
+        mockMvc.perform(post("/removeUserNotifications")
+                .content("notification=N1")
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isNoContent());
+
+
+        // perform unsuccessful removal when notification is not in list
+        mockMvc.perform(post("/removeUserNotifications")
+                .content("notification=N1")
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isUnprocessableEntity());
+
+        user1 = userRepo.findOne(user1.getId());
+        assertTrue("Failure - removal of notification did not remove right notification", user1.getNotifications().get(0).equals("N2"));
+
+        // Remove other notifications
+        mockMvc.perform(post("/removeUserNotifications")
+                .content("notification=N2")
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isNoContent());
+
+        // perform unsuccessful removal when no notifications present
+        mockMvc.perform(post("/removeUserNotifications")
+                .content("notification=N1")
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isUnprocessableEntity());
+
+        // perform unsuccessful query with empty parameter
+        mockMvc.perform(post("/removeUserNotifications")
+                .content("notification=")
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isUnprocessableEntity());
+
+        // perform unsuccessful query with no parameters
+        mockMvc.perform(post("/removeUserNotifications")
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isUnprocessableEntity());
+
+        // perform unsuccessful query with invalidated session
+        session.invalidate();
+        mockMvc.perform(post("/removeUserNotifications")
+                .content("notification=N1")
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isForbidden());
+
+        // perform unsuccessful query with no session
+        mockMvc.perform(post("/removeUserNotifications")
+                .content("notification=N1")
+                .contentType("application/x-www-form-urlencoded"))
+                .andExpect(status().isForbidden());
+    }
+
 }

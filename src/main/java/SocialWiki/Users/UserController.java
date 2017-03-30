@@ -323,4 +323,76 @@ public class UserController {
 
         return ResponseEntity.ok(userNames);
     }
+
+    /**
+     * Gets a list of notifications for the current user
+     * @param request - an empty HTTP request, the function retrieves the user from the current session
+     * @return a list of notifications for the current User
+     */
+    @GetMapping("/getUserNotifications")
+    @Transactional
+    public ResponseEntity<List<String>> getUserNotifications(HttpServletRequest request) {
+
+        // send an HTTP 403 response if there is currently not a session
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+
+        // get the logged in user from the current session
+        String username = (String) session.getAttribute("user");
+        User user = userRepo.findByUserName(username);
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+
+        return ResponseEntity.ok(user.getNotifications());
+
+    }
+
+    /**
+     * Removes the given notification from the list of notifications of the current user
+     * @param request - a HTTP request that contains the notification to be removed
+     * @return an HTTP response that indicates the notification as removed
+     */
+    @PostMapping("/removeUserNotifications")
+    @Transactional
+    public ResponseEntity<List<String>> removeUserNotifications(HttpServletRequest request) {
+
+        // send an HTTP 403 response if there is currently not a session
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+
+        // get the logged in user from the current session
+        String username = (String) session.getAttribute("user");
+        User user = userRepo.findByUserName(username);
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+
+        // get notification from request
+        String notification = request.getParameter("notification");
+
+        // send an HTTP 422 response if notification parameter is missing or empty
+        if (notification == null || notification.isEmpty()) {
+            return ResponseEntity.unprocessableEntity().body(null);
+        }
+
+        // send an HTTP 422 response if notification is not is list of notifications
+        if (!user.getNotifications().contains(notification)) {
+            return ResponseEntity.unprocessableEntity().body(null);
+        }
+
+        user.removeNotification(notification);
+
+        userRepo.save(user);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+    }
+
 }
+

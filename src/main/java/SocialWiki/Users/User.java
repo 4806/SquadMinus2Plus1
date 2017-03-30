@@ -94,8 +94,8 @@ public class User {
      * The list of notifications the User currently has
      */
     @Getter
-    @OneToMany(cascade = CascadeType.ALL)
     @JsonIgnore
+    @ElementCollection
     private List<String> notifications;
 
     /**
