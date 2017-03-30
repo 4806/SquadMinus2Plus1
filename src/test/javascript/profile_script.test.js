@@ -7,7 +7,7 @@ describe("profile_script", function(){
 
     it("Empty User", function(){
 
-      profilePage.handler.setContent();
+      profilePage.handler.setContentLikesCreated();
       expect($$("username").isVisible()).not.toBeTruthy();
       expect($$("first").isVisible()).not.toBeTruthy();
       expect($$("last").isVisible()).not.toBeTruthy();
@@ -18,7 +18,7 @@ describe("profile_script", function(){
     it("Valid User With Likes and Pages", function(){
       var date = new Date();
 
-      profilePage.handler.setContent('{"firstName":"test", "lastName":"test", "userName":"test", "email":"test@test.test", "likedPages":[{"title":"Test", "creationDate":"'+ date + '", "author":"tester"}], "createdPages":[{"title":"Test", "creationDate":"'+ date + '", "author":"tester"}]}');
+      profilePage.handler.setContentLikesCreated('{"firstName":"test", "lastName":"test", "userName":"test", "email":"test@test.test", "likedPages":[{"title":"Test", "creationDate":"'+ date + '", "author":"tester"}], "createdPages":[{"title":"Test", "creationDate":"'+ date + '", "author":"tester"}]}');
       expect($$("username").isVisible()).toBeTruthy();
       expect($$("first").isVisible()).toBeTruthy();
       expect($$("last").isVisible()).toBeTruthy();
