@@ -35,12 +35,10 @@ pageUtil.getUrlContent = function(url) {
 
 pageUtil.getFormattedDate = function(epoch) {
   var date = new Date(epoch);
-  var year = date.getFullYear();
-  var month = date.getMonth();
-  var day = date.getDay();
-  var hour = date.getHours();
+  var month = date.getMonth() + 1;  //Need to add one as month is 0 indexed
+  var day = date.getDate();
   var minute = date.getMinutes();
   var timezone = date.toString().match(/\(([A-Za-z\s].*)\)/)[1];
 
-  return day + "/" + month + "/" + year + " at " + hour + ":" + minute + " " + timezone;
+  return (day>9 ? '' : '0') + day + "/" + (month>9 ? '' : '0') + month + "/" + date.getFullYear() + " at " + date.getHours() + ":" + (minute>9 ? '' : '0') + minute + " " + timezone;
 };
