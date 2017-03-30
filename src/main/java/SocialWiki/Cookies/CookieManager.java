@@ -6,10 +6,12 @@ import SocialWiki.WikiPages.ConcreteWikiPage;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.transaction.Transactional;
 
 /**
  * Created by Connor on 2017-03-08.
  */
+@Transactional
 public class CookieManager {
 
     /**
@@ -100,6 +102,43 @@ public class CookieManager {
 
         // the page is not liked, so return false cookie
         c = new Cookie("isLiked", "false");
+        c.setMaxAge(86400);
+        return c;
+    }
+
+    /**
+     * Get a cookie that signifies if the user follows the current user or not
+     * @param request - an HTTP request that contains the session cookie used to identify the current user
+     * @param followUser - the username of the user that the user does or does not follow
+     * @return a cookie that signifies if the user follows the user, they do not, or clears the cookie
+     */
+    public static Cookie getIsFollowedCookie(HttpServletRequest request, String followUser) {
+        Cookie c;
+
+        // check that the session exists, if not, return a clearing cookie
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            c = new Cookie("isFollowed", "");
+            c.setMaxAge(0);
+            return c;
+        }
+
+        // get the user from the session
+        User user = (User) session.getAttribute("user");
+
+        user.getFollowedUsers().size();
+
+        // if the username is within the followed user list, return true cookie
+        for (User u : user.getFollowedUsers()) {
+            if (u.getUserName().equals(followUser)) {
+                c = new Cookie("isFollowed", "true");
+                c.setMaxAge(86400);
+                return c;
+            }
+        }
+
+        // the user is not followed, so return false cookie
+        c = new Cookie("isFollowed", "false");
         c.setMaxAge(86400);
         return c;
     }
