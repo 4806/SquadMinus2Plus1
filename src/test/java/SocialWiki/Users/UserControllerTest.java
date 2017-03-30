@@ -48,6 +48,7 @@ public class UserControllerTest {
     private User user2;
     private User user3;
     private ConcreteWikiPage page1;
+    private ConcreteWikiPage page2;
 
     @Before
     public void setUp() throws Exception {
@@ -55,6 +56,7 @@ public class UserControllerTest {
         user2 = userRepo.save(new User("testUserName3", "testFirstName3", "testLastName3", "testEmail3", "testPassword3"));
         user3 = userRepo.save(new User("testUserName4", "testFirstName4", "testLastName4", "testEmail4", "testPassword4"));
         page1 = pageRepo.save(new ConcreteWikiPage("testTitle1", "testContent1", user1));
+        page2 = pageRepo.save(new ConcreteWikiPage("testTitle2", "testContent2", user2));
     }
 
     @After
@@ -422,6 +424,18 @@ public class UserControllerTest {
         User testUser = userRepo.findByUserName("testUserName1");
         assertTrue("Failure - wiki page is not in the User's liked pages list", testUser.getLikedPages().contains(page1));
 
+        // perform successful liking of a second page
+        mockMvc.perform(post("/likePage")
+                .content("id=" + page2.getId())
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isNoContent());
+
+        // check that both pages are now in the User's liked pages list
+        testUser = userRepo.findByUserName("testUserName1");
+        assertTrue("Failure - wiki page is not in the User's liked pages list", testUser.getLikedPages().contains(page1));
+        assertTrue("Failure - wiki page is not in the User's liked pages list", testUser.getLikedPages().contains(page2));
+
         // perform unsuccessful liking of page that is already liked
         mockMvc.perform(post("/likePage")
                 .content("id=" + page1.getId())
@@ -469,6 +483,28 @@ public class UserControllerTest {
                 .content("id=" + page1.getId())
                 .contentType("application/x-www-form-urlencoded"))
                 .andExpect(status().isForbidden());
+
+        // perform login to get session
+        result = mockMvc.perform(post("/login")
+                .content("login=testUserName3&pass=testPassword3")
+                .contentType("application/x-www-form-urlencoded"))
+                .andReturn();
+
+        session = (MockHttpSession) result.getRequest().getSession(false);
+
+        // perform successful liking of page that another user has already liked
+        mockMvc.perform(post("/likePage")
+                .content("id=" + page1.getId())
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isNoContent());
+
+        // check that the page is in both of the Users' liked pages lists
+        User testUser1 = userRepo.findByUserName("testUserName1");
+        User testUser2 = userRepo.findByUserName("testUserName3");
+        assertTrue("Failure - wiki page is not in the User's liked pages list", testUser1.getLikedPages().contains(page1));
+        assertTrue("Failure - wiki page is not in the User's liked pages list", testUser2.getLikedPages().contains(page1));
+
     }
 
     @Test

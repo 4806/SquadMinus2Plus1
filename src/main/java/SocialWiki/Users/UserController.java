@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.*;
+import javax.transaction.Transactional;
 import java.util.List;
 
 /**
@@ -71,7 +72,7 @@ public class UserController {
 
         // create a new session for the User
         session = request.getSession();
-        session.setAttribute("user", user);
+        session.setAttribute("user", user.getUserName());
 
         // add the user cookie to the response
         response.addCookie(CookieManager.getUserCookie(user.getUserName()));
@@ -127,7 +128,7 @@ public class UserController {
 
         // create a new session for the new User
         session = request.getSession();
-        session.setAttribute("user", newUser);
+        session.setAttribute("user", user);
 
         // add the user cookie to the response
         response.addCookie(CookieManager.getUserCookie(user));
@@ -175,7 +176,8 @@ public class UserController {
         }
 
         // get the logged in user from the current session
-        User user = (User) session.getAttribute("user");
+        String username = (String) session.getAttribute("user");
+        User user = userRepo.findByUserName(username);
 
         // remove the user's sensitive info and mark as deleted
         user.delete();
@@ -199,6 +201,7 @@ public class UserController {
      * @return an HTTP response that signifies whether the liking of the page was successful
      */
     @PostMapping("/likePage")
+    @Transactional
     public ResponseEntity<String> likePage(HttpServletRequest request) {
         // send an HTTP 403 response if there is currently not a session
         HttpSession session = request.getSession(false);
@@ -223,7 +226,8 @@ public class UserController {
         }
 
         // get the logged in user from the current session
-        User user = (User) session.getAttribute("user");
+        String username = (String) session.getAttribute("user");
+        User user = userRepo.findByUserName(username);
 
         // send an HTTP 403 response if the User already likes the page
         if (user.getLikedPages().contains(page)) {
@@ -234,14 +238,14 @@ public class UserController {
         user.likePage(page);
 
         // save the update to the user in the database and session
-        user = userRepo.save(user);
-        session.setAttribute("user", user);
+        userRepo.save(user);
 
         // send an HTTP 204 response to signify the page was successfully liked
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
     }
 
     @PostMapping("/unlikePage")
+    @Transactional
     public ResponseEntity<String> unlikePage(HttpServletRequest request) {
         // send an HTTP 403 response if there is currently not a session
         HttpSession session = request.getSession(false);
@@ -266,7 +270,8 @@ public class UserController {
         }
 
         // get the logged in user from the current session
-        User user = (User) session.getAttribute("user");
+        String username = (String) session.getAttribute("user");
+        User user = userRepo.findByUserName(username);
 
         // send an HTTP 403 response if the User does not like the page
         if (!user.getLikedPages().contains(page)) {
@@ -278,7 +283,6 @@ public class UserController {
 
         // save the update to the user in the database and session
         user = userRepo.save(user);
-        session.setAttribute("user", user);
 
         // send an HTTP 204 response to signify the page was successfully unliked
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
@@ -311,6 +315,7 @@ public class UserController {
      * @return an HTTP response that signifies whether the following of the user was successful
      */
     @PostMapping("/followUser")
+    @Transactional
     public ResponseEntity<String> followUser(HttpServletRequest request) {
         // send an HTTP 403 response if there is currently not a session
         HttpSession session = request.getSession(false);
@@ -335,7 +340,8 @@ public class UserController {
         }
 
         // get the logged in user from the current session
-        User user = (User) session.getAttribute("user");
+        String username = (String) session.getAttribute("user");
+        User user = userRepo.findByUserName(username);
 
         // send an HTTP 403 response if the User already follows the user or the following user is the user behind the request
         if (user.getFollowedUsers().contains(followinguser) || followinguser.equals(user)) {
@@ -346,8 +352,7 @@ public class UserController {
         user.followUser(followinguser);
 
         // save the update to the user in the database and session
-        user = userRepo.save(user);
-        session.setAttribute("user", user);
+        userRepo.save(user);
 
         // send an HTTP 204 response to signify the user was successfully followed
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
@@ -359,6 +364,7 @@ public class UserController {
      * @return an HTTP response that signifies whether the user was removed successfully
      */
     @PostMapping("/unfollowUser")
+    @Transactional
     public ResponseEntity<String> unfollowPage(HttpServletRequest request) {
         // send an HTTP 403 response if there is currently not a session
         HttpSession session = request.getSession(false);
@@ -391,7 +397,8 @@ public class UserController {
         }
 
         // get the logged in user from the current session
-        User user = (User) session.getAttribute("user");
+        String username = (String) session.getAttribute("user");
+        User user = userRepo.findByUserName(username);
 
         // send an HTTP 403 response if the User doesn't follow the user
         if (!user.getFollowedUsers().contains(followinguser)) {
@@ -404,7 +411,6 @@ public class UserController {
 
         // save the update to the user in the database and session
         user = userRepo.save(user);
-        session.setAttribute("user", user);
 
         // send an HTTP 204 response to signify the user was successfully unfollowed
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);

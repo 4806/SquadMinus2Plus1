@@ -18,6 +18,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.transaction.Transactional;
 
 import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -29,6 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
+@Transactional
 public class CookieManagerTest {
 
     @Autowired
@@ -118,7 +120,7 @@ public class CookieManagerTest {
 
         HttpServletRequest request = result.getRequest();
 
-        Cookie c = CookieManager.getIsLikedCookie(request, page1.getId());
+        Cookie c = CookieManager.getIsLikedCookie(user1, page1.getId());
         assertEquals("Failure - created cookie does not have the correct name", "isLiked", c.getName());
         assertEquals("Failure - created cookie does not have the correct value", "true", c.getValue());
         assertEquals("Failure - created cookie does not have the correct maxAge", 86400, c.getMaxAge());
@@ -126,23 +128,21 @@ public class CookieManagerTest {
         MockHttpSession session = (MockHttpSession) request.getSession(false);
 
         // unlike page
-        result = mockMvc.perform(post("/unlikePage")
+        mockMvc.perform(post("/unlikePage")
                 .content("id=" + page1.getId())
                 .contentType("application/x-www-form-urlencoded")
-                .session(session))
-                .andReturn();
+                .session(session));
 
-        request = result.getRequest();
-        c = CookieManager.getIsLikedCookie(request, page1.getId());
+        c = CookieManager.getIsLikedCookie(user1, page1.getId());
         assertEquals("Failure - created cookie does not have the correct name", "isLiked", c.getName());
         assertEquals("Failure - created cookie does not have the correct value", "false", c.getValue());
         assertEquals("Failure - created cookie does not have the correct maxAge", 86400, c.getMaxAge());
 
-        // invalidate session
-        session = (MockHttpSession) request.getSession(false);
-        session.invalidate();
+    }
 
-        c = CookieManager.getIsLikedCookie(request, page1.getId());
+    @Test
+    public void getClearIsLikedCookie() throws Exception {
+        Cookie c = CookieManager.getClearIsLikedCookie();
         assertEquals("Failure - created cookie does not have the correct name", "isLiked", c.getName());
         assertEquals("Failure - created cookie does not have the correct value", "", c.getValue());
         assertEquals("Failure - created cookie does not have the correct maxAge", 0, c.getMaxAge());
