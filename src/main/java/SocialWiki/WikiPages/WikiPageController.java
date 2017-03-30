@@ -9,10 +9,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.HtmlUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,6 +43,7 @@ public class WikiPageController {
      * @return the new ConcreteWikiPage
      */
     @PostMapping("/createWikiPage")
+    @Transactional
     public ResponseEntity<WikiPageWithAuthorAndContentProxy> createWikiPage(HttpServletRequest request) {
 
         // send an HTTP 403 response if there is currently not a session
@@ -48,9 +51,6 @@ public class WikiPageController {
         if (session == null) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
-
-        // get the logged in user from the current session
-        User user = (User) session.getAttribute("user");
 
         //Retrieve parameters from request
         String title = request.getParameter("title");
@@ -75,6 +75,14 @@ public class WikiPageController {
             return ResponseEntity.unprocessableEntity().body(null);
         }
 
+        //Escape html
+        title = HtmlUtils.htmlEscape(title);
+        content = HtmlUtils.htmlEscape(content);
+
+        // get the logged in user from the current session
+        String username = (String) session.getAttribute("user");
+        User user = userRepo.findByUserName(username);
+
         ConcreteWikiPage newPage;
 
         //If the ConcreteWikiPage being created has no predecessor and is original then use specific constructor
@@ -94,6 +102,16 @@ public class WikiPageController {
         //Save the ConcreteWikiPage
         try {
             newPage = wikiPageRepo.save(newPage);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+
+        user.getCreatedPages().size();
+
+        // add the page to the User's list of created pages and save it in the repository
+        user.addCreatedPage(newPage);
+        try {
+            userRepo.save(user);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
@@ -163,6 +181,7 @@ public class WikiPageController {
      * @return the WikiPages found
      */
     @GetMapping("/retrieveWikiPage")
+    @Transactional
     public ResponseEntity<WikiPageWithAuthorAndContentProxy> retrieveWikiPage(HttpServletRequest request, HttpServletResponse response) {
 
         Long id;
@@ -179,7 +198,15 @@ public class WikiPageController {
             return ResponseEntity.unprocessableEntity().body(null);
         }
 
-        response.addCookie(CookieManager.getIsLikedCookie(request, id));
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            response.addCookie(CookieManager.getClearIsLikedCookie());
+        } else {
+            String username = (String) session.getAttribute("user");
+            User user = userRepo.findByUserName(username);
+            response.addCookie(CookieManager.getIsLikedCookie(user, id));
+        }
+
         return ResponseEntity.ok(page);
     }
 
