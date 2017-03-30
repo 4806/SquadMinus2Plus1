@@ -53,6 +53,8 @@ generalPages.getCookie = function (name) {
     return (value !== null) ? value[1] : null;
 };
 
+generalPages.bottomIcon = { view:"label", label:'<img src="img/flame_blue.png" height="50%" onclick="generalPages.handler.homeClick()" style="cursor: pointer;"/>', height:100, align:"center"};
+
 generalPages.toolbar = {
   view:"toolbar", elements: [
     //Left
