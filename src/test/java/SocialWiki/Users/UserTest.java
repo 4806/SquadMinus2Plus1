@@ -1,6 +1,7 @@
 package SocialWiki.Users;
 
 import SocialWiki.WikiPages.ConcreteWikiPage;
+import SocialWiki.WikiPages.WikiPageWithAuthorProxy;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -19,8 +20,8 @@ public class UserTest {
 
     @Before
     public void setUp() throws Exception {
-        user1 = new User(1L, "testUserName1", "testFirstName1", "testLastName1", "testEmail1", false, new ArrayList<>(), new ArrayList<>());
-        user2 = new User(2L, "testUserName2", "testFirstName2", "testLastName2", "testEmail2", false, new ArrayList<>(), new ArrayList<>());
+        user1 = new User(1L, "testUserName1", "testFirstName1", "testLastName1", "testEmail1", false, new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+        user2 = new User(2L, "testUserName2", "testFirstName2", "testLastName2", "testEmail2", false, new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
         user1.setPassword("testPassword1");
         user2.setPassword("testPassword2");
         page1 = new ConcreteWikiPage("testTitle1", "testContent1", user1);
@@ -36,12 +37,13 @@ public class UserTest {
         assertEquals("Failure - email for asSessionUser()", "testEmail1", sessionUser.getEmail());
         assertEquals("Failure - password for asSessionUser()", null, sessionUser.getPassword());
         assertFalse("Failure - isDeleted for asSessionUser()", sessionUser.isDeleted());
-        assertEquals("Failure - email for asSessionUser()", new ArrayList<ConcreteWikiPage>(), sessionUser.getLikedPages());
+        assertEquals("Failure - likedPages for asSessionUser()", new ArrayList<ConcreteWikiPage>(), sessionUser.getLikedPages());
+        assertEquals("Failure - createdPages for asSessionUSer()", new ArrayList<ConcreteWikiPage>(), sessionUser.getCreatedPages());
     }
 
     @Test
     public void equals() throws Exception {
-        User testUser = new User(1L, "testUserName1", "testFirstName1", "testLastName1", "testEmail1", false, new ArrayList<>(), new ArrayList<>());
+        User testUser = new User(1L, "testUserName1", "testFirstName1", "testLastName1", "testEmail1", false, new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
         assertTrue("Failure - User.equals()", testUser.equals(user1));
     }
 
@@ -85,5 +87,23 @@ public class UserTest {
         user1.followUser(user2);
         user1.unfollowUser(user2);
         assertFalse("Failure -the newly unfollowed user is in the user's followed users", user1.getFollowedUsers().contains(user2));
+    }
+
+    @Test
+    public void addCreatedPage() throws Exception {
+        user1.addCreatedPage(page1);
+        assertTrue("Failure - the newly created page is not in the user's created pages", user1.getCreatedPages().contains(page1));
+    }
+
+    @Test
+    public void getLikedProxyPages() throws Exception {
+        user1.likePage(page1);
+        assertTrue("Failure - the newly liked page is not in the user's proxy liked page list", user1.getLikedProxyPages().contains(new WikiPageWithAuthorProxy(page1)));
+    }
+
+    @Test
+    public void getCreatedProxyPages() throws Exception {
+        user1.addCreatedPage(page1);
+        assertTrue("Failure - the newly created page is not in the user's proxy created page list", user1.getCreatedProxyPages().contains(new WikiPageWithAuthorProxy(page1)));
     }
 }
