@@ -16,6 +16,9 @@ public interface UserRepository extends CrudRepository<User, Long> {
      * @param userName - the userName for the User that is being queried
      * @return the User that matches the userName
      */
+    @Query("SELECT u " +
+            "FROM SocialWiki.Users.User u " +
+            "WHERE UPPER(u.userName) = UPPER(:userName)")
     User findByUserName(String userName);
 
     /**
@@ -23,6 +26,9 @@ public interface UserRepository extends CrudRepository<User, Long> {
      * @param email - the email for the User that is being queried
      * @return the User that matches the email
      */
+    @Query("SELECT u " +
+            "FROM SocialWiki.Users.User u " +
+            "WHERE UPPER(u.email) = UPPER(:email)")
     User findByEmail(String email);
 
     /**
@@ -33,7 +39,7 @@ public interface UserRepository extends CrudRepository<User, Long> {
      */
     @Query("SELECT u " +
             "FROM SocialWiki.Users.User u " +
-            "WHERE u.userName = :userName AND u.password = :password AND u.isDeleted = false")
+            "WHERE UPPER(u.userName) = UPPER(:userName) AND u.password = :password AND u.isDeleted = false")
     User findByUserNameAndPassword(@Param("userName") String userName, @Param("password") String password);
 
     /**
@@ -42,6 +48,9 @@ public interface UserRepository extends CrudRepository<User, Long> {
      * @param password - the password for the User's account
      * @return the User that matches the email and password
      */
+    @Query("SELECT u " +
+            "FROM SocialWiki.Users.User u " +
+            "WHERE UPPER(u.email) = UPPER(:email) AND u.password = :password AND u.isDeleted = false")
     User findByEmailAndPassword(String email, String password);
 
     /**
@@ -50,5 +59,8 @@ public interface UserRepository extends CrudRepository<User, Long> {
      * @param email - the email for the User that is being queried
      * @return a list of Users that match the userName or email (should be a max of two since userName and email is unique)
      */
+    @Query("SELECT u " +
+            "FROM SocialWiki.Users.User u " +
+            "WHERE UPPER(u.userName) = UPPER(:userName) OR UPPER(u.email) = UPPER(:email)")
     List<User> findByUserNameOrEmail(String userName, String email);
 }
