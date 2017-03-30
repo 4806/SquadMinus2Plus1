@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.*;
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -416,5 +417,66 @@ public class UserController {
 
         // send an HTTP 204 response to signify the user was successfully unfollowed
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+    }
+
+    /**
+     * Gets a list of usernames of users that are being followed
+     * @param request - an HTTP request that contains the session's cookie information
+     * @return an HTTP response that contains users username's
+     */
+    @PostMapping("/getFollowingUsers")
+    @Transactional
+    public ResponseEntity<List<String>> getFollowingUsers(HttpServletRequest request) {
+
+        // get userName from request
+        String userName = request.getParameter("user");
+
+        // send an HTTP 422 response if user parameter is missing or empty
+        if (userName == null || userName.isEmpty()) {
+            return ResponseEntity.unprocessableEntity().body(null);
+        }
+
+        List<User> followingUsers = userRepo.findFollowedUsersByUsername(userName);
+
+        List<String> userNames = new ArrayList<>();
+        for (User followedUser: followingUsers) {
+            userNames.add(followedUser.getUserName());
+        }
+
+        return ResponseEntity.ok(userNames);
+    }
+
+    /**
+     * Gets a list of usernames of users that are following user specified
+     * @param request - an HTTP request that contains the session's cookie information
+     * @return an HTTP response that contains users username's
+     */
+    @PostMapping("/getUsersFollowing")
+    @Transactional
+    public ResponseEntity<List<String>> getUsersFollowing(HttpServletRequest request) {
+
+        // get userName from request
+        String userName = request.getParameter("user");
+
+        // send an HTTP 422 response if user parameter is missing or empty
+        if (userName == null || userName.isEmpty()) {
+            return ResponseEntity.unprocessableEntity().body(null);
+        }
+
+        User user = userRepo.findByUserName(userName);
+
+        // send an HTTP 422 response if there is no user with username
+        if (user == null) {
+            return ResponseEntity.unprocessableEntity().body(null);
+        }
+
+        List<User> usersFollowing = userRepo.findUsersFollowingUserByUser(user);
+
+        List<String> userNames = new ArrayList<>();
+        for (User followedUser: usersFollowing) {
+            userNames.add(followedUser.getUserName());
+        }
+
+        return ResponseEntity.ok(userNames);
     }
 }
