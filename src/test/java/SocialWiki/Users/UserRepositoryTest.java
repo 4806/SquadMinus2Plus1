@@ -53,9 +53,6 @@ public class UserRepositoryTest {
         user = userRepo.findByUserName("");
         assertEquals("Failure - userRepository found a user with a blank userName", null, user);
 
-        user = userRepo.findByUserName(null);
-        assertEquals("Failure - userRepository found a user with a null userName", null, user);
-
         user = userRepo.findByUserName("testusername1");
         assertEquals("Failure - userRepository query by LOWER userName does not return user1", user1, user);
 
@@ -79,9 +76,6 @@ public class UserRepositoryTest {
 
         user = userRepo.findByEmail("");
         assertEquals("Failure - userRepository found a user with a blank email", null, user);
-
-        user = userRepo.findByEmail(null);
-        assertEquals("Failure - userRepository found a user with a null email", null, user);
 
         user = userRepo.findByEmail("testemail1");
         assertEquals("Failure - userRepository query by lower email does not return user1", user1, user);
@@ -112,15 +106,6 @@ public class UserRepositoryTest {
 
         user = userRepo.findByUserNameAndPassword("", "");
         assertEquals("Failure - userRepository found a user with a blank userName and password", null, user);
-
-        user = userRepo.findByUserNameAndPassword(null, "testPassword2");
-        assertEquals("Failure - userRepository found a user with a null userName", null, user);
-
-        user = userRepo.findByUserNameAndPassword("testUserName2", null);
-        assertEquals("Failure - userRepository found a user with a null password", null, user);
-
-        user = userRepo.findByUserNameAndPassword(null, null);
-        assertEquals("Failure - userRepository found a user with a null userName and password", null, user);
 
         user = userRepo.findByUserNameAndPassword("testusername1", "testPassword1");
         assertEquals("Failure - userRepository query by LOWER userName does not return user1", user1, user);
@@ -158,15 +143,6 @@ public class UserRepositoryTest {
         user = userRepo.findByEmailAndPassword("", "");
         assertEquals("Failure - userRepository found a user with a blank email and password", null, user);
 
-        user = userRepo.findByEmailAndPassword(null, "testPassword2");
-        assertEquals("Failure - userRepository found a user with a null email", null, user);
-
-        user = userRepo.findByEmailAndPassword("testEmail2", null);
-        assertEquals("Failure - userRepository found a user with a null password", null, user);
-
-        user = userRepo.findByEmailAndPassword(null, null);
-        assertEquals("Failure - userRepository found a user with a null email and password", null, user);
-
         user = userRepo.findByEmailAndPassword("testemail1", "testPassword1");
         assertEquals("Failure - userRepository query by lower email does not return user1", user1, user);
 
@@ -198,9 +174,6 @@ public class UserRepositoryTest {
 
         users = userRepo.findByUserNameOrEmail("", "");
         assertEquals("Failure - userRepository query by userName or email returned users with blank userName or email", 0, users.size());
-
-        users = userRepo.findByUserNameOrEmail(null, null);
-        assertEquals("Failure - userRepository query by userName or email returned users with null userName or email", 0, users.size());
 
         users = userRepo.findByUserNameOrEmail("testusername1", "testemail2");
         assertEquals("Failure - userRepository query with existing lower userName for user1 and lower email for user2 could not find both", 2, users.size());
