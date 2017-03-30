@@ -19,7 +19,7 @@ public interface UserRepository extends CrudRepository<User, Long> {
     @Query("SELECT u " +
             "FROM SocialWiki.Users.User u " +
             "WHERE UPPER(u.userName) = UPPER(:userName)")
-    User findByUserName(String userName);
+    User findByUserName(@Param("userName") String userName);
 
     /**
      * Find the User with the corresponding email
@@ -29,7 +29,7 @@ public interface UserRepository extends CrudRepository<User, Long> {
     @Query("SELECT u " +
             "FROM SocialWiki.Users.User u " +
             "WHERE UPPER(u.email) = UPPER(:email)")
-    User findByEmail(String email);
+    User findByEmail(@Param("email") String email);
 
     /**
      * Find the User with the corresponding userName and password
@@ -51,7 +51,7 @@ public interface UserRepository extends CrudRepository<User, Long> {
     @Query("SELECT u " +
             "FROM SocialWiki.Users.User u " +
             "WHERE UPPER(u.email) = UPPER(:email) AND u.password = :password AND u.isDeleted = false")
-    User findByEmailAndPassword(String email, String password);
+    User findByEmailAndPassword(@Param("email") String email, @Param("password") String password);
 
     /**
      * Find the User with the corresponding userName or email
@@ -62,5 +62,5 @@ public interface UserRepository extends CrudRepository<User, Long> {
     @Query("SELECT u " +
             "FROM SocialWiki.Users.User u " +
             "WHERE UPPER(u.userName) = UPPER(:userName) OR UPPER(u.email) = UPPER(:email)")
-    List<User> findByUserNameOrEmail(String userName, String email);
+    List<User> findByUserNameOrEmail(@Param("userName") String userName, @Param("email") String email);
 }
