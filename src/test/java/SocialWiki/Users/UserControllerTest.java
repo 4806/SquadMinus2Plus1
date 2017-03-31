@@ -105,6 +105,114 @@ public class UserControllerTest {
         session = (MockHttpSession) result.getRequest().getSession(false);
         assertNotEquals("Failure - successful login did not create a session for user", null, session);
 
+        // perform successful login with all lowercase username
+        result = mockMvc.perform(post("/login")
+                .content("login=testusername1&pass=testPassword1")
+                .contentType("application/x-www-form-urlencoded"))
+                .andExpect(cookie().value("user", "testUserName1"))
+                .andExpect(cookie().maxAge("user", 86400))
+                .andExpect(content().string(containsString("\"id\":")))
+                .andExpect(content().string(containsString("\"userName\":\"testUserName1\"")))
+                .andExpect(content().string(containsString("\"firstName\":\"testFirstName1\"")))
+                .andExpect(content().string(containsString("\"lastName\":\"testLastName1\"")))
+                .andExpect(content().string(containsString("\"email\":\"testEmail1\"")))
+                .andExpect(content().string(containsString("\"password\":null")))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        session = (MockHttpSession) result.getRequest().getSession(false);
+        assertNotEquals("Failure - successful login did not create a session for user", null, session);
+
+        // perform successful login with all uppercase username
+        result = mockMvc.perform(post("/login")
+                .content("login=TESTUSERNAME1&pass=testPassword1")
+                .contentType("application/x-www-form-urlencoded"))
+                .andExpect(cookie().value("user", "testUserName1"))
+                .andExpect(cookie().maxAge("user", 86400))
+                .andExpect(content().string(containsString("\"id\":")))
+                .andExpect(content().string(containsString("\"userName\":\"testUserName1\"")))
+                .andExpect(content().string(containsString("\"firstName\":\"testFirstName1\"")))
+                .andExpect(content().string(containsString("\"lastName\":\"testLastName1\"")))
+                .andExpect(content().string(containsString("\"email\":\"testEmail1\"")))
+                .andExpect(content().string(containsString("\"password\":null")))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        session = (MockHttpSession) result.getRequest().getSession(false);
+        assertNotEquals("Failure - successful login did not create a session for user", null, session);
+
+        // perform successful login with improper mixed case username
+        result = mockMvc.perform(post("/login")
+                .content("login=TeStUsErNaMe1&pass=testPassword1")
+                .contentType("application/x-www-form-urlencoded"))
+                .andExpect(cookie().value("user", "testUserName1"))
+                .andExpect(cookie().maxAge("user", 86400))
+                .andExpect(content().string(containsString("\"id\":")))
+                .andExpect(content().string(containsString("\"userName\":\"testUserName1\"")))
+                .andExpect(content().string(containsString("\"firstName\":\"testFirstName1\"")))
+                .andExpect(content().string(containsString("\"lastName\":\"testLastName1\"")))
+                .andExpect(content().string(containsString("\"email\":\"testEmail1\"")))
+                .andExpect(content().string(containsString("\"password\":null")))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        session = (MockHttpSession) result.getRequest().getSession(false);
+        assertNotEquals("Failure - successful login did not create a session for user", null, session);
+
+        // perform successful login with all lowercase email
+        result = mockMvc.perform(post("/login")
+                .content("login=testemail1&pass=testPassword1")
+                .contentType("application/x-www-form-urlencoded"))
+                .andExpect(cookie().value("user", "testUserName1"))
+                .andExpect(cookie().maxAge("user", 86400))
+                .andExpect(content().string(containsString("\"id\":")))
+                .andExpect(content().string(containsString("\"userName\":\"testUserName1\"")))
+                .andExpect(content().string(containsString("\"firstName\":\"testFirstName1\"")))
+                .andExpect(content().string(containsString("\"lastName\":\"testLastName1\"")))
+                .andExpect(content().string(containsString("\"email\":\"testEmail1\"")))
+                .andExpect(content().string(containsString("\"password\":null")))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        session = (MockHttpSession) result.getRequest().getSession(false);
+        assertNotEquals("Failure - successful login did not create a session for user", null, session);
+
+        // perform successful login with all uppercase email
+        result = mockMvc.perform(post("/login")
+                .content("login=TESTEMAIL1&pass=testPassword1")
+                .contentType("application/x-www-form-urlencoded"))
+                .andExpect(cookie().value("user", "testUserName1"))
+                .andExpect(cookie().maxAge("user", 86400))
+                .andExpect(content().string(containsString("\"id\":")))
+                .andExpect(content().string(containsString("\"userName\":\"testUserName1\"")))
+                .andExpect(content().string(containsString("\"firstName\":\"testFirstName1\"")))
+                .andExpect(content().string(containsString("\"lastName\":\"testLastName1\"")))
+                .andExpect(content().string(containsString("\"email\":\"testEmail1\"")))
+                .andExpect(content().string(containsString("\"password\":null")))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        session = (MockHttpSession) result.getRequest().getSession(false);
+        assertNotEquals("Failure - successful login did not create a session for user", null, session);
+
+        // perform successful login with improper mixed case email
+        result = mockMvc.perform(post("/login")
+                .content("login=TeStEmAiL1&pass=testPassword1")
+                .contentType("application/x-www-form-urlencoded"))
+                .andExpect(cookie().value("user", "testUserName1"))
+                .andExpect(cookie().maxAge("user", 86400))
+                .andExpect(content().string(containsString("\"id\":")))
+                .andExpect(content().string(containsString("\"userName\":\"testUserName1\"")))
+                .andExpect(content().string(containsString("\"firstName\":\"testFirstName1\"")))
+                .andExpect(content().string(containsString("\"lastName\":\"testLastName1\"")))
+                .andExpect(content().string(containsString("\"email\":\"testEmail1\"")))
+                .andExpect(content().string(containsString("\"password\":null")))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        session = (MockHttpSession) result.getRequest().getSession(false);
+        assertNotEquals("Failure - successful login did not create a session for user", null, session);
+
         // perform successful login with extra parameter
         result = mockMvc.perform(post("/login")
                 .content("login=testEmail1&pass=testPassword1&last=notALastName")
@@ -210,6 +318,20 @@ public class UserControllerTest {
 
         User user = userRepo.findByUserName("testUserName2");
         assertNotEquals("Failure - userControllerTest did not successfully create new user", null, user);
+
+        // perform unsuccessful creation with alternate case version of userName that already exists
+        mockMvc.perform(post("/signup")
+                .content("user=TESTUSERNAME2&first=testFirstName2&last=testLastName2&email=testEmail3&pass=testPassword2")
+                .contentType("application/x-www-form-urlencoded"))
+                .andExpect(cookie().doesNotExist("user"))
+                .andExpect(status().isConflict());
+
+        // perform unsuccessful creation with alternate case version of email that already exists
+        mockMvc.perform(post("/signup")
+                .content("user=testUserName3&first=testFirstName2&last=testLastName2&email=TeStEmAiL2&pass=testPassword2")
+                .contentType("application/x-www-form-urlencoded"))
+                .andExpect(cookie().doesNotExist("user"))
+                .andExpect(status().isConflict());
 
         // perform unsuccessful creation with an existing session
         mockMvc.perform(post("/signup")
@@ -333,6 +455,11 @@ public class UserControllerTest {
                 .session(session))
                 .andExpect(cookie().value("user", ""))
                 .andExpect(cookie().maxAge("user", 0))
+                .andExpect(cookie().value("isLiked", ""))
+                .andExpect(cookie().maxAge("isLiked", 0))
+                // TODO: uncomment this when feature added
+//                .andExpect(cookie().value("isFollowed", ""))
+//                .andExpect(cookie().maxAge("isFollowed", 0))
                 .andExpect(status().isNoContent());
 
         // perform login to get session
@@ -349,12 +476,16 @@ public class UserControllerTest {
                 .contentType("application/x-www-form-urlencoded")
                 .session(session))
                 .andExpect(cookie().doesNotExist("user"))
+                .andExpect(cookie().doesNotExist("isLiked"))
+                .andExpect(cookie().doesNotExist("isFollowed"))
                 .andExpect(status().isForbidden());
 
         // perform unsuccessful logout with no session
         mockMvc.perform(post("/logout")
                 .contentType("application/x-www-form-urlencoded"))
                 .andExpect(cookie().doesNotExist("user"))
+                .andExpect(cookie().doesNotExist("isLiked"))
+                .andExpect(cookie().doesNotExist("isFollowed"))
                 .andExpect(status().isForbidden());
     }
 
