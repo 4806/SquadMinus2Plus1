@@ -263,8 +263,6 @@ public class WikiPageControllerTest {
         testConcreteWikiPage2 = wikiPageRepository.save(testConcreteWikiPage2);
 
         ConcreteWikiPage testConcreteWikiPage3 = new ConcreteWikiPage("testTitlePair", "testContent3", testConcreteWikiPage2.getId(),testUser2);
-
-        testConcreteWikiPage2 = wikiPageRepository.save(testConcreteWikiPage2);
         testConcreteWikiPage3 = wikiPageRepository.save(testConcreteWikiPage3);
 
         MultiValueMap<String, String> params = new HttpHeaders();
@@ -340,8 +338,8 @@ public class WikiPageControllerTest {
         this.mockMvc.perform(get("/advancedSearchWikiPage").params(params))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.[0].id", is(testConcreteWikiPage2.getId().intValue())))
-                .andExpect(jsonPath("$.[1].id", is(testConcreteWikiPage3.getId().intValue())));
+                .andExpect(jsonPath("$.[0].id", is(testConcreteWikiPage3.getId().intValue())))
+                .andExpect(jsonPath("$.[1].id", is(testConcreteWikiPage2.getId().intValue())));
         params.clear();
 
         //Check for successful search using all parameters with surrounding whitespace
@@ -476,8 +474,6 @@ public class WikiPageControllerTest {
         testConcreteWikiPage2 = wikiPageRepository.save(testConcreteWikiPage2);
 
         ConcreteWikiPage testConcreteWikiPage3 = new ConcreteWikiPage("testTitlePair", "testContent3", testConcreteWikiPage2.getId(),testUser2);
-
-        testConcreteWikiPage2 = wikiPageRepository.save(testConcreteWikiPage2);
         testConcreteWikiPage3 = wikiPageRepository.save(testConcreteWikiPage3);
 
         MultiValueMap<String, String> params = new HttpHeaders();
@@ -508,8 +504,8 @@ public class WikiPageControllerTest {
         this.mockMvc.perform(get("/advancedSearchWikiPage").params(params))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.[0].id", is(testConcreteWikiPage2.getId().intValue())))
-                .andExpect(jsonPath("$.[1].id", is(testConcreteWikiPage3.getId().intValue())));
+                .andExpect(jsonPath("$.[0].id", is(testConcreteWikiPage3.getId().intValue())))
+                .andExpect(jsonPath("$.[1].id", is(testConcreteWikiPage2.getId().intValue())));
         params.clear();
 
         //Check for successful search when parameter has surrounding whitespace
