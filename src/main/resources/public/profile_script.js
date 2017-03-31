@@ -14,9 +14,16 @@ profilePage.strings.likesLabel = "Likes";
 profilePage.strings.createdLabel = "Created Pages";
 profilePage.strings.followingLabel = "Followed Users";
 profilePage.strings.usersFollowingLabel = "Users Following";
+profilePage.strings.followError = "There was a problem following user.";
+profilePage.strings.unfollowError = "There was a problem unfollowing user.";
+profilePage.strings.errorLabel = "The profile could not be loaded.";
+
+profilePage.userError = false;
 
 profilePage.handler.error = function() {
     $$("status").show();
+
+    profilePage.userError = true;
 
     //Hide all other components
     profilePage.hideAll();
@@ -62,7 +69,10 @@ profilePage.handler.setContentLikesCreated = function(dataString) {
         profile = JSON.parse(dataString);
       } catch(e) {
         profilePage.handler.error();
+        return;
       }
+
+      profilePage.userError = false;
 
       //User Data
 
@@ -135,11 +145,11 @@ profilePage.handler.followButtonClick = function() {
 };
 
 profilePage.handler.unfollowerror = function() {
-  webix.alert("There was a problem unfollowing user.");
+  webix.alert(profilePage.strings.unfollowError);
 };
 
 profilePage.handler.followerror = function() {
-  webix.alert("There was a problem following user.");
+  webix.alert(profilePage.strings.followError);
 };
 
 profilePage.handler.unfollowButtonClick = function() {
@@ -166,7 +176,7 @@ profilePage.checkFollow = function() {
 };
 
 profilePage.handler.setFollowingUsers = function(dataString) {
-  if (dataString) {
+  if (dataString && !profilePage.userError) {
       try {
         users = JSON.parse(dataString);
       } catch(e) {
@@ -176,21 +186,19 @@ profilePage.handler.setFollowingUsers = function(dataString) {
       for( var i in users ) {
         $$("followlist").add({"userName":users[i]});
       }
-      $$("followlist").show();
 
       if(users.length > 0) {
         $$("followedusers").setHTML(profilePage.strings.followingLabel + " (" + users.length + ")");
-      } else {
-        $$("followedusers").setHTML(profilePage.strings.followingLabel);
       }
 
+      $$("followlist").show();
       $$("followedusers").show();
       $$("followlist").refresh();
   }
 };
 
 profilePage.handler.setUsersFollowing = function(dataString) {
-  if (dataString) {
+  if (dataString && !profilePage.userError) {
       try {
         users = JSON.parse(dataString);
       } catch(e) {
@@ -200,14 +208,12 @@ profilePage.handler.setUsersFollowing = function(dataString) {
       for( var i in users ) {
         $$("usersfollowinglist").add({"userName":users[i]});
       }
-      $$("usersfollowinglist").show();
 
       if(users.length > 0) {
         $$("usersfollowing").setHTML(profilePage.strings.usersFollowingLabel + " (" + users.length + ")");
-      } else {
-        $$("usersfollowing").setHTML(profilePage.strings.usersFollowingLabel);
       }
 
+      $$("usersfollowinglist").show();
       $$("usersfollowing").show();
       $$("usersfollowinglist").refresh();
   }
@@ -280,7 +286,8 @@ profilePage.onReady = function() {
             { rows:[
               { view:"label",
                 id:"status",
-                label:"The profile could not be loaded.",
+                align:"center",
+                label:profilePage.strings.errorLabel,
                 css:"label_error"
               },
               { view:"label",

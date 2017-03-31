@@ -2,6 +2,7 @@
  * Created by david on 22/03/17.
  */
 describe("profile_script", function(){
+    var date = new Date();
 
     beforeEach(function(){
       profilePage.onReady();
@@ -28,7 +29,6 @@ describe("profile_script", function(){
     });
 
     describe("Valid User With Likes, Pages, Followers, and Following Users", function(){
-      var date = new Date();
 
       it("User information is visible", function(){
         profilePage.handler.setContentLikesCreated('{"firstName":"test", "lastName":"test", "userName":"test", "email":"test@test.test", "likedProxyPages":[{"title":"Test", "creationDate":"'+ date + '", "author":"tester"}], "createdProxyPages":[{"title":"Test2", "creationDate":"'+ date + '", "author":"tester2"}]}');
@@ -88,6 +88,51 @@ describe("profile_script", function(){
         expect(element0.userName).toBe("test1");
         expect(element1.userName).toBe("test2");
       });
+    });
+
+    describe("Follow Button", function(){
+
+      it("User is not logged in", function(){
+        document.cookie = "user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        profilePage.checkFollow();
+
+        //We expect no button to be showing for follow/unfollow
+        expect($$("followbutton").isVisible()).not.toBeTruthy();
+        expect($$("unfollowbutton").isVisible()).not.toBeTruthy();
+      });
+
+      it("User logged in, profile is same user", function(){
+        profilePage.handler.setContentLikesCreated('{"firstName":"test", "lastName":"test", "userName":"test", "email":"test@test.test", "likedProxyPages":[{"title":"Test", "creationDate":"'+ date + '", "author":"tester"}], "createdProxyPages":[{"title":"Test2", "creationDate":"'+ date + '", "author":"tester2"}]}');
+        document.cookie = "user=test; expires=Thu, 01 Jan 2970 00:00:00 UTC; path=/;";
+        profilePage.checkFollow();
+
+        //We expect no button to be showing for follow/unfollow
+        expect($$("followbutton").isVisible()).not.toBeTruthy();
+        expect($$("unfollowbutton").isVisible()).not.toBeTruthy();
+      });
+
+      it("User logged in, already following", function(){
+        profilePage.handler.setContentLikesCreated('{"firstName":"test", "lastName":"test", "userName":"test", "email":"test@test.test", "likedProxyPages":[{"title":"Test", "creationDate":"'+ date + '", "author":"tester"}], "createdProxyPages":[{"title":"Test2", "creationDate":"'+ date + '", "author":"tester2"}]}');
+        document.cookie = "user=test2; expires=Thu, 01 Jan 2970 00:00:00 UTC; path=/;";
+        document.cookie = "isFollowed=true; expires=Thu, 01 Jan 2970 00:00:00 UTC; path=/;";
+        profilePage.checkFollow();
+
+        //We expect there to be an unfollow button showing
+        expect($$("followbutton").isVisible()).not.toBeTruthy();
+        expect($$("unfollowbutton").isVisible()).toBeTruthy();
+      });
+
+      it("User logged in, not following", function(){
+        profilePage.handler.setContentLikesCreated('{"firstName":"test", "lastName":"test", "userName":"test", "email":"test@test.test", "likedProxyPages":[{"title":"Test", "creationDate":"'+ date + '", "author":"tester"}], "createdProxyPages":[{"title":"Test2", "creationDate":"'+ date + '", "author":"tester2"}]}');
+        document.cookie = "user=test2; expires=Thu, 01 Jan 2970 00:00:00 UTC; path=/;";
+        document.cookie = "isFollowed=false; expires=Thu, 01 Jan 2970 00:00:00 UTC; path=/;";
+        profilePage.checkFollow();
+
+        //We expect there to be a follow button showing
+        expect($$("followbutton").isVisible()).toBeTruthy();
+        expect($$("unfollowbutton").isVisible()).not.toBeTruthy();
+      });
+
     });
 
 });
