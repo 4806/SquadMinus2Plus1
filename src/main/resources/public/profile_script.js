@@ -29,6 +29,10 @@ profilePage.hideAll = function() {
   $$("email").hide();
   $$("unfollowbutton").hide();
   $$("followbutton").hide();
+  $$("createdheader").hide();
+  $$("createdlist").hide();
+  $$("likesheader").hide();
+  $$("likelist").hide();
   $$("usersfollowing").hide();
   $$("usersfollowinglist").hide();
   $$("followedusers").hide();
@@ -93,29 +97,31 @@ profilePage.handler.setContentLikesCreated = function(dataString) {
 
       //Liked Pages - should be already in the object, just refresh the table
       if( profile.likedProxyPages !== undefined && profile.likedProxyPages !== null && profile.likedProxyPages.length > 0 ) {
-        $$("likelist").show();
         $$("likelist").clearAll();
         for( var i = 0; i < profile.likedProxyPages.length; i++){
             profile.likedProxyPages[i].creationDate = pageUtil.getFormattedDate(profile.likedProxyPages[i].creationDate);
             $$("likelist").add(profile.likedProxyPages[i]);
         }
         $$("likesheader").setHTML(profilePage.strings.likesLabel + " (" + profile.likedProxyPages.length + ")");
-        $$("likesheader").show();
         $$("likelist").refresh();
       }
 
       //Created Pages - should be already in the object, just refresh the table
       if( profile.createdProxyPages !== undefined && profile.createdProxyPages !== null && profile.createdProxyPages.length > 0 ) {
-        $$("createdlist").show();
         $$("createdlist").clearAll();
         for( var n = 0; n < profile.createdProxyPages.length; n++){
             profile.createdProxyPages[n].creationDate = pageUtil.getFormattedDate(profile.createdProxyPages[n].creationDate);
             $$("createdlist").add(profile.createdProxyPages[n]);
         }
         $$("createdheader").setHTML(profilePage.strings.createdLabel + " (" + profile.createdProxyPages.length + ")");
-        $$("createdheader").show();
         $$("createdlist").refresh();
       }
+
+      $$("createdheader").show();
+      $$("likesheader").show();
+      $$("createdlist").show();
+      $$("likelist").show();
+
   } else {
     profilePage.handler.error();
   }
@@ -171,7 +177,13 @@ profilePage.handler.setFollowingUsers = function(dataString) {
         $$("followlist").add({"userName":users[i]});
       }
       $$("followlist").show();
-      $$("followedusers").setHTML(profilePage.strings.followingLabel + " (" + users.length + ")");
+
+      if(users.length > 0) {
+        $$("followedusers").setHTML(profilePage.strings.followingLabel + " (" + users.length + ")");
+      } else {
+        $$("followedusers").setHTML(profilePage.strings.followingLabel);
+      }
+
       $$("followedusers").show();
       $$("followlist").refresh();
   }
@@ -189,7 +201,13 @@ profilePage.handler.setUsersFollowing = function(dataString) {
         $$("usersfollowinglist").add({"userName":users[i]});
       }
       $$("usersfollowinglist").show();
-      $$("usersfollowing").setHTML(profilePage.strings.usersFollowingLabel + " (" + users.length + ")");
+
+      if(users.length > 0) {
+        $$("usersfollowing").setHTML(profilePage.strings.usersFollowingLabel + " (" + users.length + ")");
+      } else {
+        $$("usersfollowing").setHTML(profilePage.strings.usersFollowingLabel);
+      }
+
       $$("usersfollowing").show();
       $$("usersfollowinglist").refresh();
   }
