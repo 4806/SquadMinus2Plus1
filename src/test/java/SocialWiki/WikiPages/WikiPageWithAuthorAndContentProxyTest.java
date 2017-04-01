@@ -70,4 +70,9 @@ public class WikiPageWithAuthorAndContentProxyTest {
         assertEquals("Failure - getFullResult(testConcreteWikiPage2)", testResult2, WikiPageWithAuthorAndContentProxy.getFullResult(testConcreteWikiPage2));
     }
 
+    @Test
+    public void getViews() throws Exception {
+        assertEquals("Failure - getViews() for testResult1", testConcreteWikiPage1.getViews(), testResult1.getViews());
+        assertEquals("Failure - getViews() for testResult2", testConcreteWikiPage2.getViews(), testResult2.getViews());
+    }
 }

@@ -93,6 +93,7 @@ public class WikiPageControllerTest {
                 .andExpect(jsonPath("$.title", is("testTitle")))
                 .andExpect(jsonPath("$.content", is("testContent")))
                 .andExpect(jsonPath("$.parentID", is(-1)))
+                .andExpect(jsonPath("$.views", is(0)))
                 .andReturn();
         params.clear();
 
@@ -110,7 +111,8 @@ public class WikiPageControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title", is("testTitle")))
                 .andExpect(jsonPath("$.content", is("testContent2")))
-                .andExpect(jsonPath("$.parentID", is(Integer.parseInt(parentid))));
+                .andExpect(jsonPath("$.parentID", is(Integer.parseInt(parentid))))
+                .andExpect(jsonPath("$.views", is(0)));
         params.clear();
 
         //Check for successful edit with altered title
@@ -124,7 +126,8 @@ public class WikiPageControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title", is("testTitle2")))
                 .andExpect(jsonPath("$.content", is("testContent")))
-                .andExpect(jsonPath("$.parentID", is(Integer.parseInt(parentid))));
+                .andExpect(jsonPath("$.parentID", is(Integer.parseInt(parentid))))
+                .andExpect(jsonPath("$.views", is(0)));;
         params.clear();
 
         //Check for successful creation with long content string > 255 length
@@ -139,6 +142,7 @@ public class WikiPageControllerTest {
                 .andExpect(jsonPath("$.title", is("long content")))
                 .andExpect(jsonPath("$.content", is("EzNFYkoP4Pk3vNkNENzWgAWANXVPSAkUORyz3ygTjADIXCMmdZDA7IGASMSfa24agfi9kj4Nw6sPCDUV3P9LKiZ6oFLo5Fj2FJ5EXbYmfYUdVKakZIts0R1kiEc799e0IEiIQZmlERkox6KLNRpOfEY8nTnrq9xjg2eJf0CojoGlKxgIp1stQZzikybuv6ng5OnnMDhFS5JLjiKM0P08gxDu4htYeUzSk90WxVEVDlAzfaeKKhfXjphctopZukFY")))
                 .andExpect(jsonPath("$.parentID", is(-1)))
+                .andExpect(jsonPath("$.views", is(0)))
                 .andReturn();
         params.clear();
 
@@ -206,7 +210,8 @@ public class WikiPageControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title", is("testTitle")))
                 .andExpect(jsonPath("$.content", is("")))
-                .andExpect(jsonPath("$.parentID", is(-1)));
+                .andExpect(jsonPath("$.parentID", is(-1)))
+                .andExpect(jsonPath("$.views", is(0)));
         params.clear();
 
         //Check for unsuccessful creation due to missing title parameter
@@ -382,7 +387,15 @@ public class WikiPageControllerTest {
         this.mockMvc.perform(get("/retrieveWikiPage").params(params))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(testConcreteWikiPage1.getId().intValue())));
+                .andExpect(jsonPath("$.id", is(testConcreteWikiPage1.getId().intValue())))
+                .andExpect(jsonPath("$.views", is(1)));
+
+        // Check for successful search again, incrementing view counter
+        this.mockMvc.perform(get("/retrieveWikiPage").params(params))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(testConcreteWikiPage1.getId().intValue())))
+                .andExpect(jsonPath("$.views", is(2)));
         params.clear();
 
     }
