@@ -14,9 +14,16 @@ profilePage.strings.likesLabel = "Likes";
 profilePage.strings.createdLabel = "Created Pages";
 profilePage.strings.followingLabel = "Followed Users";
 profilePage.strings.usersFollowingLabel = "Users Following";
+profilePage.strings.followError = "There was a problem following user.";
+profilePage.strings.unfollowError = "There was a problem unfollowing user.";
+profilePage.strings.errorLabel = "The profile could not be loaded.";
+
+profilePage.userError = false;
 
 profilePage.handler.error = function() {
     $$("status").show();
+
+    profilePage.userError = true;
 
     //Hide all other components
     profilePage.hideAll();
@@ -29,6 +36,10 @@ profilePage.hideAll = function() {
   $$("email").hide();
   $$("unfollowbutton").hide();
   $$("followbutton").hide();
+  $$("createdheader").hide();
+  $$("createdlist").hide();
+  $$("likesheader").hide();
+  $$("likelist").hide();
   $$("usersfollowing").hide();
   $$("usersfollowinglist").hide();
   $$("followedusers").hide();
@@ -58,7 +69,10 @@ profilePage.handler.setContentLikesCreated = function(dataString) {
         profile = JSON.parse(dataString);
       } catch(e) {
         profilePage.handler.error();
+        return;
       }
+
+      profilePage.userError = false;
 
       //User Data
 
@@ -93,29 +107,31 @@ profilePage.handler.setContentLikesCreated = function(dataString) {
 
       //Liked Pages - should be already in the object, just refresh the table
       if( profile.likedProxyPages !== undefined && profile.likedProxyPages !== null && profile.likedProxyPages.length > 0 ) {
-        $$("likelist").show();
         $$("likelist").clearAll();
         for( var i = 0; i < profile.likedProxyPages.length; i++){
             profile.likedProxyPages[i].creationDate = pageUtil.getFormattedDate(profile.likedProxyPages[i].creationDate);
             $$("likelist").add(profile.likedProxyPages[i]);
         }
         $$("likesheader").setHTML(profilePage.strings.likesLabel + " (" + profile.likedProxyPages.length + ")");
-        $$("likesheader").show();
         $$("likelist").refresh();
       }
 
       //Created Pages - should be already in the object, just refresh the table
       if( profile.createdProxyPages !== undefined && profile.createdProxyPages !== null && profile.createdProxyPages.length > 0 ) {
-        $$("createdlist").show();
         $$("createdlist").clearAll();
         for( var n = 0; n < profile.createdProxyPages.length; n++){
             profile.createdProxyPages[n].creationDate = pageUtil.getFormattedDate(profile.createdProxyPages[n].creationDate);
             $$("createdlist").add(profile.createdProxyPages[n]);
         }
         $$("createdheader").setHTML(profilePage.strings.createdLabel + " (" + profile.createdProxyPages.length + ")");
-        $$("createdheader").show();
         $$("createdlist").refresh();
       }
+
+      $$("createdheader").show();
+      $$("likesheader").show();
+      $$("createdlist").show();
+      $$("likelist").show();
+
   } else {
     profilePage.handler.error();
   }
@@ -129,11 +145,11 @@ profilePage.handler.followButtonClick = function() {
 };
 
 profilePage.handler.unfollowerror = function() {
-  webix.alert("There was a problem unfollowing user.");
+  webix.alert(profilePage.strings.unfollowError);
 };
 
 profilePage.handler.followerror = function() {
-  webix.alert("There was a problem following user.");
+  webix.alert(profilePage.strings.followError);
 };
 
 profilePage.handler.unfollowButtonClick = function() {
@@ -160,7 +176,7 @@ profilePage.checkFollow = function() {
 };
 
 profilePage.handler.setFollowingUsers = function(dataString) {
-  if (dataString) {
+  if (dataString && !profilePage.userError) {
       try {
         users = JSON.parse(dataString);
       } catch(e) {
@@ -170,15 +186,19 @@ profilePage.handler.setFollowingUsers = function(dataString) {
       for( var i in users ) {
         $$("followlist").add({"userName":users[i]});
       }
+
+      if(users.length > 0) {
+        $$("followedusers").setHTML(profilePage.strings.followingLabel + " (" + users.length + ")");
+      }
+
       $$("followlist").show();
-      $$("followedusers").setHTML(profilePage.strings.followingLabel + " (" + users.length + ")");
       $$("followedusers").show();
       $$("followlist").refresh();
   }
 };
 
 profilePage.handler.setUsersFollowing = function(dataString) {
-  if (dataString) {
+  if (dataString && !profilePage.userError) {
       try {
         users = JSON.parse(dataString);
       } catch(e) {
@@ -188,8 +208,12 @@ profilePage.handler.setUsersFollowing = function(dataString) {
       for( var i in users ) {
         $$("usersfollowinglist").add({"userName":users[i]});
       }
+
+      if(users.length > 0) {
+        $$("usersfollowing").setHTML(profilePage.strings.usersFollowingLabel + " (" + users.length + ")");
+      }
+
       $$("usersfollowinglist").show();
-      $$("usersfollowing").setHTML(profilePage.strings.usersFollowingLabel + " (" + users.length + ")");
       $$("usersfollowing").show();
       $$("usersfollowinglist").refresh();
   }
@@ -218,13 +242,13 @@ profilePage.getContent = function() {
     var params = pageUtil.getUrlContent(location.href);
 
     //Get user information + liked pages + created pages
-    webix.ajax().get("/retrieveUser", {"user":params.user}, {
+    webix.ajax().get("/retrieveUser?user=" + params.user, {
         error:profilePage.handler.error,
         success:profilePage.handler.setContentLikesCreated
     });
 
     //Get following users
-    webix.ajax().get("/getFollowingUsers", {"user":params.user}, {
+    webix.ajax().get("/getFollowingUsers?user=" + params.user, {
         error:function(){
           $$("followedusers").hide();
           $$("followlist").hide();
@@ -233,7 +257,7 @@ profilePage.getContent = function() {
     });
 
     //Get users following
-    webix.ajax().get("/getUsersFollowing", {"user":params.user}, {
+    webix.ajax().get("/getUsersFollowing?user=" + params.user, {
         error:function(){
           $$("usersfollowing").hide();
           $$("usersfollowinglist").hide();
@@ -242,7 +266,7 @@ profilePage.getContent = function() {
     });
 
     //Get following user activity
-    // webix.ajax().post("/followactivity", {"user":params.user}, {
+    // webix.ajax().get("/followactivity?user=" + params.user, {
     //     error:function(){
     //       // $$("followeduseractivity").hide();
     //       // $$("followactivitylist").hide();
@@ -262,7 +286,8 @@ profilePage.onReady = function() {
             { rows:[
               { view:"label",
                 id:"status",
-                label:"The profile could not be loaded.",
+                align:"center",
+                label:profilePage.strings.errorLabel,
                 css:"label_error"
               },
               { view:"label",
@@ -361,7 +386,7 @@ profilePage.onReady = function() {
                                 template:"#userName#",
                                 height:250,
                                 type:{
-                                    height:62
+                                    height:38
                                 },
                                 on:{
                                     onItemClick:profilePage.handler.itemClickFollowedUser
@@ -379,7 +404,7 @@ profilePage.onReady = function() {
                                 align:"center",
                                 template:"#userName#",
                                 type:{
-                                    height:62
+                                    height:38
                                 },
                                 on:{
                                     onItemClick:profilePage.handler.itemClickUserFollowing
