@@ -242,13 +242,13 @@ profilePage.getContent = function() {
     var params = pageUtil.getUrlContent(location.href);
 
     //Get user information + liked pages + created pages
-    webix.ajax().get("/retrieveUser", {"user":params.user}, {
+    webix.ajax().get("/retrieveUser?user=" + params.user, {
         error:profilePage.handler.error,
         success:profilePage.handler.setContentLikesCreated
     });
 
     //Get following users
-    webix.ajax().post("/getFollowingUsers", {"user":params.user}, {
+    webix.ajax().get("/getFollowingUsers?user=" + params.user, {
         error:function(){
           $$("followedusers").hide();
           $$("followlist").hide();
@@ -257,7 +257,7 @@ profilePage.getContent = function() {
     });
 
     //Get users following
-    webix.ajax().post("/getUsersFollowing", {"user":params.user}, {
+    webix.ajax().get("/getUsersFollowing?user=" + params.user, {
         error:function(){
           $$("usersfollowing").hide();
           $$("usersfollowinglist").hide();
@@ -266,7 +266,7 @@ profilePage.getContent = function() {
     });
 
     //Get following user activity
-    // webix.ajax().post("/followactivity", {"user":params.user}, {
+    // webix.ajax().get("/followactivity?user=" + params.user, {
     //     error:function(){
     //       // $$("followeduseractivity").hide();
     //       // $$("followactivitylist").hide();
@@ -386,7 +386,7 @@ profilePage.onReady = function() {
                                 template:"#userName#",
                                 height:250,
                                 type:{
-                                    height:62
+                                    height:38
                                 },
                                 on:{
                                     onItemClick:profilePage.handler.itemClickFollowedUser
@@ -404,7 +404,7 @@ profilePage.onReady = function() {
                                 align:"center",
                                 template:"#userName#",
                                 type:{
-                                    height:62
+                                    height:38
                                 },
                                 on:{
                                     onItemClick:profilePage.handler.itemClickUserFollowing
