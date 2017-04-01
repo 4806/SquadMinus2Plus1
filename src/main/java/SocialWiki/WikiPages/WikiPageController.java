@@ -207,6 +207,9 @@ public class WikiPageController {
 
         page = wikiPageRepo.save(page);
 
+        WikiPageWithAuthorAndContentProxy contentProxyPage = new WikiPageWithAuthorAndContentProxy(page);
+        contentProxyPage.setLikes(userRepo.findUsersByLikedPage(id).size());
+
         HttpSession session = request.getSession(false);
         if (session == null) {
             response.addCookie(CookieManager.getClearIsLikedCookie());
@@ -216,7 +219,7 @@ public class WikiPageController {
             response.addCookie(CookieManager.getIsLikedCookie(user, id));
         }
 
-        return ResponseEntity.ok(new WikiPageWithAuthorAndContentProxy(page));
+        return ResponseEntity.ok(contentProxyPage);
     }
 
     /**
