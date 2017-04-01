@@ -30,8 +30,8 @@ public class UserRepositoryTest {
     public void setUp() throws Exception {
         user1 = new User("testUserName1", "testFirstName1", "testLastName1", "testEmail1", "testPassword1");
         user2 = new User("testUserName2", "testFirstName2", "testLastName2", "testEmail2", "testPassword2");
-        userRepo.save(user1);
-        userRepo.save(user2);
+        user1 = userRepo.save(user1);
+        user2 = userRepo.save(user2);
     }
 
     @After
@@ -189,6 +189,38 @@ public class UserRepositoryTest {
         assertEquals("Failure - userRepository query with existing MiXeD userName for user1 and MiXeD email for user2 could not find both", 2, users.size());
         assertEquals("Failure - userRepository query with existing MiXeD userName for user1 could not be found", user1, users.get(0));
         assertEquals("Failure - userRepository query with existing MiXeD email for user2 could not be found", user2, users.get(1));
+    }
+
+    @Test
+    public void findFollowedUsersByUsername() throws Exception {
+        user1.followUser(user2);
+        user1 = userRepo.save(user1);
+
+        List<User> users = userRepo.findFollowedUsersByUsername(user1.getUserName());
+        assertEquals("Failure - findFollowedUsersByUsername(user1.getUserName()) did not return correct user", user2, users.get(0));
+
+        user1.unfollowUser(user2);
+        user1 = userRepo.save(user1);
+
+        users = userRepo.findFollowedUsersByUsername(user1.getUserName());
+        assertEquals("Failure - findFollowedUsersByUsername(user1.getUserName()) did not return empty list when no users followed", 0, users.size());
+
+    }
+
+    @Test
+    public void findUsersFollowingUserByUser() throws Exception {
+        user1.followUser(user2);
+        user1 = userRepo.save(user1);
+
+        List<User> users = userRepo.findUsersFollowingUserByUser(user2);
+        assertEquals("Failure - findUsersFollowingUserByUser(user2) did not return correct user", user1, users.get(0));
+
+        user1.unfollowUser(user2);
+        user1 = userRepo.save(user1);
+
+        users = userRepo.findUsersFollowingUserByUser(user2);
+        assertEquals("Failure - findUsersFollowingUserByUser(user2) did not return empty list when no users following", 0, users.size());
+
     }
 
 }

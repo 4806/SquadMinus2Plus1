@@ -10,9 +10,20 @@ profilePage.strings.userNamePre = "";
 profilePage.strings.firstNamePre = "First: ";
 profilePage.strings.lastNamePre = "Last: ";
 profilePage.strings.emailNamePre = "Email: ";
+profilePage.strings.likesLabel = "Likes";
+profilePage.strings.createdLabel = "Created Pages";
+profilePage.strings.followingLabel = "Followed Users";
+profilePage.strings.usersFollowingLabel = "Users Following";
+profilePage.strings.followError = "There was a problem following user.";
+profilePage.strings.unfollowError = "There was a problem unfollowing user.";
+profilePage.strings.errorLabel = "The profile could not be loaded.";
+
+profilePage.userError = false;
 
 profilePage.handler.error = function() {
     $$("status").show();
+
+    profilePage.userError = true;
 
     //Hide all other components
     profilePage.hideAll();
@@ -23,6 +34,18 @@ profilePage.hideAll = function() {
   $$("first").hide();
   $$("last").hide();
   $$("email").hide();
+  $$("unfollowbutton").hide();
+  $$("followbutton").hide();
+  $$("createdheader").hide();
+  $$("createdlist").hide();
+  $$("likesheader").hide();
+  $$("likelist").hide();
+  $$("usersfollowing").hide();
+  $$("usersfollowinglist").hide();
+  $$("followedusers").hide();
+  $$("followlist").hide();
+  $$("followeduseractivity").hide();
+  $$("followactivitylist").hide();
 };
 
 profilePage.handler.itemClickLikes = function(itemId) {
@@ -39,14 +62,17 @@ profilePage.handler.itemClickCreated = function(itemId) {
     }
 };
 
-profilePage.handler.setContent = function(dataString) {
+profilePage.handler.setContentLikesCreated = function(dataString) {
   if (dataString) {
       var profile = {};
       try {
         profile = JSON.parse(dataString);
       } catch(e) {
         profilePage.handler.error();
+        return;
       }
+
+      profilePage.userError = false;
 
       //User Data
 
@@ -54,6 +80,9 @@ profilePage.handler.setContent = function(dataString) {
       if(profile.userName !== undefined && profile.userName !== null) {
         $$("username").setValue(profilePage.strings.userNamePre + profile.userName);
         $$("username").show();
+
+        //Showing the follow button will only work when the username is present
+        profilePage.checkFollow();
       }
 
       //Email
@@ -78,29 +107,133 @@ profilePage.handler.setContent = function(dataString) {
 
       //Liked Pages - should be already in the object, just refresh the table
       if( profile.likedProxyPages !== undefined && profile.likedProxyPages !== null && profile.likedProxyPages.length > 0 ) {
-        $$("likelist").show();
         $$("likelist").clearAll();
         for( var i = 0; i < profile.likedProxyPages.length; i++){
             profile.likedProxyPages[i].creationDate = pageUtil.getFormattedDate(profile.likedProxyPages[i].creationDate);
             $$("likelist").add(profile.likedProxyPages[i]);
         }
-        $$("likesheader").show();
+        $$("likesheader").setHTML(profilePage.strings.likesLabel + " (" + profile.likedProxyPages.length + ")");
         $$("likelist").refresh();
       }
 
       //Created Pages - should be already in the object, just refresh the table
       if( profile.createdProxyPages !== undefined && profile.createdProxyPages !== null && profile.createdProxyPages.length > 0 ) {
-        $$("createdlist").show();
         $$("createdlist").clearAll();
         for( var n = 0; n < profile.createdProxyPages.length; n++){
             profile.createdProxyPages[n].creationDate = pageUtil.getFormattedDate(profile.createdProxyPages[n].creationDate);
             $$("createdlist").add(profile.createdProxyPages[n]);
         }
-        $$("createdheader").show();
+        $$("createdheader").setHTML(profilePage.strings.createdLabel + " (" + profile.createdProxyPages.length + ")");
         $$("createdlist").refresh();
       }
+
+      $$("createdheader").show();
+      $$("likesheader").show();
+      $$("createdlist").show();
+      $$("likelist").show();
+
   } else {
     profilePage.handler.error();
+  }
+};
+
+profilePage.handler.followButtonClick = function() {
+  webix.ajax().post("/followUser", {"user":$$("username").getValue()} , {
+      error:profilePage.handler.followerror,
+      success:profilePage.setFollowButton
+  });
+};
+
+profilePage.handler.unfollowerror = function() {
+  webix.alert(profilePage.strings.unfollowError);
+};
+
+profilePage.handler.followerror = function() {
+  webix.alert(profilePage.strings.followError);
+};
+
+profilePage.handler.unfollowButtonClick = function() {
+  webix.ajax().post("/unfollowUser", {"user":$$("username").getValue()}, {
+      error:profilePage.handler.unfollowerror,
+      success:profilePage.setFollowButton
+  });
+};
+
+profilePage.setFollowButton = function() {
+  if(generalPages.getCookie("isFollowed").toLowerCase() === "true") {
+    $$("followbutton").hide();
+    $$("unfollowbutton").show();
+  } else {
+    $$("unfollowbutton").hide();
+    $$("followbutton").show();
+  }
+};
+
+profilePage.checkFollow = function() {
+  if(generalPages.getCookie("user") !== null && generalPages.getCookie("user") !== $$("username").getValue()) {
+    profilePage.setFollowButton();
+  }
+};
+
+profilePage.handler.setFollowingUsers = function(dataString) {
+  if (dataString && !profilePage.userError) {
+      try {
+        users = JSON.parse(dataString);
+      } catch(e) {
+        return;
+      }
+
+      for( var i in users ) {
+        $$("followlist").add({"userName":users[i]});
+      }
+
+      if(users.length > 0) {
+        $$("followedusers").setHTML(profilePage.strings.followingLabel + " (" + users.length + ")");
+      }
+
+      $$("followlist").show();
+      $$("followedusers").show();
+      $$("followlist").refresh();
+  }
+};
+
+profilePage.handler.setUsersFollowing = function(dataString) {
+  if (dataString && !profilePage.userError) {
+      try {
+        users = JSON.parse(dataString);
+      } catch(e) {
+        return;
+      }
+
+      for( var i in users ) {
+        $$("usersfollowinglist").add({"userName":users[i]});
+      }
+
+      if(users.length > 0) {
+        $$("usersfollowing").setHTML(profilePage.strings.usersFollowingLabel + " (" + users.length + ")");
+      }
+
+      $$("usersfollowinglist").show();
+      $$("usersfollowing").show();
+      $$("usersfollowinglist").refresh();
+  }
+};
+
+// profilePage.handler.setFollowingUserActivity = function(dataString) {
+//
+// };
+
+profilePage.handler.itemClickFollowedUser = function(itemId) {
+  var item = $$("followlist").getItem(itemId);
+  if(item !== null) {
+    location.href = "/profile?user=" + item.userName;
+  }
+};
+
+profilePage.handler.itemClickUserFollowing = function(itemId) {
+  var item = $$("usersfollowinglist").getItem(itemId);
+  if(item.userName !== undefined) {
+    location.href = "/profile?user=" + item.userName;
   }
 };
 
@@ -108,11 +241,38 @@ profilePage.getContent = function() {
 
     var params = pageUtil.getUrlContent(location.href);
 
-    //Get user information
+    //Get user information + liked pages + created pages
     webix.ajax().get("/retrieveUser?user=" + params.user, {
         error:profilePage.handler.error,
-        success:profilePage.handler.setContent
+        success:profilePage.handler.setContentLikesCreated
     });
+
+    //Get following users
+    webix.ajax().get("/getFollowingUsers?user=" + params.user, {
+        error:function(){
+          $$("followedusers").hide();
+          $$("followlist").hide();
+        },
+        success:profilePage.handler.setFollowingUsers
+    });
+
+    //Get users following
+    webix.ajax().get("/getUsersFollowing?user=" + params.user, {
+        error:function(){
+          $$("usersfollowing").hide();
+          $$("usersfollowinglist").hide();
+        },
+        success:profilePage.handler.setUsersFollowing
+    });
+
+    //Get following user activity
+    // webix.ajax().get("/followactivity?user=" + params.user, {
+    //     error:function(){
+    //       // $$("followeduseractivity").hide();
+    //       // $$("followactivitylist").hide();
+    //     },
+    //     success:profilePage.handler.setFollowingUserActivity
+    // });
 };
 
 profilePage.onReady = function() {
@@ -126,7 +286,8 @@ profilePage.onReady = function() {
             { rows:[
               { view:"label",
                 id:"status",
-                label:"The profile could not be loaded.",
+                align:"center",
+                label:profilePage.strings.errorLabel,
                 css:"label_error"
               },
               { view:"label",
@@ -149,38 +310,123 @@ profilePage.onReady = function() {
                 label:"Last: ",
                 css:"label_medium"
               },
+              {
+                view:"button",
+                id:"followbutton",
+                value:"Follow",
+                inputWidth:150,
+                click:profilePage.handler.followButtonClick
+              },
+              {
+                view:"button",
+                id:"unfollowbutton",
+                value:"Unfollow",
+                inputWidth:150,
+                click:profilePage.handler.unfollowButtonClick
+              },
             ]},
             { width:30 }
           ]},
           { height:30 },
           { cols:[
-            { width:30 },
-            {
+              { width:30 },
+              {
                 rows:[
-                    {view:"template", id:"likesheader", template:"Likes", type:"header", align:"left"},
-                    {
-                        view:"list",
-                        id:"likelist",
-                        align:"center",
-                        template:"#title# <div> Created by #author# on #creationDate#</div>",
-                        type:{
-                            height:62
-                        },
-                        on:{
-                            onItemClick:profilePage.handler.itemClickLikes
-                        }
-                    }
+                  {
+                    cols:[
+                      {
+                          rows:[
+                              {view:"template", id:"likesheader", template:profilePage.strings.likesLabel, type:"header", align:"left"},
+                              {
+                                  view:"list",
+                                  id:"likelist",
+                                  align:"center",
+                                  template:"#title# <div> Created by #author# on #creationDate#</div>",
+                                  height:250,
+                                  type:{
+                                      height:62
+                                  },
+                                  on:{
+                                      onItemClick:profilePage.handler.itemClickLikes
+                                  }
+                              }
+                          ]
+                      },
+                      { width:30 },
+                      {
+                          rows:[
+                              {view:"template", id:"createdheader", template:profilePage.strings.createdLabel, type:"header", align:"left"},
+                              {
+                                  view:"list",
+                                  id:"createdlist",
+                                  align:"center",
+                                  template:"#title# <div> Created by #author# on #creationDate#</div>",
+                                  height:250,
+                                  type:{
+                                      height:62
+                                  },
+                                  on:{
+                                      onItemClick:profilePage.handler.itemClickCreated
+                                  }
+                              }
+                          ]
+                      }
+                    ]
+                  },
+                  { height:30 },
+                  {
+                    cols:[
+                      {
+                        rows:[
+                            {view:"template", id:"followedusers", template:profilePage.strings.followingLabel, type:"header", align:"left"},
+                            {
+                                view:"list",
+                                id:"followlist",
+                                align:"center",
+                                template:"#userName#",
+                                height:250,
+                                type:{
+                                    height:38
+                                },
+                                on:{
+                                    onItemClick:profilePage.handler.itemClickFollowedUser
+                                }
+                            }
+                        ]
+                      },
+                      { width:30 },
+                      {
+                        rows:[
+                            {view:"template", id:"usersfollowing", template:profilePage.strings.usersFollowingLabel, type:"header", align:"left"},
+                            {
+                                view:"list",
+                                id:"usersfollowinglist",
+                                align:"center",
+                                template:"#userName#",
+                                type:{
+                                    height:38
+                                },
+                                on:{
+                                    onItemClick:profilePage.handler.itemClickUserFollowing
+                                }
+                            }
+                        ]
+                      },
+                    ]
+                  }
                 ]
-            },
-            { width:30 },
-            {
+              },
+              { width:30 },
+              {
+                autoheight:true,
                 rows:[
-                    {view:"template", id:"createdheader", template:"Pages Created", type:"header", align:"left"},
+                    {view:"template", id:"followeduseractivity", template:"Followed User Activity", type:"header", align:"left"},
                     {
                         view:"list",
-                        id:"createdlist",
+                        id:"followactivitylist",
                         align:"center",
                         template:"#title# <div> Created by #author# on #creationDate#</div>",
+                        maxHeight:500,
                         type:{
                             height:62
                         },
@@ -189,9 +435,10 @@ profilePage.onReady = function() {
                         }
                     }
                 ]
-            },
-            { width:30 }
-          ]},
+              },
+              { width:30 }
+            ]
+          },
           { height:50 },
           generalPages.bottomIcon
       ]
@@ -203,6 +450,8 @@ profilePage.onReady = function() {
   $$("status").hide();
   profilePage.hideAll();
   profilePage.getContent();
+  $$("followbutton").hide();
+  $$("unfollowbutton").hide();
 };
 
 webix.ready(profilePage.onReady);

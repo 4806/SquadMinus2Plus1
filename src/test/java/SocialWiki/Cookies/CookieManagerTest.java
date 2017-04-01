@@ -148,6 +148,56 @@ public class CookieManagerTest {
         assertEquals("Failure - created cookie does not have the correct maxAge", 0, c.getMaxAge());
     }
 
+    @Test
+    public void getIsFollowedCookie() throws Exception {
+        // set up user following a user
+        User user1 = new User("testUserName", "testFirstName", "testLastName", "testEmail", "testPassword");
+        user1 = userRepo.save(user1);
+        User user2 = new User("testUserName2", "testFirstName2", "testLastName2", "testEmail2", "testPassword2");
+        user2 = userRepo.save(user2);
+
+        user1.followUser(user2);
+        user1 = userRepo.save(user1);
+
+
+        // login to get the request
+        MvcResult result = mockMvc.perform(post("/login")
+                .content("login=testUserName&pass=testPassword")
+                .contentType("application/x-www-form-urlencoded"))
+                .andReturn();
+
+        HttpServletRequest request = result.getRequest();
+
+        Cookie c = CookieManager.getIsFollowedCookie(user1, user2.getUserName());
+        assertEquals("Failure - created cookie does not have the correct name", "isFollowed", c.getName());
+        assertEquals("Failure - created cookie does not have the correct value", "true", c.getValue());
+        assertEquals("Failure - created cookie does not have the correct maxAge", 86400, c.getMaxAge());
+
+        MockHttpSession session = (MockHttpSession) request.getSession(false);
+
+        // unfollow user
+        result = mockMvc.perform(post("/unfollowUser")
+                .content("user=" + user2.getUserName())
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andReturn();
+
+        request = result.getRequest();
+        c = CookieManager.getIsFollowedCookie(user1, user2.getUserName());
+        assertEquals("Failure - created cookie does not have the correct name", "isFollowed", c.getName());
+        assertEquals("Failure - created cookie does not have the correct value", "false", c.getValue());
+        assertEquals("Failure - created cookie does not have the correct maxAge", 86400, c.getMaxAge());
+
+    }
+
+    @Test
+    public void getClearIsFollowedCookie() throws Exception {
+        Cookie c = CookieManager.getClearIsFollowedCookie();
+        assertEquals("Failure - created cookie does not have the correct name", "isFollowed", c.getName());
+        assertEquals("Failure - created cookie does not have the correct value", "", c.getValue());
+        assertEquals("Failure - created cookie does not have the correct maxAge", 0, c.getMaxAge());
+    }
+
     @After
     public void tearDown() throws Exception {
         pageRepo.deleteAll();

@@ -63,4 +63,15 @@ public interface UserRepository extends CrudRepository<User, Long> {
             "FROM SocialWiki.Users.User u " +
             "WHERE UPPER(u.userName) = UPPER(:userName) OR UPPER(u.email) = UPPER(:email)")
     List<User> findByUserNameOrEmail(@Param("userName") String userName, @Param("email") String email);
+
+    @Query("SELECT u.followedUsers" +
+                  " FROM SocialWiki.Users.User u " +
+            "WHERE UPPER(u.userName) = UPPER(:userName)")
+    List<User> findFollowedUsersByUsername(@Param("userName") String userName);
+
+    @Query("SELECT u " +
+            "FROM SocialWiki.Users.User u " +
+            "INNER JOIN u.followedUsers f " +
+            "WHERE :user IN (f)")
+    List<User> findUsersFollowingUserByUser(@Param("user") User userName);
 }

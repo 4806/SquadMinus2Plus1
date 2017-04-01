@@ -86,7 +86,7 @@ public class User {
      * The list of Users that the User follows
      */
     @Getter
-    @ManyToMany(cascade = CascadeType.MERGE)
+    @ManyToMany(cascade = CascadeType.PERSIST)
     @JsonIgnore
     private List<User> followedUsers;
 
@@ -130,6 +130,7 @@ public class User {
      * @param isDeleted - boolean as to whether or not the user is deleted
      * @param likedPages - list of pages the User likes
      * @param followedUsers - list of users the User follows
+     * @param createdPages - list of pages the User created
      */
     public User(Long id, String userName, String firstName, String lastName, String email, boolean isDeleted, List<ConcreteWikiPage> likedPages, List<User> followedUsers, List<ConcreteWikiPage> createdPages) {
         this.id = id;
