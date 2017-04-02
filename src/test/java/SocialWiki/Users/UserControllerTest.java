@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,475 +66,6 @@ public class UserControllerTest {
     public void tearDown() throws Exception {
         pageRepo.deleteAll();
         userRepo.deleteAll();
-    }
-
-    @Test
-    public void login() throws Exception {
-        // perform successful login with userName
-        MvcResult result = mockMvc.perform(post("/login")
-                .content("login=testUserName1&pass=testPassword1")
-                .contentType("application/x-www-form-urlencoded"))
-                .andExpect(cookie().value("user", "testUserName1"))
-                .andExpect(cookie().maxAge("user", 86400))
-                .andExpect(content().string(containsString("\"id\":")))
-                .andExpect(content().string(containsString("\"userName\":\"testUserName1\"")))
-                .andExpect(content().string(containsString("\"firstName\":\"testFirstName1\"")))
-                .andExpect(content().string(containsString("\"lastName\":\"testLastName1\"")))
-                .andExpect(content().string(containsString("\"email\":\"testEmail1\"")))
-                .andExpect(content().string(containsString("\"password\":null")))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        MockHttpSession session = (MockHttpSession) result.getRequest().getSession(false);
-        assertNotEquals("Failure - successful login did not create a session for user", null, session);
-
-        // perform successful login with email
-        result = mockMvc.perform(post("/login")
-                .content("login=testEmail1&pass=testPassword1")
-                .contentType("application/x-www-form-urlencoded"))
-                .andExpect(cookie().value("user", "testUserName1"))
-                .andExpect(cookie().maxAge("user", 86400))
-                .andExpect(content().string(containsString("\"id\":")))
-                .andExpect(content().string(containsString("\"userName\":\"testUserName1\"")))
-                .andExpect(content().string(containsString("\"firstName\":\"testFirstName1\"")))
-                .andExpect(content().string(containsString("\"lastName\":\"testLastName1\"")))
-                .andExpect(content().string(containsString("\"email\":\"testEmail1\"")))
-                .andExpect(content().string(containsString("\"password\":null")))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        session = (MockHttpSession) result.getRequest().getSession(false);
-        assertNotEquals("Failure - successful login did not create a session for user", null, session);
-
-        // perform successful login with all lowercase username
-        result = mockMvc.perform(post("/login")
-                .content("login=testusername1&pass=testPassword1")
-                .contentType("application/x-www-form-urlencoded"))
-                .andExpect(cookie().value("user", "testUserName1"))
-                .andExpect(cookie().maxAge("user", 86400))
-                .andExpect(content().string(containsString("\"id\":")))
-                .andExpect(content().string(containsString("\"userName\":\"testUserName1\"")))
-                .andExpect(content().string(containsString("\"firstName\":\"testFirstName1\"")))
-                .andExpect(content().string(containsString("\"lastName\":\"testLastName1\"")))
-                .andExpect(content().string(containsString("\"email\":\"testEmail1\"")))
-                .andExpect(content().string(containsString("\"password\":null")))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        session = (MockHttpSession) result.getRequest().getSession(false);
-        assertNotEquals("Failure - successful login did not create a session for user", null, session);
-
-        // perform successful login with all uppercase username
-        result = mockMvc.perform(post("/login")
-                .content("login=TESTUSERNAME1&pass=testPassword1")
-                .contentType("application/x-www-form-urlencoded"))
-                .andExpect(cookie().value("user", "testUserName1"))
-                .andExpect(cookie().maxAge("user", 86400))
-                .andExpect(content().string(containsString("\"id\":")))
-                .andExpect(content().string(containsString("\"userName\":\"testUserName1\"")))
-                .andExpect(content().string(containsString("\"firstName\":\"testFirstName1\"")))
-                .andExpect(content().string(containsString("\"lastName\":\"testLastName1\"")))
-                .andExpect(content().string(containsString("\"email\":\"testEmail1\"")))
-                .andExpect(content().string(containsString("\"password\":null")))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        session = (MockHttpSession) result.getRequest().getSession(false);
-        assertNotEquals("Failure - successful login did not create a session for user", null, session);
-
-        // perform successful login with improper mixed case username
-        result = mockMvc.perform(post("/login")
-                .content("login=TeStUsErNaMe1&pass=testPassword1")
-                .contentType("application/x-www-form-urlencoded"))
-                .andExpect(cookie().value("user", "testUserName1"))
-                .andExpect(cookie().maxAge("user", 86400))
-                .andExpect(content().string(containsString("\"id\":")))
-                .andExpect(content().string(containsString("\"userName\":\"testUserName1\"")))
-                .andExpect(content().string(containsString("\"firstName\":\"testFirstName1\"")))
-                .andExpect(content().string(containsString("\"lastName\":\"testLastName1\"")))
-                .andExpect(content().string(containsString("\"email\":\"testEmail1\"")))
-                .andExpect(content().string(containsString("\"password\":null")))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        session = (MockHttpSession) result.getRequest().getSession(false);
-        assertNotEquals("Failure - successful login did not create a session for user", null, session);
-
-        // perform successful login with all lowercase email
-        result = mockMvc.perform(post("/login")
-                .content("login=testemail1&pass=testPassword1")
-                .contentType("application/x-www-form-urlencoded"))
-                .andExpect(cookie().value("user", "testUserName1"))
-                .andExpect(cookie().maxAge("user", 86400))
-                .andExpect(content().string(containsString("\"id\":")))
-                .andExpect(content().string(containsString("\"userName\":\"testUserName1\"")))
-                .andExpect(content().string(containsString("\"firstName\":\"testFirstName1\"")))
-                .andExpect(content().string(containsString("\"lastName\":\"testLastName1\"")))
-                .andExpect(content().string(containsString("\"email\":\"testEmail1\"")))
-                .andExpect(content().string(containsString("\"password\":null")))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        session = (MockHttpSession) result.getRequest().getSession(false);
-        assertNotEquals("Failure - successful login did not create a session for user", null, session);
-
-        // perform successful login with all uppercase email
-        result = mockMvc.perform(post("/login")
-                .content("login=TESTEMAIL1&pass=testPassword1")
-                .contentType("application/x-www-form-urlencoded"))
-                .andExpect(cookie().value("user", "testUserName1"))
-                .andExpect(cookie().maxAge("user", 86400))
-                .andExpect(content().string(containsString("\"id\":")))
-                .andExpect(content().string(containsString("\"userName\":\"testUserName1\"")))
-                .andExpect(content().string(containsString("\"firstName\":\"testFirstName1\"")))
-                .andExpect(content().string(containsString("\"lastName\":\"testLastName1\"")))
-                .andExpect(content().string(containsString("\"email\":\"testEmail1\"")))
-                .andExpect(content().string(containsString("\"password\":null")))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        session = (MockHttpSession) result.getRequest().getSession(false);
-        assertNotEquals("Failure - successful login did not create a session for user", null, session);
-
-        // perform successful login with improper mixed case email
-        result = mockMvc.perform(post("/login")
-                .content("login=TeStEmAiL1&pass=testPassword1")
-                .contentType("application/x-www-form-urlencoded"))
-                .andExpect(cookie().value("user", "testUserName1"))
-                .andExpect(cookie().maxAge("user", 86400))
-                .andExpect(content().string(containsString("\"id\":")))
-                .andExpect(content().string(containsString("\"userName\":\"testUserName1\"")))
-                .andExpect(content().string(containsString("\"firstName\":\"testFirstName1\"")))
-                .andExpect(content().string(containsString("\"lastName\":\"testLastName1\"")))
-                .andExpect(content().string(containsString("\"email\":\"testEmail1\"")))
-                .andExpect(content().string(containsString("\"password\":null")))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        session = (MockHttpSession) result.getRequest().getSession(false);
-        assertNotEquals("Failure - successful login did not create a session for user", null, session);
-
-        // perform successful login with extra parameter
-        result = mockMvc.perform(post("/login")
-                .content("login=testEmail1&pass=testPassword1&last=notALastName")
-                .contentType("application/x-www-form-urlencoded"))
-                .andExpect(cookie().value("user", "testUserName1"))
-                .andExpect(cookie().maxAge("user", 86400))
-                .andExpect(content().string(containsString("\"id\":")))
-                .andExpect(content().string(containsString("\"userName\":\"testUserName1\"")))
-                .andExpect(content().string(containsString("\"firstName\":\"testFirstName1\"")))
-                .andExpect(content().string(containsString("\"lastName\":\"testLastName1\"")))
-                .andExpect(content().string(containsString("\"email\":\"testEmail1\"")))
-                .andExpect(content().string(containsString("\"password\":null")))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        session = (MockHttpSession) result.getRequest().getSession(false);
-        assertNotEquals("Failure - successful login did not create a session for user", null, session);
-
-        // perform unsuccessful login with an existing session
-        mockMvc.perform(post("/login")
-                .content("login=testUserName1&pass=testPassword1")
-                .contentType("application/x-www-form-urlencoded")
-                .session(session))
-                .andExpect(cookie().doesNotExist("user"))
-                .andExpect(status().isForbidden());
-
-        // perform unsuccessful login with missing "pass" parameter
-        mockMvc.perform(post("/login")
-                .content("login=testUserName1")
-                .contentType("application/x-www-form-urlencoded"))
-                .andExpect(cookie().doesNotExist("user"))
-                .andExpect(content().string(""))
-                .andExpect(status().isUnprocessableEntity())
-                .andReturn();
-
-        //perform unsuccessful login with missing "login" parameter
-        mockMvc.perform(post("/login")
-                .content("pass=testPassword1")
-                .contentType("application/x-www-form-urlencoded"))
-                .andExpect(cookie().doesNotExist("user"))
-                .andExpect(content().string(""))
-                .andExpect(status().isUnprocessableEntity());
-
-        //perform unsuccessful login with both parameters missing
-        mockMvc.perform(post("/login")
-                .contentType("application/x-www-form-urlencoded"))
-                .andExpect(cookie().doesNotExist("user"))
-                .andExpect(content().string(""))
-                .andExpect(status().isUnprocessableEntity());
-
-        // perform unsuccessful login with empty "login" parameter
-        mockMvc.perform(post("/login")
-                .content("login=&pass=testPassword1")
-                .contentType("application/x-www-form-urlencoded"))
-                .andExpect(cookie().doesNotExist("user"))
-                .andExpect(content().string(""))
-                .andExpect(status().isUnprocessableEntity());
-
-        // perform unsuccessful login with empty "pass" parameter
-        mockMvc.perform(post("/login")
-                .content("login=testUserName1&pass=")
-                .contentType("application/x-www-form-urlencoded"))
-                .andExpect(cookie().doesNotExist("user"))
-                .andExpect(content().string(""))
-                .andExpect(status().isUnprocessableEntity());
-
-        // perform unsuccessful login with both parameters empty
-        mockMvc.perform(post("/login")
-                .content("login=testUserName1&pass=")
-                .contentType("application/x-www-form-urlencoded"))
-                .andExpect(cookie().doesNotExist("user"))
-                .andExpect(content().string(""))
-                .andExpect(status().isUnprocessableEntity());
-
-        // perform unsuccessful login with wrong credentials
-        mockMvc.perform(post("/login")
-                .content("login=testUserName2&pass=testPassword2")
-                .contentType("application/x-www-form-urlencoded"))
-                .andExpect(cookie().doesNotExist("user"))
-                .andExpect(content().string(""))
-                .andExpect(status().isUnauthorized());
-    }
-
-    @Test
-    public void create() throws Exception {
-        // perform successful creation
-        MvcResult result = mockMvc.perform(post("/signup")
-                .content("user=testUserName2&first=testFirstName2&last=testLastName2&email=testEmail2&pass=testPassword2")
-                .contentType("application/x-www-form-urlencoded"))
-                .andExpect(cookie().value("user", "testUserName2"))
-                .andExpect(cookie().maxAge("user", 86400))
-                .andExpect(content().string(containsString("\"id\":")))
-                .andExpect(content().string(containsString("\"userName\":\"testUserName2\"")))
-                .andExpect(content().string(containsString("\"firstName\":\"testFirstName2\"")))
-                .andExpect(content().string(containsString("\"lastName\":\"testLastName2\"")))
-                .andExpect(content().string(containsString("\"email\":\"testEmail2\"")))
-                .andExpect(content().string(containsString("\"password\":null")))
-                .andExpect(status().isCreated())
-                .andReturn();
-
-        MockHttpSession session = (MockHttpSession) result.getRequest().getSession(false);
-        assertNotEquals("Failure - successful creation of new user did not create a session for user", null, session);
-
-        User user = userRepo.findByUserName("testUserName2");
-        assertNotEquals("Failure - userControllerTest did not successfully create new user", null, user);
-
-        // perform unsuccessful creation with alternate case version of userName that already exists
-        mockMvc.perform(post("/signup")
-                .content("user=TESTUSERNAME2&first=testFirstName2&last=testLastName2&email=testEmail3&pass=testPassword2")
-                .contentType("application/x-www-form-urlencoded"))
-                .andExpect(cookie().doesNotExist("user"))
-                .andExpect(status().isConflict());
-
-        // perform unsuccessful creation with alternate case version of email that already exists
-        mockMvc.perform(post("/signup")
-                .content("user=testUserName3&first=testFirstName2&last=testLastName2&email=TeStEmAiL2&pass=testPassword2")
-                .contentType("application/x-www-form-urlencoded"))
-                .andExpect(cookie().doesNotExist("user"))
-                .andExpect(status().isConflict());
-
-        // perform unsuccessful creation with an existing session
-        mockMvc.perform(post("/signup")
-                .content("user=testUserName2&first=testFirstName2&last=testLastName2&email=testEmail2&pass=testPassword2")
-                .contentType("application/x-www-form-urlencoded")
-                .session(session))
-                .andExpect(cookie().doesNotExist("user"))
-                .andExpect(status().isForbidden());
-
-        // perform unsuccessful creation with same userName
-        mockMvc.perform(post("/signup")
-                .content("user=testUserName2&first=testFirstName2&last=testLastName2&email=testEmail3&pass=testPassword2")
-                .contentType("application/x-www-form-urlencoded"))
-                .andExpect(cookie().doesNotExist("user"))
-                .andExpect(status().isConflict());
-
-        // perform unsuccessful creation with same email
-        mockMvc.perform(post("/signup")
-                .content("user=testUserName3&first=testFirstName2&last=testLastName2&email=testEmail2&pass=testPassword2")
-                .contentType("application/x-www-form-urlencoded"))
-                .andExpect(cookie().doesNotExist("user"))
-                .andExpect(status().isConflict());
-
-        // perform unsuccessful creation with same userName and email
-        mockMvc.perform(post("/signup")
-                .content("user=testUserName2&first=testFirstName2&last=testLastName2&email=testEmail2&pass=testPassword2")
-                .contentType("application/x-www-form-urlencoded"))
-                .andExpect(cookie().doesNotExist("user"))
-                .andExpect(status().isConflict());
-
-        // perform unsuccessful creation with missing userName parameter
-        mockMvc.perform(post("/signup")
-                .content("first=testFirstName3&last=testLastName3&email=testEmail3&pass=testPassword3")
-                .contentType("application/x-www-form-urlencoded"))
-                .andExpect(cookie().doesNotExist("user"))
-                .andExpect(status().isUnprocessableEntity());
-
-        // perform unsuccessful creation with empty userName parameter
-        mockMvc.perform(post("/signup")
-                .content("user=&first=testFirstName3&last=testLastName3&email=testEmail3&pass=testPassword3")
-                .contentType("application/x-www-form-urlencoded"))
-                .andExpect(cookie().doesNotExist("user"))
-                .andExpect(status().isUnprocessableEntity());
-
-        // perform unsuccessful creation with missing firstName parameter
-        mockMvc.perform(post("/signup")
-                .content("user=testUserName3&last=testLastName3&email=testEmail3&pass=testPassword3")
-                .contentType("application/x-www-form-urlencoded"))
-                .andExpect(cookie().doesNotExist("user"))
-                .andExpect(status().isUnprocessableEntity());
-
-        // perform unsuccessful creation with empty firstName parameter
-        mockMvc.perform(post("/signup")
-                .content("user=testUserName3&first=&last=testLastName3&email=testEmail3&pass=testPassword3")
-                .contentType("application/x-www-form-urlencoded"))
-                .andExpect(cookie().doesNotExist("user"))
-                .andExpect(status().isUnprocessableEntity());
-
-        // perform unsuccessful creation with missing lastName parameter
-        mockMvc.perform(post("/signup")
-                .content("user=testUserName3&first=testFirstName3&email=testEmail3&pass=testPassword3")
-                .contentType("application/x-www-form-urlencoded"))
-                .andExpect(cookie().doesNotExist("user"))
-                .andExpect(status().isUnprocessableEntity());
-
-        // perform unsuccessful creation with empty lastName parameter
-        mockMvc.perform(post("/signup")
-                .content("user=testUserName3&first=testFirstName3&last=&email=testEmail3&pass=testPassword3")
-                .contentType("application/x-www-form-urlencoded"))
-                .andExpect(cookie().doesNotExist("user"))
-                .andExpect(status().isUnprocessableEntity());
-
-        // perform unsuccessful creation with missing email parameter
-        mockMvc.perform(post("/signup")
-                .content("user=testUserName3&first=testFirstName3&last=testLastName3&pass=testPassword3")
-                .contentType("application/x-www-form-urlencoded"))
-                .andExpect(cookie().doesNotExist("user"))
-                .andExpect(status().isUnprocessableEntity());
-
-        // perform unsuccessful creation with empty email parameter
-        mockMvc.perform(post("/signup")
-                .content("user=testUserName3&first=testFirstName3&last=testLastName3&email=&pass=testPassword3")
-                .contentType("application/x-www-form-urlencoded"))
-                .andExpect(cookie().doesNotExist("user"))
-                .andExpect(status().isUnprocessableEntity());
-
-        // perform unsuccessful creation with missing password parameter
-        mockMvc.perform(post("/signup")
-                .content("user=testUserName3&first=testFirstName3&last=testLastName3&email=testEmail3")
-                .contentType("application/x-www-form-urlencoded"))
-                .andExpect(cookie().doesNotExist("user"))
-                .andExpect(status().isUnprocessableEntity());
-
-        // perform unsuccessful creation with empty password parameter
-        mockMvc.perform(post("/signup")
-                .content("user=testUserName3&first=testFirstName3&last=testLastName3&email=testEmail3&pass=")
-                .contentType("application/x-www-form-urlencoded"))
-                .andExpect(cookie().doesNotExist("user"))
-                .andExpect(status().isUnprocessableEntity());
-
-        // perform unsuccessful creation with no parameters
-        mockMvc.perform(post("/signup")
-                .contentType("application/x-www-form-urlencoded"))
-                .andExpect(cookie().doesNotExist("user"))
-                .andExpect(status().isUnprocessableEntity());
-    }
-
-    @Test
-    public void logout() throws Exception {
-        // perform login to get session
-        MvcResult result = mockMvc.perform(post("/login")
-                .content("login=testUserName1&pass=testPassword1")
-                .contentType("application/x-www-form-urlencoded"))
-                .andReturn();
-
-        MockHttpSession session = (MockHttpSession) result.getRequest().getSession(false);
-
-        // perform successful logout with existing session
-        mockMvc.perform(post("/logout")
-                .contentType("application/x-www-form-urlencoded")
-                .session(session))
-                .andExpect(cookie().value("user", ""))
-                .andExpect(cookie().maxAge("user", 0))
-                .andExpect(cookie().value("isLiked", ""))
-                .andExpect(cookie().maxAge("isLiked", 0))
-                // TODO: uncomment this when feature added
-//                .andExpect(cookie().value("isFollowed", ""))
-//                .andExpect(cookie().maxAge("isFollowed", 0))
-                .andExpect(status().isNoContent());
-
-        // perform login to get session
-        result = mockMvc.perform(post("/login")
-                .content("login=testUserName1&pass=testPassword1")
-                .contentType("application/x-www-form-urlencoded"))
-                .andReturn();
-
-        session = (MockHttpSession) result.getRequest().getSession(false);
-
-        // perform unsuccessful logout with invalidated session
-        session.invalidate();
-        mockMvc.perform(post("/logout")
-                .contentType("application/x-www-form-urlencoded")
-                .session(session))
-                .andExpect(cookie().doesNotExist("user"))
-                .andExpect(cookie().doesNotExist("isLiked"))
-                .andExpect(cookie().doesNotExist("isFollowed"))
-                .andExpect(status().isForbidden());
-
-        // perform unsuccessful logout with no session
-        mockMvc.perform(post("/logout")
-                .contentType("application/x-www-form-urlencoded"))
-                .andExpect(cookie().doesNotExist("user"))
-                .andExpect(cookie().doesNotExist("isLiked"))
-                .andExpect(cookie().doesNotExist("isFollowed"))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    public void deleteUser() throws Exception {
-        // perform login to get session
-        MvcResult result = mockMvc.perform(post("/login")
-                .content("login=testUserName1&pass=testPassword1")
-                .contentType("application/x-www-form-urlencoded"))
-                .andReturn();
-
-        MockHttpSession session = (MockHttpSession) result.getRequest().getSession(false);
-
-        // perform successful delete with existing session
-        mockMvc.perform(delete("/deleteUser")
-                .contentType("application/x-www-form-urlencoded")
-                .session(session))
-                .andExpect(cookie().value("user", ""))
-                .andExpect(cookie().maxAge("user", 0))
-                .andExpect(status().isNoContent());
-
-        // perform unsuccessful delete with invalidated session
-        mockMvc.perform(delete("/deleteUser")
-                .contentType("application/x-www-form-urlencoded")
-                .session(session))
-                .andExpect(cookie().doesNotExist("user"))
-                .andExpect(status().isForbidden());
-
-        // perform unsuccessful delete with no session
-        mockMvc.perform(delete("/deleteUser")
-                .contentType("application/x-www-form-urlencoded"))
-                .andExpect(cookie().doesNotExist("user"))
-                .andExpect(status().isForbidden());
-
-        // perform unsuccessful login with deleted credentials
-        mockMvc.perform(post("/login")
-                .content("login=testUserName1&pass=testPassword1")
-                .contentType("application/x-www-form-urlencoded"))
-                .andExpect(cookie().doesNotExist("user"))
-                .andExpect(content().string(""))
-                .andExpect(status().isUnauthorized());
-
-        // perform unsuccessful creation with deleted userName
-        mockMvc.perform(post("/signup")
-                .content("user=testUserName1&first=testFirstName1&last=testLastName1&email=testEmail1&pass=testPassword1")
-                .contentType("application/x-www-form-urlencoded"))
-                .andExpect(cookie().doesNotExist("user"))
-                .andExpect(status().isConflict());
     }
 
     @Test
@@ -1087,24 +619,158 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.[1]", is(user3.getUserName())));
 
         // unsuccessful query with empty parameter
-        mockMvc.perform(post("/unfollowUser")
+        mockMvc.perform(get("/getFollowingUsers")
                 .contentType("application/x-www-form-urlencoded")
                 .content("user=")
                 .session(session))
                 .andExpect(status().isUnprocessableEntity());
 
-        // unsuccessful query with invalid parameter
-        mockMvc.perform(post("/unfollowUser")
+        // successful query with invalid parameter return empty list
+        mockMvc.perform(get("/getFollowingUsers")
                 .contentType("application/x-www-form-urlencoded")
                 .content("user=badName")
                 .session(session))
-                .andExpect(status().isUnprocessableEntity());
+                .andExpect(content().string(containsString("[]")));
 
         // unsuccessful query with no parameter
-        mockMvc.perform(post("/unfollowUser")
+        mockMvc.perform(get("/getFollowingUsers")
                 .contentType("application/x-www-form-urlencoded")
                 .session(session))
                 .andExpect(status().isUnprocessableEntity());
 
     }
+
+    @Test
+    public void getUserNotifications()throws Exception {
+        // perform login to get session
+        MvcResult result = mockMvc.perform(post("/login")
+                .content("login=" + user1.getUserName() + "&pass=" + user1.getPassword())
+                .contentType("application/x-www-form-urlencoded"))
+                .andReturn();
+
+        MockHttpSession session = (MockHttpSession) result.getRequest().getSession(false);
+
+        // successfully get list of notifications with no user notifications present (blank array)
+        mockMvc.perform(get("/getUserNotifications")
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(content().string(containsString("[]")));
+
+        user1.addNotification("N1");
+        user1 = userRepo.save(user1);
+
+        // successfully get list of notifications with 1 user notifications present
+        mockMvc.perform(get("/getUserNotifications")
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(jsonPath("$[0]", is("N1")));
+
+        user1.addNotification("N2");
+        user1 = userRepo.save(user1);
+
+        // successfully get list of notifications with 2 user notifications present
+        mockMvc.perform(get("/getUserNotifications")
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(jsonPath("$[0]", is("N1")))
+                .andExpect(jsonPath("$[1]", is("N2")));
+
+        // perform unsuccessful query with invalidated session
+        session.invalidate();
+        mockMvc.perform(get("/getUserNotifications")
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isForbidden());
+
+        // perform unsuccessful query with no session
+        mockMvc.perform(get("/getUserNotifications")
+                .contentType("application/x-www-form-urlencoded"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void removeUserNotifications()throws Exception {
+
+        // perform login to get session
+        MvcResult result = mockMvc.perform(post("/login")
+                .content("login=" + user1.getUserName() + "&pass=" + user1.getPassword())
+                .contentType("application/x-www-form-urlencoded"))
+                .andReturn();
+
+        MockHttpSession session = (MockHttpSession) result.getRequest().getSession(false);
+
+        user1.addNotification("N1");
+        user1 = userRepo.save(user1);
+
+        // successfully remove notifications with 1 user notifications present
+        mockMvc.perform(post("/removeUserNotifications")
+                .content("notification=N1")
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isNoContent());
+
+        user1.addNotification("N1");
+        user1.addNotification("N2");
+        user1 = userRepo.save(user1);
+
+        // successfully remove notifications with 2 user notifications present
+        mockMvc.perform(post("/removeUserNotifications")
+                .content("notification=N1")
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isNoContent());
+
+
+        // perform unsuccessful removal when notification is not in list
+        mockMvc.perform(post("/removeUserNotifications")
+                .content("notification=N1")
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isUnprocessableEntity());
+
+        user1 = userRepo.findOne(user1.getId());
+        assertTrue("Failure - removal of notification did not remove right notification", user1.getNotifications().get(0).equals("N2"));
+
+        // Remove other notifications
+        mockMvc.perform(post("/removeUserNotifications")
+                .content("notification=N2")
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isNoContent());
+
+        // perform unsuccessful removal when no notifications present
+        mockMvc.perform(post("/removeUserNotifications")
+                .content("notification=N1")
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isUnprocessableEntity());
+
+        // perform unsuccessful query with empty parameter
+        mockMvc.perform(post("/removeUserNotifications")
+                .content("notification=")
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isUnprocessableEntity());
+
+        // perform unsuccessful query with no parameters
+        mockMvc.perform(post("/removeUserNotifications")
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isUnprocessableEntity());
+
+        // perform unsuccessful query with invalidated session
+        session.invalidate();
+        mockMvc.perform(post("/removeUserNotifications")
+                .content("notification=N1")
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isForbidden());
+
+        // perform unsuccessful query with no session
+        mockMvc.perform(post("/removeUserNotifications")
+                .content("notification=N1")
+                .contentType("application/x-www-form-urlencoded"))
+                .andExpect(status().isForbidden());
+    }
+
 }
