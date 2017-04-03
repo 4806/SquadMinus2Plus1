@@ -387,7 +387,8 @@ public class WikiPageControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(testConcreteWikiPage1.getId().intValue())))
                 .andExpect(jsonPath("$.views", is(1)))
-                .andExpect(jsonPath("$.likes", is(0)));
+                .andExpect(jsonPath("$.likes", is(0)))
+                .andExpect(jsonPath("$.authorDeleted", is(false)));
         params.clear();
 
         // Check for successful search again, incrementing view counter
@@ -397,7 +398,8 @@ public class WikiPageControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(testConcreteWikiPage1.getId().intValue())))
                 .andExpect(jsonPath("$.views", is(2)))
-                .andExpect(jsonPath("$.likes", is(0)));
+                .andExpect(jsonPath("$.likes", is(0)))
+                .andExpect(jsonPath("$.authorDeleted", is(false)));
         params.clear();
 
         // Check for successful search after user likes page and increments like counter
@@ -409,7 +411,8 @@ public class WikiPageControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(testConcreteWikiPage1.getId().intValue())))
                 .andExpect(jsonPath("$.views", is(3)))
-                .andExpect(jsonPath("$.likes", is(1)));
+                .andExpect(jsonPath("$.likes", is(1)))
+                .andExpect(jsonPath("$.authorDeleted", is(false)));
         params.clear();
 
         // Check for successful search after user unlikes page
@@ -421,7 +424,21 @@ public class WikiPageControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(testConcreteWikiPage1.getId().intValue())))
                 .andExpect(jsonPath("$.views", is(4)))
-                .andExpect(jsonPath("$.likes", is(0)));
+                .andExpect(jsonPath("$.likes", is(0)))
+                .andExpect(jsonPath("$.authorDeleted", is(false)));
+        params.clear();
+
+        // Check for successful search after the author account has been deleted
+        testUser1.delete();
+        testUser1 = userRepository.save(testUser1);
+        params.add("id", testConcreteWikiPage1.getId().toString());
+        this.mockMvc.perform(get("/retrieveWikiPage").params(params))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(testConcreteWikiPage1.getId().intValue())))
+                .andExpect(jsonPath("$.views", is(5)))
+                .andExpect(jsonPath("$.likes", is(0)))
+                .andExpect(jsonPath("$.authorDeleted", is(true)));
         params.clear();
     }
 
