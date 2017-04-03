@@ -1,6 +1,9 @@
 package SocialWiki.WikiPages;
 
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.Calendar;
 
 /**
@@ -13,6 +16,10 @@ public class WikiPageWithAuthorProxy implements WikiPage {
      * The real WikiPage
      */
     protected ConcreteWikiPage realWikiPage;
+
+
+    @Getter @Setter
+    private Integer likes;
 
     /**
      * Constructs WikiPageWithAuthorProxy for the provided WikiPage

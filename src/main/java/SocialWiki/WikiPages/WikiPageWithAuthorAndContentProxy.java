@@ -1,16 +1,10 @@
 package SocialWiki.WikiPages;
 
-import lombok.Getter;
-import lombok.Setter;
-
 /**
  * Created by Chris on 3/4/2017.
  * Proxy for ConcreteWikiPage that exposes the username of the authoring user and the WikiPages contents
  */
 public class WikiPageWithAuthorAndContentProxy extends WikiPageWithAuthorProxy {
-
-    @Getter @Setter
-    private Integer likes;
 
     /**
      * Constructs WikiPageWithAuthorAndContentProxy for the provided WikiPage
@@ -18,7 +12,6 @@ public class WikiPageWithAuthorAndContentProxy extends WikiPageWithAuthorProxy {
      */
     public WikiPageWithAuthorAndContentProxy(ConcreteWikiPage realWikiPage) {
         super(realWikiPage);
-        this.likes = 0;
     }
 
     /**
