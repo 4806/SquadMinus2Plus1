@@ -292,6 +292,24 @@ public class UserControllerTest {
         mockMvc.perform(get("/retrieveUser?user=testUserName5")
                 .contentType("application/x-www-form-urlencoded"))
                 .andExpect(status().isUnprocessableEntity());
+
+        // perform login to get session
+        result = mockMvc.perform(post("/login")
+                .content("login=testUserName1&pass=testPassword1")
+                .contentType("application/x-www-form-urlencoded"))
+                .andReturn();
+
+        session = (MockHttpSession) result.getRequest().getSession(false);
+
+        // delete the logged in user
+        mockMvc.perform(delete("/deleteUser")
+                .contentType("application/x-www-form-urlencoded")
+                .session(session));
+
+        // perform unsuccessful retrieval of user that is deleted
+        mockMvc.perform(get("/retrieveUser?user=" + user1.getUserName())
+                .contentType("application/x-www-form-urlencoded"))
+                .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
