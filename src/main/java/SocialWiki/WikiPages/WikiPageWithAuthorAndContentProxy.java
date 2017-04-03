@@ -23,6 +23,14 @@ public class WikiPageWithAuthorAndContentProxy extends WikiPageWithAuthorProxy {
     }
 
     /**
+     * Get the flag that signifies if the author account is deleted or not
+     * @return boolean that signifies if the account is deleted or not
+     */
+    public Boolean isAuthorDeleted() {
+        return realWikiPage.getAuthor().isDeleted();
+    }
+
+    /**
      * Creates a WikiPageWithAuthorAndContentProxy object from te given WikiPage
      * @param page - The WikiPage to create a WikiPageWithAuthorAndContentProxy from
      * @return The associated WikiPageWithAuthorAndContentProxy from the WikiPage

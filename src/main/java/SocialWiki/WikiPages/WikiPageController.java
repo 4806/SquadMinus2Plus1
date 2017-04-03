@@ -91,7 +91,7 @@ public class WikiPageController {
         }
         else {
             newPage = new ConcreteWikiPage(title, content, parentID, user);
-            WikiPageWithAuthorAndContentProxy parent = wikiPageRepo.findById(parentID);
+            ConcreteWikiPage parent = wikiPageRepo.findById(parentID);
 
             if (parent.getTitle().equals(newPage.getTitle()) && parent.getContent().equals(newPage.getContent())) { //Ensure that a change was actually made before saving
                 return ResponseEntity.unprocessableEntity().body(null);
@@ -192,11 +192,23 @@ public class WikiPageController {
             return ResponseEntity.unprocessableEntity().body(null);
         }
 
-        WikiPageWithAuthorAndContentProxy page = wikiPageRepo.findById(id);
+        ConcreteWikiPage page = wikiPageRepo.findById(id);
 
         if (page == null) {
             return ResponseEntity.unprocessableEntity().body(null);
         }
+
+        // catch NullPointerException for reverse compatibility with pages that do not have counter yet
+        try {
+            page.setViews(page.getViews() + 1);
+        } catch (NullPointerException e) {
+            page.setViews(1); // assume this is the first viewing
+        }
+
+        page = wikiPageRepo.save(page);
+
+        WikiPageWithAuthorAndContentProxy contentProxyPage = new WikiPageWithAuthorAndContentProxy(page);
+        contentProxyPage.setLikes(userRepo.findUsersByLikedPage(id).size());
 
         HttpSession session = request.getSession(false);
         if (session == null) {
@@ -207,7 +219,7 @@ public class WikiPageController {
             response.addCookie(CookieManager.getIsLikedCookie(user, id));
         }
 
-        return ResponseEntity.ok(page);
+        return ResponseEntity.ok(contentProxyPage);
     }
 
     /**

@@ -1,6 +1,9 @@
 package SocialWiki.WikiPages;
 
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.Calendar;
 
 /**
@@ -13,6 +16,12 @@ public class WikiPageWithAuthorProxy implements WikiPage {
      * The real WikiPage
      */
     protected ConcreteWikiPage realWikiPage;
+
+    /**
+     * The counter used to display how many likes this page has (must be set by the controller)
+     */
+    @Getter @Setter
+    private Integer likes;
 
     /**
      * Constructs WikiPageWithAuthorProxy for the provided WikiPage
@@ -28,6 +37,14 @@ public class WikiPageWithAuthorProxy implements WikiPage {
      */
     public String getAuthor() {
         return realWikiPage.getAuthor().getUserName();
+    }
+
+    /**
+     * Get the total views of the WikiPage
+     * @return the total views of the WikiPage
+     */
+    public Integer getViews() {
+        return realWikiPage.getViews();
     }
 
     /**
