@@ -25,6 +25,8 @@ viewPage.handler.previousVersionClick = function() {
 viewPage.handler.likeSuccessHandler = function() {
     $$("unlikebutton").show();
     $$("likebutton").hide();
+    viewPage.pageData.likes += 1;
+    $$("likes").setHTML(viewPage.pageData.likes);
 };
 
 viewPage.handler.likeErrorHandler = function() {
@@ -41,6 +43,8 @@ viewPage.handler.likeClick = function() {
 viewPage.handler.unlikeSuccessHandler = function() {
     $$("likebutton").show();
     $$("unlikebutton").hide();
+    viewPage.pageData.likes -= 1;
+    $$("likes").setHTML(viewPage.pageData.likes);
 };
 
 viewPage.handler.unlikeClick = function() {
