@@ -12,7 +12,7 @@ describe("viewpage_script", function(){
 
   describe("Existing Page With Parent", function(){
     beforeEach(function(){
-      viewPage.handler.setContent('{"id":1, "content":"#Testing!", "title":"Test", "author":"test", "creationDate":' + date + ', "parentID":0, "views":1}');
+      viewPage.handler.setContent('{"id":1, "content":"#Testing!", "title":"Test", "author":"test", "creationDate":' + date + ', "parentID":0, "views":1, "likes":0}');
     });
 
     it("Page Content is correct", function(){
@@ -23,6 +23,7 @@ describe("viewpage_script", function(){
       expect(viewPage.pageData.parentID).toBe(0);
       expect(viewPage.pageData.id).toBe(1);
       expect(viewPage.pageData.views).toBe(1);
+      expect(viewPage.pageData.likes).toBe(0);
     });
 
     it("Parent button should be showing", function(){
@@ -32,7 +33,7 @@ describe("viewpage_script", function(){
 
   describe("Existing Page No Parent", function(){
     beforeEach(function(){
-      viewPage.handler.setContent('{"id":1, "content":"#Testing!", "title":"Test", "author":"test", "creationDate":' + date + ', "parentID":-1, "views":1}');
+      viewPage.handler.setContent('{"id":1, "content":"#Testing!", "title":"Test", "author":"test", "creationDate":' + date + ', "parentID":-1, "views":1, "likes":1}');
     });
 
     it("Page Content is correct", function(){
@@ -42,7 +43,8 @@ describe("viewpage_script", function(){
       expect(viewPage.pageData.creationDate).toBe(date);
       expect(viewPage.pageData.parentID).toBe(-1);
       expect(viewPage.pageData.id).toBe(1);
-      expect(viewPage.pageData.id).toBe(1);
+      expect(viewPage.pageData.views).toBe(1);
+      expect(viewPage.pageData.likes).toBe(1);
     });
 
     it("No parent button should be showing", function(){

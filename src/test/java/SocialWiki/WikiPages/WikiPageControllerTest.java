@@ -388,16 +388,43 @@ public class WikiPageControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(testConcreteWikiPage1.getId().intValue())))
-                .andExpect(jsonPath("$.views", is(1)));
+                .andExpect(jsonPath("$.views", is(1)))
+                .andExpect(jsonPath("$.likes", is(0)));
+        params.clear();
 
         // Check for successful search again, incrementing view counter
+        params.add("id", testConcreteWikiPage1.getId().toString());
         this.mockMvc.perform(get("/retrieveWikiPage").params(params))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(testConcreteWikiPage1.getId().intValue())))
-                .andExpect(jsonPath("$.views", is(2)));
+                .andExpect(jsonPath("$.views", is(2)))
+                .andExpect(jsonPath("$.likes", is(0)));
         params.clear();
 
+        // Check for successful search after user likes page and increments like counter
+        testUser1.likePage(testConcreteWikiPage1);
+        testUser1 = userRepository.save(testUser1);
+        params.add("id", testConcreteWikiPage1.getId().toString());
+        this.mockMvc.perform(get("/retrieveWikiPage").params(params))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(testConcreteWikiPage1.getId().intValue())))
+                .andExpect(jsonPath("$.views", is(3)))
+                .andExpect(jsonPath("$.likes", is(1)));
+        params.clear();
+
+        // Check for successful search after user unlikes page
+        testUser1.unlikePage(testConcreteWikiPage1);
+        testUser1 = userRepository.save(testUser1);
+        params.add("id", testConcreteWikiPage1.getId().toString());
+        this.mockMvc.perform(get("/retrieveWikiPage").params(params))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(testConcreteWikiPage1.getId().intValue())))
+                .andExpect(jsonPath("$.views", is(4)))
+                .andExpect(jsonPath("$.likes", is(0)));
+        params.clear();
     }
 
     @Test
