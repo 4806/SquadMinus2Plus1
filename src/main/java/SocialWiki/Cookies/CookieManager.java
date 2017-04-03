@@ -105,4 +105,40 @@ public class CookieManager {
 
         return c;
     }
+
+    /**
+     * Get a cookie that signifies if the user follows the current user or not
+     * @param user - the user that is currently logged in
+     * @param followUser - the username of the user that the user does or does not follow
+     * @return a cookie that signifies if the user follows the user, they do not, or clears the cookie
+     */
+    public static Cookie getIsFollowedCookie(User user, String followUser) {
+        Cookie c;
+
+        // if the username is within the followed user list, return true cookie
+        for (User u : user.getFollowedUsers()) {
+            if (u.getUserName().equals(followUser)) {
+                c = new Cookie("isFollowed", "true");
+                c.setMaxAge(86400);
+                return c;
+            }
+        }
+
+        // the user is not followed, so return false cookie
+        c = new Cookie("isFollowed", "false");
+        c.setMaxAge(86400);
+        return c;
+    }
+
+    /**
+     * Get a cookie that effectively clears the client's isFollowed cookie
+     * @return the clear isLiked cookie
+     */
+    public static Cookie getClearIsFollowedCookie() {
+        // create a cookie that will overwrite the isFollowed cookie
+        Cookie c = new Cookie("isFollowed", "");
+        c.setMaxAge(0); // expires immediately
+
+        return c;
+    }
 }

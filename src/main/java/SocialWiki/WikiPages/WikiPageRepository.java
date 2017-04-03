@@ -19,7 +19,17 @@ public interface WikiPageRepository extends JpaRepository<ConcreteWikiPage, Long
      */
     @Query("SELECT NEW SocialWiki.WikiPages.WikiPageWithAuthorProxy(page) " +
             "FROM ConcreteWikiPage page  " +
-            "WHERE UPPER(page.title) = UPPER(:title)")
+            "WHERE UPPER(page.title) = UPPER(:title)" +
+            "ORDER BY " +
+            "CASE " +
+            "    WHEN (UPPER(page.title) = UPPER(:title) ) THEN 0 " +
+            "    WHEN (UPPER(page.title) LIKE (UPPER(:title) || '%') ) THEN 1 " +
+            "    WHEN (UPPER(page.title) LIKE ('%' || UPPER(:title) || '%') ) THEN 2 " +
+            "    WHEN (UPPER(page.title) LIKE ('%' || UPPER(:title)) ) THEN 3 " +
+            "    ELSE 4 " +
+            "END ASC," +
+            "page.creationDate DESC," +
+            "page.id DESC")
     List<WikiPageWithAuthorProxy> findByTitleIgnoreCase(@Param("title") String title);
 
     /**
@@ -71,8 +81,24 @@ public interface WikiPageRepository extends JpaRepository<ConcreteWikiPage, Long
             "WHERE (" +
             "(UPPER(page.title) LIKE ('%' || UPPER(:title) || '%')  ) AND " +
             "(UPPER(author.userName) LIKE ('%' || UPPER(:username) || '%') ) AND " +
-            "(UPPER(page.content) LIKE ('%' || UPPER(:pageContent) || '%') )" +
-            ")")
+            "(UPPER(page.content) LIKE ('%' || UPPER(:pageContent) || '%') )) " +
+            "ORDER BY " +
+            "CASE " +
+            "    WHEN (UPPER(page.title) = UPPER(:title) ) THEN 0 " +
+            "    WHEN (UPPER(page.title) LIKE (UPPER(:title) || '%') ) THEN 1 " +
+            "    WHEN (UPPER(page.title) LIKE ('%' || UPPER(:title) || '%') ) THEN 2 " +
+            "    WHEN (UPPER(page.title) LIKE ('%' || UPPER(:title)) ) THEN 3 " +
+            "    ELSE 4 " +
+            "END ASC," +
+            "CASE " +
+            "    WHEN (UPPER(author.userName) = UPPER(:username) ) THEN 0 " +
+            "    WHEN (UPPER(author.userName) LIKE (UPPER(:username) || '%') ) THEN 1 " +
+            "    WHEN (UPPER(author.userName) LIKE ('%' || UPPER(:username) || '%') ) THEN 2 " +
+            "    WHEN (UPPER(author.userName) LIKE ('%' || UPPER(:username)) ) THEN 3 " +
+            "    ELSE 4 " +
+            "END ASC," +
+            "page.creationDate DESC," +
+            "page.id DESC")
     List<WikiPageWithAuthorProxy> findByTitleAndAuthorAndContent(@Param("title") String title, @Param("username") String username, @Param("pageContent") String content);
 
     /**
@@ -83,7 +109,17 @@ public interface WikiPageRepository extends JpaRepository<ConcreteWikiPage, Long
     @Query("SELECT NEW SocialWiki.WikiPages.WikiPageWithAuthorProxy(page) " +
             "FROM ConcreteWikiPage page LEFT JOIN page.author author " +
             "WHERE " +
-            "(UPPER(page.title) LIKE ('%' || UPPER(:title) || '%') OR  UPPER(page.content) LIKE ('%' || UPPER(:title) || '%') ) ")
+            "(UPPER(page.title) LIKE ('%' || UPPER(:title) || '%') OR  UPPER(page.content) LIKE ('%' || UPPER(:title) || '%') ) " +
+            "ORDER BY " +
+            "CASE " +
+            "    WHEN (UPPER(page.title) = UPPER(:title) ) THEN 0 " +
+            "    WHEN (UPPER(page.title) LIKE (UPPER(:title) || '%') ) THEN 1 " +
+            "    WHEN (UPPER(page.title) LIKE ('%' || UPPER(:title) || '%') ) THEN 2 " +
+            "    WHEN (UPPER(page.title) LIKE ('%' || UPPER(:title)) ) THEN 3 " +
+            "    ELSE 4 " +
+            "END ASC," +
+            "page.creationDate DESC," +
+            "page.id DESC")
     List<WikiPageWithAuthorProxy> findByTitleAndContent(@Param("title") String titleOrContent);
 
 

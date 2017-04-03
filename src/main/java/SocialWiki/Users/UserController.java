@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.*;
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -20,6 +21,7 @@ import java.util.List;
  */
 
 @RestController
+@Transactional
 public class UserController {
 
     /**
@@ -33,170 +35,6 @@ public class UserController {
      */
     @Autowired
     private WikiPageRepository pageRepo;
-
-    /**
-     * Authenticate a User's login information and return a version of the User to be used in the session
-     * @param request - an HTTP request that contains the login information
-     * @param response - an HTTP response that will be used to provide the user cookie on successful login
-     * @return an HTTP response that contains the User for the session, or an error response
-     */
-    @PostMapping("/login")
-    public ResponseEntity<User> login(HttpServletRequest request, HttpServletResponse response) {
-        // check that another session doesn't already exist for this request, and if there is, send a 403 response
-        HttpSession session = request.getSession(false);
-        if (session != null) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
-        }
-
-        // get the login parameters from the post request
-        String login = request.getParameter("login");
-        String pass = request.getParameter("pass");
-
-        // send an HTTP 422 response if either parameter is missing or empty
-        if (login == null || login.isEmpty() || pass == null || pass.isEmpty()) {
-            return ResponseEntity.unprocessableEntity().body(null);
-        }
-
-        // get the user by userName and password
-        User user = userRepo.findByUserNameAndPassword(login, pass);
-
-        // if it could not find by using a username, try using an email instead
-        if (user == null) {
-            user = userRepo.findByEmailAndPassword(login, pass);
-
-            // send an HTTP 401 response, if no user exists for provided login info
-            if (user == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-            }
-        }
-
-        // create a new session for the User
-        session = request.getSession();
-        session.setAttribute("user", user.getUserName());
-
-        // add the user cookie to the response
-        response.addCookie(CookieManager.getUserCookie(user.getUserName()));
-
-        // send an HTTP 200 response with the session user
-        return ResponseEntity.ok(user.asSessionUser());
-    }
-
-    /**
-     * Create a new User in the system, add it to the user repository, and return a version of the User to be used in the session
-     * @param request - an HTTP request that contains the new User's information
-     * @param response - an HTTP response that will be used to provide the user cookie on successful User creation
-     * @return an HTTP response that contains the new User for the session, or an error response
-     */
-    @PostMapping("/signup")
-    public ResponseEntity<User> create(HttpServletRequest request, HttpServletResponse response) {
-        // check that another session doesn't already exist for this request, and if there is, send a 403 response
-        HttpSession session = request.getSession(false);
-        if (session != null) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
-        }
-
-        // get the sign-up parameters from the post request
-        String user = request.getParameter("user");
-        String first = request.getParameter("first");
-        String last = request.getParameter("last");
-        String email = request.getParameter("email");
-        String pass = request.getParameter("pass");
-
-        // send an HTTP 422 response if any parameter is missing or empty
-        if (user == null || user.isEmpty()) {
-            return ResponseEntity.unprocessableEntity().body(null);
-        } else if (first == null || first.isEmpty()) {
-            return ResponseEntity.unprocessableEntity().body(null);
-        } else if (last == null || last.isEmpty()) {
-            return ResponseEntity.unprocessableEntity().body(null);
-        } else if (email == null || email.isEmpty()) {
-            return ResponseEntity.unprocessableEntity().body(null);
-        } else if (pass == null || pass.isEmpty()) {
-            return ResponseEntity.unprocessableEntity().body(null);
-        }
-
-        // check to see if the userName or email are already taken
-        List<User> uniqueAttributeCheck = userRepo.findByUserNameOrEmail(user, email);
-
-        // send an HTTP 409 response if either already exists
-        if (uniqueAttributeCheck.size() > 0) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
-        }
-
-        // create the new User and save it in the user repository
-        User newUser = userRepo.save(new User(user, first, last, email, pass));
-
-        // create a new session for the new User
-        session = request.getSession();
-        session.setAttribute("user", user);
-
-        // add the user cookie to the response
-        response.addCookie(CookieManager.getUserCookie(user));
-
-        // send an HTTP 201 response with the new session User
-        return ResponseEntity.status(HttpStatus.CREATED).body(newUser.asSessionUser());
-    }
-
-    /**
-     * Log the user out of their current session
-     * @param request - an HTTP request that contains the session's cookie information
-     * @param response - an HTTP response that will be used to clear the user cookie on successful log out
-     * @return an HTTP response that signifies whether the log out was successful
-     */
-    @PostMapping("/logout")
-    public ResponseEntity<String> logout(HttpServletRequest request, HttpServletResponse response) {
-        // send an HTTP 403 response if there is currently not a session
-        HttpSession session = request.getSession(false);
-        if (session == null) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
-        }
-
-        // invalidate the old session, so that one for the new user can be created later
-        session.invalidate();
-
-        // clear the cookies for the user's session on logout
-        response.addCookie(CookieManager.getClearUserCookie());
-        response.addCookie(CookieManager.getClearIsLikedCookie());
-        // TODO: uncomment this when it is added
-        // response.addCookie(CookieManager.getClearIsFollowedCookie());
-
-        // send an HTTP 204 response to signify successful logout
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
-    }
-
-    /**
-     * Remove a user account from the system
-     * @param request - an HTTP request that contains the session's cookie information
-     * @param response - an HTTP response that will be used to clear the user cookie on successful delete
-     * @return an HTTP response that signifies whether the deletion was successful
-     */
-    @DeleteMapping("/deleteUser")
-    public ResponseEntity<String> deleteUser(HttpServletRequest request, HttpServletResponse response) {
-        // send an HTTP 403 response if there is currently not a session
-        HttpSession session = request.getSession(false);
-        if (session == null) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
-        }
-
-        // get the logged in user from the current session
-        String username = (String) session.getAttribute("user");
-        User user = userRepo.findByUserName(username);
-
-        // remove the user's sensitive info and mark as deleted
-        user.delete();
-
-        // save the deletion of the account into the repository
-        userRepo.save(user);
-
-        // invalidate the user session, since the user no longer exists
-        session.invalidate();
-
-        // add the clearUser cookie so that it deletes the browsers cookie
-        response.addCookie(CookieManager.getClearUserCookie());
-
-        // send an HTTP 204 response to signify successful deletion
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
-    }
 
     /**
      * Add a wiki page to the list of pages that a User currently likes
@@ -292,7 +130,7 @@ public class UserController {
     }
 
     @GetMapping("/retrieveUser")
-    public ResponseEntity<User> retrieveUser(HttpServletRequest request) {
+    public ResponseEntity<User> retrieveUser(HttpServletRequest request, HttpServletResponse response) {
         // get userName from request
         String userName = request.getParameter("user");
 
@@ -309,6 +147,15 @@ public class UserController {
             return ResponseEntity.unprocessableEntity().body(null);
         }
 
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            response.addCookie(CookieManager.getClearIsFollowedCookie());
+        } else {
+            String username = (String) session.getAttribute("user");
+            User sessionUser = userRepo.findByUserName(username);
+            response.addCookie(CookieManager.getIsFollowedCookie(sessionUser, userName));
+        }
+
         return ResponseEntity.ok(user.asSessionUser());
     }
 
@@ -319,23 +166,23 @@ public class UserController {
      */
     @PostMapping("/followUser")
     @Transactional
-    public ResponseEntity<String> followUser(HttpServletRequest request) {
+    public ResponseEntity<String> followUser(HttpServletRequest request, HttpServletResponse response) {
         // send an HTTP 403 response if there is currently not a session
         HttpSession session = request.getSession(false);
         if (session == null) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
 
-        // get the userId parameter from the post request
-        Long userId;
-        try {
-            userId = Long.parseLong(request.getParameter("id"));
-        } catch (NumberFormatException e) {
-            return ResponseEntity.unprocessableEntity().body(null); // send an HTTP 422 response if parameter cannot be cast as a Long
+        // get userName from request
+        String userName = request.getParameter("user");
+
+        // send an HTTP 422 response if user parameter is missing or empty
+        if (userName == null || userName.isEmpty()) {
+            return ResponseEntity.unprocessableEntity().body(null);
         }
 
-        // get the user from the user repo
-        User followinguser = userRepo.findOne(userId);
+        // get the user from the user repository
+        User followinguser = userRepo.findByUserName(userName);
 
         // send an HTTP 422 response if there is no user with userId
         if (followinguser == null) {
@@ -357,6 +204,9 @@ public class UserController {
         // save the update to the user in the database and session
         userRepo.save(user);
 
+        //Respond with isFollowed Cookie
+        response.addCookie(CookieManager.getIsFollowedCookie(user, userName));
+
         // send an HTTP 204 response to signify the user was successfully followed
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
     }
@@ -368,31 +218,23 @@ public class UserController {
      */
     @PostMapping("/unfollowUser")
     @Transactional
-    public ResponseEntity<String> unfollowPage(HttpServletRequest request) {
+    public ResponseEntity<String> unfollowUser(HttpServletRequest request, HttpServletResponse response) {
         // send an HTTP 403 response if there is currently not a session
         HttpSession session = request.getSession(false);
         if (session == null) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
 
-        // get the pageId parameter from the post request
-        Long pageId;
-        try {
-            pageId = Long.parseLong(request.getParameter("id"));
-        } catch (NumberFormatException e) {
-            return ResponseEntity.unprocessableEntity().body(null); // send an HTTP 422 response if parameter cannot be cast as a Long
+        // get userName from request
+        String userName = request.getParameter("user");
+
+        // send an HTTP 422 response if user parameter is missing or empty
+        if (userName == null || userName.isEmpty()) {
+            return ResponseEntity.unprocessableEntity().body(null);
         }
 
-        // get the userId parameter from the post request
-        Long userId;
-        try {
-            userId = Long.parseLong(request.getParameter("id"));
-        } catch (NumberFormatException e) {
-            return ResponseEntity.unprocessableEntity().body(null); // send an HTTP 422 response if parameter cannot be cast as a Long
-        }
-
-        // get the user from the user repo
-        User followinguser = userRepo.findOne(userId);
+        // get the user from the user repository
+        User followinguser = userRepo.findByUserName(userName);
 
         // send an HTTP 422 response if there is no user with userId
         if (followinguser == null) {
@@ -415,7 +257,143 @@ public class UserController {
         // save the update to the user in the database and session
         user = userRepo.save(user);
 
+        //Respond with isFollowed Cookie
+        response.addCookie(CookieManager.getIsFollowedCookie(user, userName));
+
         // send an HTTP 204 response to signify the user was successfully unfollowed
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
     }
+
+    /**
+     * Gets a list of usernames of users that are being followed
+     * @param request - an HTTP request that contains the session's cookie information
+     * @return an HTTP response that contains users username's
+     */
+    @GetMapping("/getFollowingUsers")
+    @Transactional
+    public ResponseEntity<List<String>> getFollowingUsers(HttpServletRequest request) {
+
+        // get userName from request
+        String userName = request.getParameter("user");
+
+        // send an HTTP 422 response if user parameter is missing or empty
+        if (userName == null || userName.isEmpty()) {
+            return ResponseEntity.unprocessableEntity().body(null);
+        }
+
+        List<User> followingUsers = userRepo.findFollowedUsersByUsername(userName);
+
+        List<String> userNames = new ArrayList<>();
+        for (User followedUser: followingUsers) {
+            userNames.add(followedUser.getUserName());
+        }
+
+        return ResponseEntity.ok(userNames);
+    }
+
+    /**
+     * Gets a list of usernames of users that are following user specified
+     * @param request - an HTTP request that contains the session's cookie information
+     * @return an HTTP response that contains users username's
+     */
+    @GetMapping("/getUsersFollowing")
+    @Transactional
+    public ResponseEntity<List<String>> getUsersFollowing(HttpServletRequest request) {
+
+        // get userName from request
+        String userName = request.getParameter("user");
+
+        // send an HTTP 422 response if user parameter is missing or empty
+        if (userName == null || userName.isEmpty()) {
+            return ResponseEntity.unprocessableEntity().body(null);
+        }
+
+        User user = userRepo.findByUserName(userName);
+
+        // send an HTTP 422 response if there is no user with username
+        if (user == null) {
+            return ResponseEntity.unprocessableEntity().body(null);
+        }
+
+        List<User> usersFollowing = userRepo.findUsersFollowingUserByUser(user);
+
+        List<String> userNames = new ArrayList<>();
+        for (User followedUser: usersFollowing) {
+            userNames.add(followedUser.getUserName());
+        }
+
+        return ResponseEntity.ok(userNames);
+    }
+
+    /**
+     * Gets a list of notifications for the current user
+     * @param request - an empty HTTP request, the function retrieves the user from the current session
+     * @return a list of notifications for the current User
+     */
+    @GetMapping("/getUserNotifications")
+    @Transactional
+    public ResponseEntity<List<String>> getUserNotifications(HttpServletRequest request) {
+
+        // send an HTTP 403 response if there is currently not a session
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+
+        // get the logged in user from the current session
+        String username = (String) session.getAttribute("user");
+        User user = userRepo.findByUserName(username);
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+
+        return ResponseEntity.ok(user.getNotifications());
+
+    }
+
+    /**
+     * Removes the given notification from the list of notifications of the current user
+     * @param request - a HTTP request that contains the notification to be removed
+     * @return an HTTP response that indicates the notification as removed
+     */
+    @PostMapping("/removeUserNotifications")
+    @Transactional
+    public ResponseEntity<List<String>> removeUserNotifications(HttpServletRequest request) {
+
+        // send an HTTP 403 response if there is currently not a session
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+
+        // get the logged in user from the current session
+        String username = (String) session.getAttribute("user");
+        User user = userRepo.findByUserName(username);
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+
+        // get notification from request
+        String notification = request.getParameter("notification");
+
+        // send an HTTP 422 response if notification parameter is missing or empty
+        if (notification == null || notification.isEmpty()) {
+            return ResponseEntity.unprocessableEntity().body(null);
+        }
+
+        // send an HTTP 422 response if notification is not is list of notifications
+        if (!user.getNotifications().contains(notification)) {
+            return ResponseEntity.unprocessableEntity().body(null);
+        }
+
+        user.removeNotification(notification);
+
+        userRepo.save(user);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+    }
+
 }
+
