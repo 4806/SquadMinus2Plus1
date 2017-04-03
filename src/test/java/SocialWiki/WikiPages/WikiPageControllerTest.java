@@ -357,6 +357,19 @@ public class WikiPageControllerTest {
                 .andExpect(jsonPath("$.[0].id", is(testConcreteWikiPage1.getId().intValue())));
         params.clear();
 
+        testUser1.likePage(testConcreteWikiPage1);
+        testUser1 = userRepository.save(testUser1);
+        //Check for successful search that also returns amount of likes page has
+        params.add("title", "testTitle1");
+        params.add("user", testUser1.getUserName());
+        params.add("content", "testContent1");
+        this.mockMvc.perform(get("/advancedSearchWikiPage").params(params))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0].id", is(testConcreteWikiPage1.getId().intValue())))
+                .andExpect(jsonPath("$.[0].likes", is(1)));
+        params.clear();
+
     }
 
     @Test
@@ -541,7 +554,7 @@ public class WikiPageControllerTest {
 
         //Check for successful search resulting in multiple WikiPages found
         params.add("title", "testTitlePair");
-        this.mockMvc.perform(get("/advancedSearchWikiPage").params(params))
+        this.mockMvc.perform(get("/searchWikiPage").params(params))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0].id", is(testConcreteWikiPage3.getId().intValue())))
@@ -550,10 +563,21 @@ public class WikiPageControllerTest {
 
         //Check for successful search when parameter has surrounding whitespace
         params.add("title", "\n \r testTitle1 \t");
-        this.mockMvc.perform(get("/advancedSearchWikiPage").params(params))
+        this.mockMvc.perform(get("/searchWikiPage").params(params))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0].id", is(testConcreteWikiPage1.getId().intValue())));
+        params.clear();
+
+        testUser1.likePage(testConcreteWikiPage1);
+        testUser1 = userRepository.save(testUser1);
+        //Check for successful search that also returns amount of likes page has
+        params.add("title", "\n \r testTitle1 \t");
+        this.mockMvc.perform(get("/searchWikiPage").params(params))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0].id", is(testConcreteWikiPage1.getId().intValue())))
+                .andExpect(jsonPath("$.[0].likes", is(1)));
         params.clear();
 
     }
