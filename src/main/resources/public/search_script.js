@@ -15,6 +15,30 @@ searchPage.handler.itemClick = function(itemId) {
     }
 };
 
+searchPage.handler.likeSortCheckboxClicked = function() {
+
+  if ( $$("likeSortCheckbox").getValue() === 1) {
+    $$("resultlist").sort("#likes#","desc","int");
+  } else {
+    $$("resultlist").clearAll();
+    for( var i = 0; i < searchPage.results.length; i++){
+      $$("resultlist").add(searchPage.results[i]);
+    }
+  }
+};
+
+searchPage.handler.visitedSortCheckboxClicked = function() {
+
+  if ( $$("visitedSortCheckbox").getValue() === 1) {
+    $$("resultlist").sort("#views#","desc","int");
+  } else {
+    $$("resultlist").clearAll();
+    for( var i = 0; i < searchPage.results.length; i++){
+      $$("resultlist").add(searchPage.results[i]);
+    }
+  }
+};
+
 searchPage.handler.error = function() {
     $$("infostatus").setValue("There was an error retrieving the results.");
     $$("resultlist").hide();
@@ -110,6 +134,7 @@ searchPage.onReady = function() {
                               {view:"text", id:"titleTextArea", label:"Title:", height:40, inputWidth:500, align:"right", labelAlign:"right", placeholder:"Page title", tooltip:"Filters search by the pages title", labelWidth:130},
                               {view:"text", id:"usernameTextArea", label:"Username:", height:40, inputWidth:500, align:"right", labelAlign:"right", placeholder:"Authors username", tooltip:"Filters search by the pages author",labelWidth:130},
                               {view:"text", id:"contentTextArea", label:"Content:", height:40, inputWidth:500, align:"right", labelAlign:"right", placeholder:"Page content snippet", tooltip:"Filters search by the content of the page",labelWidth:130},
+                              {cols:[{}, {view:"checkbox", id:"likeSortCheckbox", label:"Sort by most liked", labelWidth:130, align:"right", on:{onChange:searchPage.handler.likeSortCheckboxClicked}}, {view:"checkbox", id:"visitedSortCheckbox", label:"Sort by most visited", labelWidth:140, align:"right", on:{onChange:searchPage.handler.visitedSortCheckboxClicked}}]},
                               {cols:[ { }, {view:"button", id:"advancedFilter", autowidth:true, label:"Apply Filter", on:{onItemClick:searchPage.handler.advancedFilter}, tooltip:"Apply filters to search"} ]}
                           ]
                       },
