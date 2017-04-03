@@ -17,7 +17,9 @@ public class WikiPageWithAuthorProxy implements WikiPage {
      */
     protected ConcreteWikiPage realWikiPage;
 
-
+    /**
+     * The counter used to display how many likes this page has (must be set by the controller)
+     */
     @Getter @Setter
     private Integer likes;
 
