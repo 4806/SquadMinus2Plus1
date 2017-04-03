@@ -38,6 +38,14 @@ public class WikiPageWithAuthorProxy implements WikiPage {
     }
 
     /**
+     * Get the total views of the WikiPage
+     * @return the total views of the WikiPage
+     */
+    public Integer getViews() {
+        return realWikiPage.getViews();
+    }
+
+    /**
      * Creates a WikiPageWithAuthorProxy object from te given WikiPage
      * @param page - The WikiPage to create a WikiPageWithAuthorProxy from
      * @return The associated WikiPageWithAuthorProxy from the WikiPage

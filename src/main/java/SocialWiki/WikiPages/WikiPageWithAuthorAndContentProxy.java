@@ -31,11 +31,4 @@ public class WikiPageWithAuthorAndContentProxy extends WikiPageWithAuthorProxy {
          return new WikiPageWithAuthorAndContentProxy(page);
      }
 
-    /**
-     * Get the total views of the WikiPage
-     * @return the total views of the WikiPage
-     */
-     public Integer getViews() {
-         return realWikiPage.getViews();
-     }
 }
