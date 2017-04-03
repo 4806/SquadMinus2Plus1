@@ -69,6 +69,36 @@ public class UserRepositoryTest {
     }
 
     @Test
+    public void findByUserNameWithoutDeletions() throws Exception {
+        User user = userRepo.findByUserNameWithoutDeletions("testUserName1");
+        assertEquals("Failure - userRepository query by userName that is not deleted does not return user1", user1, user);
+
+        user = userRepo.findByUserNameWithoutDeletions("testUserName2");
+        assertEquals("Failure - userRepository query by userName that is not deleted does not return user2", user2, user);
+
+        user = userRepo.findByUserNameWithoutDeletions("testUserName3");
+        assertEquals("Failure - userRepository found a user with a userName that does not exist", null, user);
+
+        user = userRepo.findByUserNameWithoutDeletions("");
+        assertEquals("Failure - userRepository found a user with a blank userName", null, user);
+
+        user = userRepo.findByUserNameWithoutDeletions("testusername1");
+        assertEquals("Failure - userRepository query by LOWER userName that is not deleted does not return user1", user1, user);
+
+        user = userRepo.findByUserNameWithoutDeletions("TESTUSERNAME1");
+        assertEquals("Failure - userRepository query by UPPER userName that is not deleted does not return user1", user1, user);
+
+        user = userRepo.findByUserNameWithoutDeletions("TeStUsErNaMe1");
+        assertEquals("Failure - userRepository query by MiXeD userName that is not deleted does not return user1", user1, user);
+
+        user1.delete();
+        user1 = userRepo.save(user1);
+
+        user = userRepo.findByUserNameWithoutDeletions("testUserName1");
+        assertEquals("Failure - userRepository query by userName that is deleted found a user still", null, user);
+    }
+
+    @Test
     public void findByEmail() throws Exception {
         User user = userRepo.findByEmail("testEmail1");
         assertEquals("Failure - userRepository query by email does not return user1", user1, user);

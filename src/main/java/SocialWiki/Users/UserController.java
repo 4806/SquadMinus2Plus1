@@ -140,7 +140,7 @@ public class UserController {
         }
 
         // get the user from the user repository
-        User user = userRepo.findByUserName(userName);
+        User user = userRepo.findByUserNameWithoutDeletions(userName);
 
         // send an HTTP 422 response if there is no user with userName
         if (user == null) {
