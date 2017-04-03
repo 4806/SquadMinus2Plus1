@@ -62,7 +62,13 @@ viewPage.handler.setContent = function(dataString) {
   if (dataString !== null) {
       viewPage.pageData = JSON.parse(dataString);
       var heading = "<h1>" + viewPage.pageData.title + "</h1>";
-      heading += '<h3>Created by <a href="/profile?user=' + viewPage.pageData.author + '">' + viewPage.pageData.author + "</a> on " + pageUtil.getFormattedDate(viewPage.pageData.creationDate);
+
+      if( viewPage.pageData.authorDeleted ) {
+          heading += "<h3>Created by " + viewPage.pageData.author + " [Deleted] on " + pageUtil.getFormattedDate(viewPage.pageData.creationDate);
+      } else {
+          heading += '<h3>Created by <a href="/profile?user=' + viewPage.pageData.author + '">' + viewPage.pageData.author + '</a> on ' + pageUtil.getFormattedDate(viewPage.pageData.creationDate);
+      }
+
       $$("views").setHTML(viewPage.pageData.views);
       $$("likes").setHTML(viewPage.pageData.likes);
 
