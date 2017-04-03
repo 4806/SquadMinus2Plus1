@@ -94,4 +94,10 @@ public class WikiPageWithAuthorProxyTest {
         assertEquals("Failure - getCreationDate() for testResult2", testConcreteWikiPage2.getCreationDate(), testResult2.getCreationDate());
     }
 
+    @Test
+    public void getViews() throws Exception {
+        assertEquals("Failure - getViews() for testResult1", testConcreteWikiPage1.getViews(), testResult1.getViews());
+        assertEquals("Failure - getViews() for testResult2", testConcreteWikiPage2.getViews(), testResult2.getViews());
+    }
+
 }
