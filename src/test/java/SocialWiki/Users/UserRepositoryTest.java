@@ -1,5 +1,7 @@
 package SocialWiki.Users;
 
+import SocialWiki.WikiPages.ConcreteWikiPage;
+import SocialWiki.WikiPages.WikiPageRepository;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,6 +24,9 @@ public class UserRepositoryTest {
 
     @Autowired
     private UserRepository userRepo;
+
+    @Autowired
+    private WikiPageRepository pageRepo;
 
     private User user1;
     private User user2;
@@ -61,6 +66,36 @@ public class UserRepositoryTest {
 
         user = userRepo.findByUserName("TeStUsErNaMe1");
         assertEquals("Failure - userRepository query by MiXeD userName does not return user1", user1, user);
+    }
+
+    @Test
+    public void findByUserNameWithoutDeletions() throws Exception {
+        User user = userRepo.findByUserNameWithoutDeletions("testUserName1");
+        assertEquals("Failure - userRepository query by userName that is not deleted does not return user1", user1, user);
+
+        user = userRepo.findByUserNameWithoutDeletions("testUserName2");
+        assertEquals("Failure - userRepository query by userName that is not deleted does not return user2", user2, user);
+
+        user = userRepo.findByUserNameWithoutDeletions("testUserName3");
+        assertEquals("Failure - userRepository found a user with a userName that does not exist", null, user);
+
+        user = userRepo.findByUserNameWithoutDeletions("");
+        assertEquals("Failure - userRepository found a user with a blank userName", null, user);
+
+        user = userRepo.findByUserNameWithoutDeletions("testusername1");
+        assertEquals("Failure - userRepository query by LOWER userName that is not deleted does not return user1", user1, user);
+
+        user = userRepo.findByUserNameWithoutDeletions("TESTUSERNAME1");
+        assertEquals("Failure - userRepository query by UPPER userName that is not deleted does not return user1", user1, user);
+
+        user = userRepo.findByUserNameWithoutDeletions("TeStUsErNaMe1");
+        assertEquals("Failure - userRepository query by MiXeD userName that is not deleted does not return user1", user1, user);
+
+        user1.delete();
+        user1 = userRepo.save(user1);
+
+        user = userRepo.findByUserNameWithoutDeletions("testUserName1");
+        assertEquals("Failure - userRepository query by userName that is deleted found a user still", null, user);
     }
 
     @Test
@@ -223,4 +258,31 @@ public class UserRepositoryTest {
 
     }
 
+    public void findUsersByLikedPage() throws Exception {
+        ConcreteWikiPage page1 = pageRepo.save(new ConcreteWikiPage("testTitle1", "testContent1", user1));
+
+        List<User> users = userRepo.findUsersByLikedPage(page1.getId());
+        assertEquals("Failure - userRepository query for user that likes specified pageId should have found no users", 0, users.size());
+
+        user1.likePage(page1);
+        user1 = userRepo.save(user1);
+
+        users = userRepo.findUsersByLikedPage(page1.getId());
+        assertEquals("Failure - userRepository query for user that likes specified pageId should have found 1 user", 1, users.size());
+        assertTrue("Failure - userRepository query for user that likes specified pageId not found", users.contains(user1));
+
+        user2.likePage(page1);
+        user2 = userRepo.save(user2);
+
+        users = userRepo.findUsersByLikedPage(page1.getId());
+        assertEquals("Failure - userRepository query for user that likes specified pageId should have found 2 users", 2, users.size());
+        assertTrue("Failure - userRepository query for user1 that likes specified pageId not found", users.contains(user1));
+        assertTrue("Failure - userRepository query for user2 that likes specified pageId not found", users.contains(user2));
+
+        user1.unlikePage(page1);
+        user1 = userRepo.save(user1);
+        users = userRepo.findUsersByLikedPage(page1.getId());
+        assertEquals("Failure - userRepository query for user that likes specified pageId should have found 1 user", 1, users.size());
+        assertTrue("Failure - userRepository query for user that likes specified pageId not found", users.contains(user2));
+    }
 }

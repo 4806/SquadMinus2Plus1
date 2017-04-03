@@ -22,6 +22,16 @@ public interface UserRepository extends CrudRepository<User, Long> {
     User findByUserName(@Param("userName") String userName);
 
     /**
+     * Find the User with the corresponding userName and is not deleted
+     * @param userName - the userName for the User that is being queried
+     * @return the User that matches the userName that is not deleted
+     */
+    @Query("SELECT u " +
+            "FROM SocialWiki.Users.User u " +
+            "WHERE UPPER(u.userName) = UPPER(:userName) AND u.isDeleted = false")
+    User findByUserNameWithoutDeletions(@Param("userName") String userName);
+
+    /**
      * Find the User with the corresponding email
      * @param email - the email for the User that is being queried
      * @return the User that matches the email
@@ -64,14 +74,35 @@ public interface UserRepository extends CrudRepository<User, Long> {
             "WHERE UPPER(u.userName) = UPPER(:userName) OR UPPER(u.email) = UPPER(:email)")
     List<User> findByUserNameOrEmail(@Param("userName") String userName, @Param("email") String email);
 
+    /**
+     * Find the Users that like a specific page
+     * @param pageId - the id of the specific page that is being checked
+     * @return a list of Users that like the page specified by pageId
+     */
+    @Query("SELECT u " +
+            "FROM SocialWiki.Users.User u " +
+            "INNER JOIN u.likedPages p " +
+            "WHERE :pageId = p.id")
+    List<User> findUsersByLikedPage(@Param("pageId") Long pageId);
+
+    /**
+     * Find the Users that a specific User follows
+     * @param userName - the userName of the specific User
+     * @return a list of Users that the User follows
+     */
     @Query("SELECT u.followedUsers" +
                   " FROM SocialWiki.Users.User u " +
             "WHERE UPPER(u.userName) = UPPER(:userName)")
     List<User> findFollowedUsersByUsername(@Param("userName") String userName);
 
+    /**
+     * Find the Users that are following a specific User
+     * @param user - the specific User who's followers are being checked
+     * @return a list of Users that are following the specific User
+     */
     @Query("SELECT u " +
             "FROM SocialWiki.Users.User u " +
             "INNER JOIN u.followedUsers f " +
             "WHERE :user IN (f)")
-    List<User> findUsersFollowingUserByUser(@Param("user") User userName);
+    List<User> findUsersFollowingUserByUser(@Param("user") User user);
 }
