@@ -59,8 +59,8 @@ viewPage.handler.setContent = function(dataString) {
       viewPage.pageData = JSON.parse(dataString);
       var heading = "<h1>" + viewPage.pageData.title + "</h1>";
       heading += '<h3>Created by <a href="/profile?user=' + viewPage.pageData.author + '">' + viewPage.pageData.author + "</a> on " + pageUtil.getFormattedDate(viewPage.pageData.creationDate);
-      heading += '<br>Total Views: ' + viewPage.pageData.views;
-      heading += '<br>Total Likes: ' + viewPage.pageData.likes;
+      $$("views").setHTML(viewPage.pageData.views);
+      $$("likes").setHTML(viewPage.pageData.likes);
 
       if (viewPage.pageData.parentID === -1) { //If the original copy
         $$("previousversionbutton").hide();
@@ -126,10 +126,34 @@ viewPage.onReady = function() {
                   {
                       paddingY:20,
                       paddingX:10,
-                      align:"right",
+                      align: "right",
                       rows:[
-                          { },
                           {
+                              cols:[
+                                  {
+                                      view: "icon",
+                                      icon: "users"
+                                  },
+                                  {
+                                      view: "label",
+                                      label: 0,
+                                      id: "views",
+                                      autowidth: true
+                                  },
+                                  {
+                                      view: "icon",
+                                      icon: "thumbs-up"
+                                  },
+                                  {
+                                      view: "label",
+                                      label: 0,
+                                      id: "likes",
+                                      autowidth: true
+                                  }
+                              ]
+                          },
+                          {
+                              align:"right",
                               cols:[
                                   {
                                       view: "button",
