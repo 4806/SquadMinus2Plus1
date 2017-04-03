@@ -147,10 +147,8 @@ public class WikiPageRepositoryTest {
     @Test
     public void findById() throws Exception {
 
-        WikiPageWithAuthorAndContentProxy testResult1 = WikiPageWithAuthorAndContentProxy.getFullResult(testConcreteWikiPage1);
-
-        WikiPageWithAuthorAndContentProxy page = wikiPageRepository.findById(testConcreteWikiPage1.getId());
-        assertEquals("Failure - Page found by findById(testConcreteWikiPage1.getId()) is not correct", testResult1, page);
+        ConcreteWikiPage page = wikiPageRepository.findById(testConcreteWikiPage1.getId());
+        assertEquals("Failure - Page found by findById(testConcreteWikiPage1.getId()) is not correct", testConcreteWikiPage1, page);
 
         page = wikiPageRepository.findById(-1L);
         assertEquals("Failure - Page found by findById(-1L) is not correct", null, page);

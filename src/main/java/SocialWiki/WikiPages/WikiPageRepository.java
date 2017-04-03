@@ -37,10 +37,10 @@ public interface WikiPageRepository extends JpaRepository<ConcreteWikiPage, Long
      * @param id - id to look for
      * @return The WikiPages with matching id
      */
-    @Query("SELECT NEW SocialWiki.WikiPages.WikiPageWithAuthorAndContentProxy(page) " +
+    @Query("SELECT page " +
             "FROM ConcreteWikiPage page  " +
             "WHERE page.id = :id")
-    WikiPageWithAuthorAndContentProxy findById(@Param("id") Long id);
+    ConcreteWikiPage findById(@Param("id") Long id);
 
     /**
      * Finds the descendants of source WikiPage

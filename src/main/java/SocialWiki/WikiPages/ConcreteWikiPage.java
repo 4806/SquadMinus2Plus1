@@ -2,6 +2,8 @@ package SocialWiki.WikiPages;
 
 import SocialWiki.Users.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
@@ -78,6 +80,12 @@ public class ConcreteWikiPage implements WikiPage {
     private User author;
 
     /**
+     * The number of views that the page has
+     */
+    @Getter @Setter
+    private Integer views;
+
+    /**
      * Default constructor
      */
     public ConcreteWikiPage() {
@@ -97,6 +105,7 @@ public class ConcreteWikiPage implements WikiPage {
         this.content = content;
         this.author = author;
         this.creationDate = Calendar.getInstance();
+        this.views = 0;
     }
 
     /**
@@ -111,6 +120,7 @@ public class ConcreteWikiPage implements WikiPage {
         this.content = content;
         this.author = author;
         this.creationDate = Calendar.getInstance();
+        this.views = 0;
     }
 
 

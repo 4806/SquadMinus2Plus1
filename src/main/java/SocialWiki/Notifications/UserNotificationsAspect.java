@@ -115,7 +115,7 @@ public class UserNotificationsAspect {
 
             case LIKE_PAGE_URI:
                 Long id = Long.valueOf(request.getParameter("id")); //Get Id of page being liked
-                WikiPageWithAuthorAndContentProxy page = wikiRepo.findById(id);
+                ConcreteWikiPage page = wikiRepo.findById(id);
                 notificationMessage = "The user " + user.getUserName() + " has just liked the page [" + page.getId() + ", "  + page.getTitle() + "]";
                 break;
 
