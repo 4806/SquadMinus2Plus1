@@ -37,8 +37,8 @@ public class WikiPageWithAuthorProxyTest {
 
     @Before
     public void setUp() throws Exception {
-        testUser1 = new User("testUserName1", "testFirstName1", "testLastName1", "testEmail1", "testPassword1");
-        testUser2 = new User("testUserName2", "testFirstName2", "testLastName2", "testEmail2", "testPassword2");
+        testUser1 = new User("testUserName1", "testFirstName1", "testLastName1", "Test1@email.com", "testPassword1");
+        testUser2 = new User("testUserName2", "testFirstName2", "testLastName2", "Test2@email.com", "testPassword2");
         testUser1 = userRepository.save(testUser1);
         testUser2 = userRepository.save(testUser2);
 

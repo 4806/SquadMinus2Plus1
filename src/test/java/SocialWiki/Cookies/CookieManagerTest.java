@@ -60,7 +60,7 @@ public class CookieManagerTest {
 
     @Test
     public void checkUserCookie() throws Exception {
-        User user = new User("testUserName", "testFirstName", "testLastName", "test@email.com", "testPassword");
+        User user = new User("testUserName", "testFirstName", "testLastName", "Test@email.com", "testPassword");
         user = userRepo.save(user);
 
         // perform successful check where cookie value matches session value
@@ -103,7 +103,7 @@ public class CookieManagerTest {
     @Test
     public void getIsLikedCookie() throws Exception {
         // set up user liking a page
-        User user1 = new User("testUserName", "testFirstName", "testLastName", "testEmail", "testPassword");
+        User user1 = new User("testUserName", "testFirstName", "testLastName", "Test@email.com", "testPassword");
         user1 = userRepo.save(user1);
         ConcreteWikiPage page1 = new ConcreteWikiPage("testTitle1", "testContent1", user1);
         page1 = pageRepo.save(page1);
@@ -151,9 +151,9 @@ public class CookieManagerTest {
     @Test
     public void getIsFollowedCookie() throws Exception {
         // set up user following a user
-        User user1 = new User("testUserName", "testFirstName", "testLastName", "testEmail", "testPassword");
+        User user1 = new User("testUserName", "testFirstName", "testLastName", "Test1@email.com", "testPassword");
         user1 = userRepo.save(user1);
-        User user2 = new User("testUserName2", "testFirstName2", "testLastName2", "testEmail2", "testPassword2");
+        User user2 = new User("testUserName2", "testFirstName2", "testLastName2", "Test2@email.com", "testPassword2");
         user2 = userRepo.save(user2);
 
         user1.followUser(user2);

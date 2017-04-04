@@ -55,9 +55,9 @@ public class UserControllerTest {
 
     @Before
     public void setUp() throws Exception {
-        user1 = userRepo.save(new User("testUserName1", "testFirstName1", "testLastName1", "testEmail1", "testPassword1"));
-        user2 = userRepo.save(new User("testUserName3", "testFirstName3", "testLastName3", "testEmail3", "testPassword3"));
-        user3 = userRepo.save(new User("testUserName4", "testFirstName4", "testLastName4", "testEmail4", "testPassword4"));
+        user1 = userRepo.save(new User("testUserName1", "testFirstName1", "testLastName1", "Test1@email.com", "testPassword1"));
+        user2 = userRepo.save(new User("testUserName3", "testFirstName3", "testLastName3", "Test3@email.com", "testPassword3"));
+        user3 = userRepo.save(new User("testUserName4", "testFirstName4", "testLastName4", "Test4@email.com", "testPassword4"));
         page1 = pageRepo.save(new ConcreteWikiPage("testTitle1", "testContent1", user1));
         page2 = pageRepo.save(new ConcreteWikiPage("testTitle2", "testContent2", user2));
     }
@@ -273,7 +273,7 @@ public class UserControllerTest {
                 .andExpect(content().string(containsString("\"userName\":\"testUserName1\"")))
                 .andExpect(content().string(containsString("\"firstName\":\"testFirstName1\"")))
                 .andExpect(content().string(containsString("\"lastName\":\"testLastName1\"")))
-                .andExpect(content().string(containsString("\"email\":\"testEmail1\"")))
+                .andExpect(content().string(containsString("\"email\":\"Test1@email.com\"")))
                 .andExpect(content().string(containsString("\"password\":null")))
                 .andExpect(content().string(containsString("\"title\":\"testTitle1\"")))
                 .andExpect(status().isOk());

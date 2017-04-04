@@ -5,6 +5,7 @@ import SocialWiki.WikiPages.WikiPageWithAuthorProxy;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.validator.constraints.Email;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
@@ -50,7 +51,7 @@ public class User {
      * The unique email address used for logging in and contacting the User outside of the application
      */
     @Column(unique = true)
-    @Getter @Setter
+    @Getter @Setter @Email
     private String email;
 
     /**

@@ -4,13 +4,17 @@ import SocialWiki.Cookies.CookieManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.TransactionSystemException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.persistence.RollbackException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.transaction.Transactional;
+import javax.validation.ConstraintViolationException;
 import java.util.List;
 
 /**
@@ -114,8 +118,14 @@ public class UserAccountController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
         }
 
+        User newUser;
+
         // create the new User and save it in the user repository
-        User newUser = userRepo.save(new User(user, first, last, email, pass));
+        try {
+            newUser = userRepo.save(new User(user, first, last, email, pass));
+        } catch (TransactionSystemException e) { // this exception will be thrown if the email does not validate
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
 
         // create a new session for the new User
         session = request.getSession();
