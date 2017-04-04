@@ -791,4 +791,53 @@ public class UserControllerTest {
                 .andExpect(status().isForbidden());
     }
 
+    @Test
+    public void removeAllUserNotifications()throws Exception {
+
+        // perform login to get session
+        MvcResult result = mockMvc.perform(post("/login")
+                .content("login=" + user1.getUserName() + "&pass=" + user1.getPassword())
+                .contentType("application/x-www-form-urlencoded"))
+                .andReturn();
+
+        MockHttpSession session = (MockHttpSession) result.getRequest().getSession(false);
+
+        user1.addNotification("N1");
+        user1 = userRepo.save(user1);
+
+        // successfully remove notifications with 1 user notifications present
+        mockMvc.perform(post("/removeAllUserNotifications")
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isNoContent());
+
+        user1.addNotification("N1");
+        user1.addNotification("N2");
+        user1 = userRepo.save(user1);
+
+        // successfully remove notifications with 2 user notifications present
+        mockMvc.perform(post("/removeAllUserNotifications")
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isNoContent());
+
+        // perform successful removal when no notifications present
+        mockMvc.perform(post("/removeAllUserNotifications")
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isNoContent());
+
+        // perform unsuccessful query with invalidated session
+        session.invalidate();
+        mockMvc.perform(post("/removeAllUserNotifications")
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isForbidden());
+
+        // perform unsuccessful query with no session
+        mockMvc.perform(post("/removeAllUserNotifications")
+                .contentType("application/x-www-form-urlencoded"))
+                .andExpect(status().isForbidden());
+    }
+
 }
