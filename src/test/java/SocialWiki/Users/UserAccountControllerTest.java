@@ -418,6 +418,7 @@ public class UserAccountControllerTest {
     }
 
     @Test
+    @Transactional
     public void deleteUser() throws Exception {
         // perform login to get session
         MvcResult result = mockMvc.perform(post("/login")
