@@ -135,7 +135,7 @@ public class WikiPageController {
         }
 
         List<WikiPageWithAuthorProxy> pages = wikiPageRepo.findByTitleAndContent(searchText.trim());
-
+        pages.forEach(wikiPageWithAuthorProxy -> wikiPageWithAuthorProxy.setLikes(userRepo.findUsersByLikedPage(wikiPageWithAuthorProxy.getId()).size()));
         return ResponseEntity.ok(pages);
 
     }
@@ -170,7 +170,7 @@ public class WikiPageController {
         //Note this still allows for parameters to be NULL if at least one is not null. In these cases, null parameters will be treated as empty string by the query.
 
         List<WikiPageWithAuthorProxy> pages = wikiPageRepo.findByTitleAndAuthorAndContent(title.trim(), username.trim(), content.trim());
-
+        pages.forEach(wikiPageWithAuthorProxy -> wikiPageWithAuthorProxy.setLikes(userRepo.findUsersByLikedPage(wikiPageWithAuthorProxy.getId()).size()));
         return ResponseEntity.ok(pages);
 
     }
