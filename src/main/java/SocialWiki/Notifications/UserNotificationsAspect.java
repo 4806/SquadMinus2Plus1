@@ -137,7 +137,7 @@ public class UserNotificationsAspect {
 
                     ConcreteWikiPage parentPage = wikiRepo.findById(createdPage.getParentID());
                     effectedUser = parentPage.getAuthor();
-                    effectedUserNotificationMessage = "The user " + user.getUserName() + " has just edited your page "  + createdPage.getTitle();
+                    effectedUserNotificationMessage = "The user " + user.getUserName() + " has just edited your page "  + parentPage.getTitle();
                 }
                 break;
         }
