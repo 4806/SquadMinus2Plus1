@@ -317,35 +317,35 @@ public class UserAccountControllerTest {
                 .content("user=testUserName5&first=testFirstName5&last=testLastName5&email=testEmail5&pass=testPassword5")
                 .contentType("application/x-www-form-urlencoded"))
                 .andExpect(cookie().doesNotExist("user"))
-                .andExpect(status().is5xxServerError());
+                .andExpect(status().isUnprocessableEntity());
 
         // perform unsuccessful creation with a userName that is too long
         mockMvc.perform(post("/signup")
                 .content("user=testUserName123456789012345678901&first=testFirstName5&last=testLastName5&email=Test5@email.com&pass=testPassword5")
                 .contentType("application/x-www-form-urlencoded"))
                 .andExpect(cookie().doesNotExist("user"))
-                .andExpect(status().is5xxServerError());
+                .andExpect(status().isUnprocessableEntity());
 
         // perform unsuccessful creation with a firstName that is too long
         mockMvc.perform(post("/signup")
                 .content("user=testUserName5&first=testFirstName12345678901234567890&last=testLastName5&email=Test5@email.com&pass=testPassword5")
                 .contentType("application/x-www-form-urlencoded"))
                 .andExpect(cookie().doesNotExist("user"))
-                .andExpect(status().is5xxServerError());
+                .andExpect(status().isUnprocessableEntity());
 
         // perform unsuccessful creation with a lastName that is too long
         mockMvc.perform(post("/signup")
                 .content("user=testUserName5&first=testFirstName5&last=testLastName123456789012345678901&email=Test5@email.com&pass=testPassword5")
                 .contentType("application/x-www-form-urlencoded"))
                 .andExpect(cookie().doesNotExist("user"))
-                .andExpect(status().is5xxServerError());
+                .andExpect(status().isUnprocessableEntity());
 
         // perform unsuccessful creation with a password that is too long
         mockMvc.perform(post("/signup")
                 .content("user=testUserName5&first=testFirstName5&last=testLastName123456789012345678901&email=Test5@email.com&pass=testPassword123456789012345678901")
                 .contentType("application/x-www-form-urlencoded"))
                 .andExpect(cookie().doesNotExist("user"))
-                .andExpect(status().is5xxServerError());
+                .andExpect(status().isUnprocessableEntity());
     }
 
     @Test

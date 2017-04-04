@@ -124,7 +124,7 @@ public class UserAccountController {
         try {
             newUser = userRepo.save(new User(user, first, last, email, pass));
         } catch (TransactionSystemException e) { // this exception will be thrown if the email does not validate
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return ResponseEntity.unprocessableEntity().body(null);
         }
 
         // create a new session for the new User
