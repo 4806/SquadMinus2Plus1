@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>DATABASE</ID>
+  <OriginalElement>911fc6c6-e165-4f02-9c64-d1e23d762713.SCHEMA:postgres.public</OriginalElement>
+  <nodes>
+    <node x="-131.22727272727275" y="107.09090909090907">911fc6c6-e165-4f02-9c64-d1e23d762713.TABLE:postgres.public.concrete_wiki_page</node>
+    <node x="593.0" y="363.5">911fc6c6-e165-4f02-9c64-d1e23d762713.TABLE:postgres.public.wiki_user_followed_users</node>
+    <node x="-109.72727272727275" y="-37.409090909090935">911fc6c6-e165-4f02-9c64-d1e23d762713.TABLE:postgres.public.wiki_user_liked_pages</node>
+    <node x="251.5" y="108.0">911fc6c6-e165-4f02-9c64-d1e23d762713.TABLE:postgres.public.wiki_user</node>
+    <node x="273.0" y="443.5">911fc6c6-e165-4f02-9c64-d1e23d762713.TABLE:postgres.public.wiki_user_notifications</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="911fc6c6-e165-4f02-9c64-d1e23d762713.TABLE:postgres.public.wiki_user_liked_pages" target="911fc6c6-e165-4f02-9c64-d1e23d762713.TABLE:postgres.public.concrete_wiki_page">
+      <point x="0.0" y="36.5" />
+      <point x="0.0" y="-92.0" />
+    </edge>
+    <edge source="911fc6c6-e165-4f02-9c64-d1e23d762713.TABLE:postgres.public.concrete_wiki_page" target="911fc6c6-e165-4f02-9c64-d1e23d762713.TABLE:postgres.public.wiki_user">
+      <point x="108.5" y="0.0" />
+      <point x="-108.5" y="0.0" />
+    </edge>
+    <edge source="911fc6c6-e165-4f02-9c64-d1e23d762713.TABLE:postgres.public.wiki_user_liked_pages" target="911fc6c6-e165-4f02-9c64-d1e23d762713.TABLE:postgres.public.wiki_user">
+      <point x="87.0" y="0.0" />
+      <point x="360.0" y="0.0" />
+      <point x="0.0" y="-92.0" />
+    </edge>
+    <edge source="911fc6c6-e165-4f02-9c64-d1e23d762713.TABLE:postgres.public.wiki_user_notifications" target="911fc6c6-e165-4f02-9c64-d1e23d762713.TABLE:postgres.public.wiki_user">
+      <point x="0.0" y="-36.5" />
+      <point x="0.0" y="92.0" />
+    </edge>
+    <edge source="911fc6c6-e165-4f02-9c64-d1e23d762713.TABLE:postgres.public.wiki_user_followed_users" target="911fc6c6-e165-4f02-9c64-d1e23d762713.TABLE:postgres.public.wiki_user">
+      <point x="-87.0" y="0.0" />
+      <point x="400.0" y="400.0" />
+      <point x="40.0" y="92.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="1.0" x="317.5" y="239.5" />
+  <SelectedNodes />
+  <Categories>
+    <Category>Key columns</Category>
+    <Category>Columns</Category>
+  </Categories>
+</Diagram>
+
