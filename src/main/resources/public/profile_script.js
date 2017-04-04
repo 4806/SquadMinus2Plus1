@@ -17,6 +17,10 @@ profilePage.strings.usersFollowingLabel = "Users Following";
 profilePage.strings.followError = "There was a problem following user.";
 profilePage.strings.unfollowError = "There was a problem unfollowing user.";
 profilePage.strings.errorLabel = "The profile could not be loaded.";
+profilePage.strings.deleteConfirm = "You are about to delete your account. This cannot be reversed. Are you sure?";
+profilePage.strings.deleteSuccess = "Account sucessfully deleted.";
+profilePage.strings.deleteError = "There was a problem deleting the account.";
+profilePage.strings.deleteAlertTitle = "Delete Account";
 
 profilePage.userError = false;
 
@@ -46,6 +50,7 @@ profilePage.hideAll = function() {
   $$("followlist").hide();
   $$("followeduseractivity").hide();
   $$("followactivitylist").hide();
+  $$("deleteuserbutton").hide();
 };
 
 profilePage.handler.itemClickLikes = function(itemId) {
@@ -80,6 +85,12 @@ profilePage.handler.setContentLikesCreated = function(dataString) {
       if(profile.userName !== undefined && profile.userName !== null) {
         $$("username").setValue(profilePage.strings.userNamePre + profile.userName);
         $$("username").show();
+
+        if( generalPages.getCookie("user") === profile.userName ) {
+          $$("deleteuserbutton").show();
+        } else {
+          $$("deleteuserbutton").hide();
+        }
 
         //Showing the follow button will only work when the username is present
         profilePage.checkFollow();
@@ -156,6 +167,32 @@ profilePage.handler.unfollowButtonClick = function() {
   webix.ajax().post("/unfollowUser", {"user":$$("username").getValue()}, {
       error:profilePage.handler.unfollowerror,
       success:profilePage.setFollowButton
+  });
+};
+
+profilePage.handler.deleteButtonClick = function() {
+
+  //Very simple check to make sure that we are on the proper user page
+  if(generalPages.getCookie("user") !== $$("username").getValue()) {
+    return;
+  }
+
+  webix.confirm({
+    title:profilePage.strings.deleteAlertTitle,
+    ok:"Yes",
+    cancel:"No",
+    type:"confirm-error",
+    text:profilePage.strings.deleteConfirm,
+    callback:function(button){
+      if(button) {
+        webix.ajax().del("/deleteUser", {
+            error:function(x){console.log(x);webix.alert(profilePage.strings.deleteError);},
+            success:function(){
+              webix.alert(profilePage.strings.deleteSuccess, function(){location.href = "/";});
+            }
+        });
+      }
+    }
   });
 };
 
@@ -323,6 +360,14 @@ profilePage.onReady = function() {
                 value:"Unfollow",
                 inputWidth:150,
                 click:profilePage.handler.unfollowButtonClick
+              },
+              {
+                view:"button",
+                id:"deleteuserbutton",
+                value:"DELETE ACCOUNT",
+                inputWidth:150,
+                type:"danger",
+                click:profilePage.handler.deleteButtonClick
               },
             ]},
             { width:30 }
