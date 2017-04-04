@@ -116,15 +116,15 @@ public class UserNotificationsAspect {
             case LIKE_PAGE_URI:
                 Long id = Long.valueOf(request.getParameter("id")); //Get Id of page being liked
                 ConcreteWikiPage page = wikiRepo.findById(id);
-                notificationMessage = "The user " + user.getUserName() + " has just liked the page [" + page.getId() + ", "  + page.getTitle() + "]";
+                notificationMessage = "The user " + user.getUserName() + " has just liked the page "  + page.getTitle();
                 break;
 
             case CREATE_WIKI_PAGE_URI:
                 WikiPageWithAuthorAndContentProxy createdPage = (WikiPageWithAuthorAndContentProxy) response.getBody();
                 if (createdPage.getParentID().equals(ConcreteWikiPage.IS_ORIGINAL_ID)) {  //If new page created
-                    notificationMessage = "The user " + user.getUserName() + " has just created the page [" + createdPage.getId() + ", "  + createdPage.getTitle() + "]";
+                    notificationMessage = "The user " + user.getUserName() + " has just created the page "  + createdPage.getTitle();
                 } else {    //If page was edited
-                    notificationMessage = "The user " + user.getUserName() + " has just edited the page [" + createdPage.getId() + ", "  + createdPage.getTitle() + "]";
+                    notificationMessage = "The user " + user.getUserName() + " has just edited the page "  + createdPage.getTitle();
                 }
                 break;
         }
