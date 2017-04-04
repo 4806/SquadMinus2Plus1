@@ -23,6 +23,7 @@ import javax.transaction.Transactional;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -32,7 +33,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-@Transactional
 public class UserNotificationsAspectTest {
 
     @Autowired
@@ -70,6 +70,7 @@ public class UserNotificationsAspectTest {
     }
 
     @Test
+    @Transactional
     public void userNotificationAdvice() throws Exception {
 
         //************************** Test Advice after Page creation
@@ -176,12 +177,63 @@ public class UserNotificationsAspectTest {
         //Check that user2 has received notification
         assertEquals("Failure - user2 did not receive notification from user follow", 4, user2.getNotifications().size());
         assertTrue("Failure - user2 did not receive correctly formatted notification from user follow",
-                user2.getNotifications().get(3).contains("The user " + user1.getUserName() + " has just followed " +  user2.getUserName()));
+                user2.getNotifications().get(3).contains("The user " + user1.getUserName() + " has just followed you"));
 
         //Check that user3 has received notification
         assertEquals("Failure - user3 did not receive notification from user follow", 4, user3.getNotifications().size());
         assertTrue("Failure - user3 did not receive correctly formatted notification from user follow",
                 user3.getNotifications().get(3).contains("The user " + user1.getUserName() + " has just followed " +  user2.getUserName()));
+
+
+        //************************** Test Advice sending notifications to effected user
+
+        // logout
+        mockMvc.perform(post("/logout")
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(cookie().value("user", ""))
+                .andExpect(cookie().maxAge("user", 0))
+                .andExpect(status().isNoContent());
+
+        result = mockMvc.perform(post("/login")
+                .content("login=" + user2.getUserName() + "&pass=" + user2.getPassword())
+                .contentType("application/x-www-form-urlencoded"))
+                .andReturn();
+
+        session = (MockHttpSession) result.getRequest().getSession(false);
+
+        //edit wiki page
+        params.add("title", "testTitle");
+        params.add("content", "testContent");
+        params.add("parentID", page1.getId().toString());
+        result = this.mockMvc.perform(post("/createWikiPage")
+                .params(params)
+                .session(session))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title", is("testTitle")))
+                .andExpect(jsonPath("$.content", is("testContent")))
+                .andExpect(jsonPath("$.parentID", is(Integer.parseInt(page1.getId().toString()))))
+                .andReturn();
+        params.clear();
+
+        user1 = userRepo.findOne(user1.getId());
+        //Check that user1 has received notification
+        assertEquals("Failure - user1 did not receive notification from page editing", 1, user1.getNotifications().size());
+        assertTrue("Failure - user1 did not receive correctly formatted notification from page editing\n" + user1.getNotifications().get(0),
+                user1.getNotifications().get(0).contains("The user " + user2.getUserName() + " has just edited your page testTitle"));
+
+        // Like page
+        mockMvc.perform(post("/likePage")
+                .content("id=" + page1.getId())
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(status().isNoContent());
+
+        user1 = userRepo.findOne(user1.getId());
+        //Check that user1 has received notification
+        assertEquals("Failure - user1 did not receive notification from page like", 2, user1.getNotifications().size());
+        assertTrue("Failure - user1 did not receive correctly formatted notification from page like",
+                user1.getNotifications().get(1).contains("The user " + user2.getUserName() + " has just liked your page testTitle1"));
 
     }
 
