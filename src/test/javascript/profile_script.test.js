@@ -21,9 +21,6 @@ describe("profile_script", function(){
       expect($$("followedusers").isVisible()).not.toBeTruthy();
       expect($$("followlist").isVisible()).not.toBeTruthy();
       expect($$("usersfollowing").isVisible()).not.toBeTruthy();
-      // expect($$("usersfollowinglist").isVisible()).not.toBeTruthy(); //Not yet implemented
-      // expect($$("followeduseractivity").isVisible()).not.toBeTruthy();
-      expect($$("followactivitylist").isVisible()).not.toBeTruthy();
       expect($$("likesheader").isVisible()).not.toBeTruthy();
       expect($$("likelist").isVisible()).not.toBeTruthy();
       expect($$("deleteuserbutton").isVisible()).not.toBeTruthy();
@@ -50,8 +47,6 @@ describe("profile_script", function(){
         expect($$("followlist").isVisible()).toBeTruthy();
         expect($$("usersfollowing").isVisible()).toBeTruthy();
         expect($$("usersfollowinglist").isVisible()).toBeTruthy();
-        // expect($$("followeduseractivity").isVisible()).toBeTruthy(); //Not yet implemented
-        // expect($$("followactivitylist").isVisible()).toBeTruthy();
         expect($$("deleteuserbutton").isVisible()).not.toBeTruthy();
       });
 
