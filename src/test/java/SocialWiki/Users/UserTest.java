@@ -119,4 +119,12 @@ public class UserTest {
         user1.removeNotification("test notification");
         assertTrue("Failure - the removed notification is in the user's notification list", !user1.getNotifications().contains("test notification"));
     }
+
+    @Test
+    public void removeAllNotification() throws Exception {
+        user1.addNotification("test notification");
+        user1.addNotification("test notification 2");
+        user1.removeAllNotifications();
+        assertTrue("Failure - the removed notification is in the user's notification list", user1.getNotifications().size() == 0);
+    }
 }
