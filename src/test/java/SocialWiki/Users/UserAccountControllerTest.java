@@ -400,6 +400,30 @@ public class UserAccountControllerTest {
                 .contentType("application/x-www-form-urlencoded"))
                 .andExpect(cookie().doesNotExist("user"))
                 .andExpect(status().isConflict());
+
+        //login with user2
+        result = mockMvc.perform(post("/login")
+                .content("login=" + user2.getUserName() + "&pass=" + user2.getPassword())
+                .contentType("application/x-www-form-urlencoded"))
+                .andReturn();
+
+        session = (MockHttpSession) result.getRequest().getSession(false);
+
+        //have user 3 follow user 2
+        user3.followUser(user2);
+        user3 = userRepo.save(user3);
+
+        // perform successful delete with user being followed
+        mockMvc.perform(delete("/deleteUser")
+                .contentType("application/x-www-form-urlencoded")
+                .session(session))
+                .andExpect(cookie().value("user", ""))
+                .andExpect(cookie().maxAge("user", 0))
+                .andExpect(status().isNoContent());
+
+        user3 = userRepo.findOne(user3.getId());
+
+        assertTrue("Failure - Deleting a user should remove it from all followers lists",user3.getFollowedUsers().size() == 0);
     }
 
 }
