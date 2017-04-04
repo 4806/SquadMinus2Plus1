@@ -48,4 +48,9 @@ describe("util", function(){
 
     });
 
+    it("Unescape HTML", function(){
+      expect(pageUtil.htmlDecode("&lt;test&gt;")).toBe("<test>");
+      expect(pageUtil.htmlDecode("&lt;&apos;test&apos;&gt;")).toBe("<'test'>");
+    });
+
 });
