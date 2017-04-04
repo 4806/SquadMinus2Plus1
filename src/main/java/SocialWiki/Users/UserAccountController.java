@@ -182,6 +182,11 @@ public class UserAccountController {
         String username = (String) session.getAttribute("user");
         User user = userRepo.findByUserName(username);
 
+        //remove deleted user from all followers lists
+        List<User> followers = userRepo.findUsersFollowingUserByUser(user);
+        followers.forEach(user1 -> user1.unfollowUser(user));
+        userRepo.save(followers);
+
         // remove the user's sensitive info and mark as deleted
         user.delete();
 

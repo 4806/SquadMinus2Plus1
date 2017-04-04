@@ -22,6 +22,16 @@ public interface UserRepository extends CrudRepository<User, Long> {
     User findByUserName(@Param("userName") String userName);
 
     /**
+     * Find the User with the corresponding userName and is not deleted
+     * @param userName - the userName for the User that is being queried
+     * @return the User that matches the userName that is not deleted
+     */
+    @Query("SELECT u " +
+            "FROM SocialWiki.Users.User u " +
+            "WHERE UPPER(u.userName) = UPPER(:userName) AND u.isDeleted = false")
+    User findByUserNameWithoutDeletions(@Param("userName") String userName);
+
+    /**
      * Find the User with the corresponding email
      * @param email - the email for the User that is being queried
      * @return the User that matches the email

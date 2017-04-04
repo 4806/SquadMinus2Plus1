@@ -357,6 +357,19 @@ public class WikiPageControllerTest {
                 .andExpect(jsonPath("$.[0].id", is(testConcreteWikiPage1.getId().intValue())));
         params.clear();
 
+        testUser1.likePage(testConcreteWikiPage1);
+        testUser1 = userRepository.save(testUser1);
+        //Check for successful search that also returns amount of likes page has
+        params.add("title", "testTitle1");
+        params.add("user", testUser1.getUserName());
+        params.add("content", "testContent1");
+        this.mockMvc.perform(get("/advancedSearchWikiPage").params(params))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0].id", is(testConcreteWikiPage1.getId().intValue())))
+                .andExpect(jsonPath("$.[0].likes", is(1)));
+        params.clear();
+
     }
 
     @Test
@@ -387,7 +400,8 @@ public class WikiPageControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(testConcreteWikiPage1.getId().intValue())))
                 .andExpect(jsonPath("$.views", is(1)))
-                .andExpect(jsonPath("$.likes", is(0)));
+                .andExpect(jsonPath("$.likes", is(0)))
+                .andExpect(jsonPath("$.authorDeleted", is(false)));
         params.clear();
 
         // Check for successful search again, incrementing view counter
@@ -397,7 +411,8 @@ public class WikiPageControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(testConcreteWikiPage1.getId().intValue())))
                 .andExpect(jsonPath("$.views", is(2)))
-                .andExpect(jsonPath("$.likes", is(0)));
+                .andExpect(jsonPath("$.likes", is(0)))
+                .andExpect(jsonPath("$.authorDeleted", is(false)));
         params.clear();
 
         // Check for successful search after user likes page and increments like counter
@@ -409,7 +424,8 @@ public class WikiPageControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(testConcreteWikiPage1.getId().intValue())))
                 .andExpect(jsonPath("$.views", is(3)))
-                .andExpect(jsonPath("$.likes", is(1)));
+                .andExpect(jsonPath("$.likes", is(1)))
+                .andExpect(jsonPath("$.authorDeleted", is(false)));
         params.clear();
 
         // Check for successful search after user unlikes page
@@ -421,7 +437,21 @@ public class WikiPageControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(testConcreteWikiPage1.getId().intValue())))
                 .andExpect(jsonPath("$.views", is(4)))
-                .andExpect(jsonPath("$.likes", is(0)));
+                .andExpect(jsonPath("$.likes", is(0)))
+                .andExpect(jsonPath("$.authorDeleted", is(false)));
+        params.clear();
+
+        // Check for successful search after the author account has been deleted
+        testUser1.delete();
+        testUser1 = userRepository.save(testUser1);
+        params.add("id", testConcreteWikiPage1.getId().toString());
+        this.mockMvc.perform(get("/retrieveWikiPage").params(params))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(testConcreteWikiPage1.getId().intValue())))
+                .andExpect(jsonPath("$.views", is(5)))
+                .andExpect(jsonPath("$.likes", is(0)))
+                .andExpect(jsonPath("$.authorDeleted", is(true)));
         params.clear();
     }
 
@@ -541,7 +571,7 @@ public class WikiPageControllerTest {
 
         //Check for successful search resulting in multiple WikiPages found
         params.add("title", "testTitlePair");
-        this.mockMvc.perform(get("/advancedSearchWikiPage").params(params))
+        this.mockMvc.perform(get("/searchWikiPage").params(params))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0].id", is(testConcreteWikiPage3.getId().intValue())))
@@ -550,10 +580,21 @@ public class WikiPageControllerTest {
 
         //Check for successful search when parameter has surrounding whitespace
         params.add("title", "\n \r testTitle1 \t");
-        this.mockMvc.perform(get("/advancedSearchWikiPage").params(params))
+        this.mockMvc.perform(get("/searchWikiPage").params(params))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0].id", is(testConcreteWikiPage1.getId().intValue())));
+        params.clear();
+
+        testUser1.likePage(testConcreteWikiPage1);
+        testUser1 = userRepository.save(testUser1);
+        //Check for successful search that also returns amount of likes page has
+        params.add("title", "\n \r testTitle1 \t");
+        this.mockMvc.perform(get("/searchWikiPage").params(params))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0].id", is(testConcreteWikiPage1.getId().intValue())))
+                .andExpect(jsonPath("$.[0].likes", is(1)));
         params.clear();
 
     }

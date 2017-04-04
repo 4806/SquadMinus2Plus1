@@ -6,7 +6,6 @@ import SocialWiki.WikiPages.WikiPageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -140,7 +139,7 @@ public class UserController {
         }
 
         // get the user from the user repository
-        User user = userRepo.findByUserName(userName);
+        User user = userRepo.findByUserNameWithoutDeletions(userName);
 
         // send an HTTP 422 response if there is no user with userName
         if (user == null) {
@@ -389,6 +388,36 @@ public class UserController {
         }
 
         user.removeNotification(notification);
+
+        userRepo.save(user);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+    }
+
+    /**
+     * Removes all notifications for the current user
+     * @param request - an empty HTTP request, the function retrieves the user from the current session
+     * @return an HTTP response that indicates the notifications were removed
+     */
+    @PostMapping("/removeAllUserNotifications")
+    @Transactional
+    public ResponseEntity<List<String>> removeAllUserNotifications(HttpServletRequest request) {
+
+        // send an HTTP 403 response if there is currently not a session
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+
+        // get the logged in user from the current session
+        String username = (String) session.getAttribute("user");
+        User user = userRepo.findByUserName(username);
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+
+        user.removeAllNotifications();
 
         userRepo.save(user);
 

@@ -299,4 +299,10 @@ public class User {
      * @param notification - the notification to remove
      */
     public void removeNotification(String notification) { this.notifications.remove(notification); }
+
+    /**
+     * Removes all notifications from the list for the User
+     */
+    public void removeAllNotifications() { this.notifications.clear(); }
+
 }

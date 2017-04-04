@@ -103,14 +103,12 @@ public class UserNotificationsAspectTest {
         //Check that user2 has received notification
         assertEquals("Failure - user2 did not receive notification from page creation", 1, user2.getNotifications().size());
         assertTrue("Failure - user2 did not receive correctly formatted notification from page creation",
-                user2.getNotifications().get(0).contains("The user " + user1.getUserName() + " has just created the page [") && //check for notification message without id
-                        user2.getNotifications().get(0).contains(", testTitle]"));
+                user2.getNotifications().get(0).contains("The user " + user1.getUserName() + " has just created the page testTitle"));
 
         //Check that user3 has received notification
         assertEquals("Failure - user3 did not receive notification from page creation", 1, user3.getNotifications().size());
         assertTrue("Failure - user3 did not receive correctly formatted notification from page creation",
-                user3.getNotifications().get(0).contains("The user " + user1.getUserName() + " has just created the page [") && //check for notification message without id
-                        user3.getNotifications().get(0).contains(", testTitle]"));
+                user3.getNotifications().get(0).contains("The user " + user1.getUserName() + " has just created the page testTitle"));
 
         //************************** Test Advice after Page edit
 
@@ -134,14 +132,12 @@ public class UserNotificationsAspectTest {
         //Check that user2 has received notification
         assertEquals("Failure - user2 did not receive notification from page editing", 2, user2.getNotifications().size());
         assertTrue("Failure - user2 did not receive correctly formatted notification from page editing",
-                user2.getNotifications().get(1).contains("The user " + user1.getUserName() + " has just edited the page [") && //check for notification message without id
-                        user2.getNotifications().get(1).contains(", testTitle]"));
+                user2.getNotifications().get(1).contains("The user " + user1.getUserName() + " has just edited the page testTitle"));
 
         //Check that user3 has received notification
         assertEquals("Failure - user3 did not receive notification from page editing", 2, user3.getNotifications().size());
         assertTrue("Failure - user3 did not receive correctly formatted notification from page editing",
-                user3.getNotifications().get(1).contains("The user " + user1.getUserName() + " has just edited the page [") && //check for notification message without id
-                        user3.getNotifications().get(1).contains(", testTitle]"));
+                user3.getNotifications().get(1).contains("The user " + user1.getUserName() + " has just edited the page testTitle"));
 
         //************************** Test Advice after Page liked
 
@@ -158,14 +154,12 @@ public class UserNotificationsAspectTest {
         //Check that user2 has received notification
         assertEquals("Failure - user2 did not receive notification from page like", 3, user2.getNotifications().size());
         assertTrue("Failure - user2 did not receive correctly formatted notification from page like",
-                user2.getNotifications().get(2).contains("The user " + user1.getUserName() + " has just liked the page [") && //check for notification message without id
-                        user2.getNotifications().get(2).contains(", testTitle1]"));
+                user2.getNotifications().get(2).contains("The user " + user1.getUserName() + " has just liked the page testTitle1"));
 
         //Check that user3 has received notification
         assertEquals("Failure - user3 did not receive notification from page like", 3, user3.getNotifications().size());
         assertTrue("Failure - user3 did not receive correctly formatted notification from page like",
-                user3.getNotifications().get(2).contains("The user " + user1.getUserName() + " has just liked the page [") && //check for notification message without id
-                        user3.getNotifications().get(2).contains(", testTitle1]"));
+                user3.getNotifications().get(2).contains("The user " + user1.getUserName() + " has just liked the page testTitle1"));
 
         //************************** Test Advice after User followed
 

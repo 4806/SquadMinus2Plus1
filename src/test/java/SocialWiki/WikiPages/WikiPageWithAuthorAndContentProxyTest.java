@@ -70,4 +70,9 @@ public class WikiPageWithAuthorAndContentProxyTest {
         assertEquals("Failure - getFullResult(testConcreteWikiPage2)", testResult2, WikiPageWithAuthorAndContentProxy.getFullResult(testConcreteWikiPage2));
     }
 
+    @Test
+    public void isAuthorDeleted() throws Exception {
+        assertEquals("Failure - isAuthorDeleted() for testResult1", testUser1.isDeleted(), testResult1.isAuthorDeleted());
+        assertEquals("Failure - isAuthorDeleted() for testResult1", testUser2.isDeleted(), testResult2.isAuthorDeleted());
+    }
 }
