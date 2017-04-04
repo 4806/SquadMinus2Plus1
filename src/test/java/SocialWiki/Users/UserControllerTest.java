@@ -830,14 +830,12 @@ public class UserControllerTest {
         // perform unsuccessful query with invalidated session
         session.invalidate();
         mockMvc.perform(post("/removeAllUserNotifications")
-                .content("notification=N1")
                 .contentType("application/x-www-form-urlencoded")
                 .session(session))
                 .andExpect(status().isForbidden());
 
         // perform unsuccessful query with no session
         mockMvc.perform(post("/removeAllUserNotifications")
-                .content("notification=N1")
                 .contentType("application/x-www-form-urlencoded"))
                 .andExpect(status().isForbidden());
     }
