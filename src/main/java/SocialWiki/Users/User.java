@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.constraints.Length;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
@@ -32,19 +33,19 @@ public class User {
      * The unique name used for logging in and displaying to other SocialWiki.Users
      */
     @Column(unique = true)
-    @Getter @Setter
+    @Getter @Setter @Length(min = 1, max = 32)
     private String userName;
 
     /**
      * The User's first name
      */
-    @Getter @Setter
+    @Getter @Setter @Length(min = 1, max = 32)
     private String firstName;
 
     /**
      * The User's last name
      */
-    @Getter @Setter
+    @Getter @Setter @Length(min = 1, max = 32)
     private String lastName;
 
     /**
@@ -57,7 +58,7 @@ public class User {
     /**
      * The password used for logging into the User's account
      */
-    @Getter @Setter
+    @Getter @Setter @Length(min = 1, max = 32)
     private String password;
 
     /**
