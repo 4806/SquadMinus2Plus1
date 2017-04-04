@@ -45,10 +45,10 @@ editPage.handler.setContent = function(dataString) {
     if (dataString !== null) {
         editPage.pageContent = JSON.parse(dataString);
         if(editPage.pageContent.content !== undefined) {
-            $$("rawtext").setValue(editPage.pageContent.content);
+            $$("rawtext").setValue(pageUtil.htmlDecode(editPage.pageContent.content));
         }
         if(editPage.pageContent.title !== undefined) {
-            $$("title").setValue(editPage.pageContent.title);
+            $$("title").setValue(pageUtil.htmlDecode(editPage.pageContent.title));
         }
     }
 };

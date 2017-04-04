@@ -42,3 +42,8 @@ pageUtil.getFormattedDate = function(epoch) {
 
   return (day>9 ? '' : '0') + day + "/" + (month>9 ? '' : '0') + month + "/" + date.getFullYear() + " at " + date.getHours() + ":" + (minute>9 ? '' : '0') + minute + " " + timezone;
 };
+
+pageUtil.htmlDecode = function(input)
+{
+  return $('<div/>').html(input).text();
+};
