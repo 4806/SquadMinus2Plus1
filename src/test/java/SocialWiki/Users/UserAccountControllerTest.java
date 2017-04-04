@@ -312,9 +312,37 @@ public class UserAccountControllerTest {
                 .andExpect(cookie().doesNotExist("user"))
                 .andExpect(status().isUnprocessableEntity());
 
+        // perform unsuccessful creation with an improper userName
+        mockMvc.perform(post("/signup")
+                .content("user=testUserN@me5&first=testFirstName5&last=testLastName5&email=Test5@email.com&pass=testPassword5")
+                .contentType("application/x-www-form-urlencoded"))
+                .andExpect(cookie().doesNotExist("user"))
+                .andExpect(status().isUnprocessableEntity());
+
+        // perform unsuccessful creation with an improper firstName
+        mockMvc.perform(post("/signup")
+                .content("user=testUserName5&first=testFirstN@me5&last=testLastName5&email=Test5@email.com&pass=testPassword5")
+                .contentType("application/x-www-form-urlencoded"))
+                .andExpect(cookie().doesNotExist("user"))
+                .andExpect(status().isUnprocessableEntity());
+
+        // perform unsuccessful creation with an improper lastName
+        mockMvc.perform(post("/signup")
+                .content("user=testUserName5&first=testFirstName5&last=testLastN@me5&email=Test5@email.com&pass=testPassword5")
+                .contentType("application/x-www-form-urlencoded"))
+                .andExpect(cookie().doesNotExist("user"))
+                .andExpect(status().isUnprocessableEntity());
+
         // perform unsuccessful creation with an improper email
         mockMvc.perform(post("/signup")
                 .content("user=testUserName5&first=testFirstName5&last=testLastName5&email=testEmail5&pass=testPassword5")
+                .contentType("application/x-www-form-urlencoded"))
+                .andExpect(cookie().doesNotExist("user"))
+                .andExpect(status().isUnprocessableEntity());
+
+        // perform unsuccessful creation with an improper password
+        mockMvc.perform(post("/signup")
+                .content("user=testUserName5&first=testFirstName5&last=testLastName5&email=Test5@email.com&pass=testP@ssword5")
                 .contentType("application/x-www-form-urlencoded"))
                 .andExpect(cookie().doesNotExist("user"))
                 .andExpect(status().isUnprocessableEntity());

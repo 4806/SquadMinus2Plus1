@@ -97,16 +97,18 @@ public class UserAccountController {
         String email = request.getParameter("email");
         String pass = request.getParameter("pass");
 
-        // send an HTTP 422 response if any parameter is missing or empty
-        if (user == null || user.isEmpty()) {
+        String pattern = "^[a-zA-Z0-9]*$";
+
+        // send an HTTP 422 response if any parameter is missing, empty, does not match the pattern (except email)
+        if (user == null || user.isEmpty() || !user.matches(pattern)) {
             return ResponseEntity.unprocessableEntity().body(null);
-        } else if (first == null || first.isEmpty()) {
+        } else if (first == null || first.isEmpty() || !first.matches(pattern)) {
             return ResponseEntity.unprocessableEntity().body(null);
-        } else if (last == null || last.isEmpty()) {
+        } else if (last == null || last.isEmpty() || !last.matches(pattern)) {
             return ResponseEntity.unprocessableEntity().body(null);
         } else if (email == null || email.isEmpty()) {
             return ResponseEntity.unprocessableEntity().body(null);
-        } else if (pass == null || pass.isEmpty()) {
+        } else if (pass == null || pass.isEmpty() || !pass.matches(pattern)) {
             return ResponseEntity.unprocessableEntity().body(null);
         }
 
