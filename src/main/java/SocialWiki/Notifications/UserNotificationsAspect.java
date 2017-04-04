@@ -3,6 +3,7 @@ package SocialWiki.Notifications;
 import SocialWiki.Users.User;
 import SocialWiki.Users.UserRepository;
 import SocialWiki.WikiPages.ConcreteWikiPage;
+import SocialWiki.WikiPages.WikiPage;
 import SocialWiki.WikiPages.WikiPageRepository;
 import SocialWiki.WikiPages.WikiPageWithAuthorAndContentProxy;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -104,32 +105,50 @@ public class UserNotificationsAspect {
      */
     private void SendNotifications(HttpServletRequest request, ResponseEntity response, String requestURI, List<User> followingUsers, User user) {
 
-        String notificationMessage = "";
+        String followingUsersNotificationMessage = "";
+        String effectedUserNotificationMessage = "";
+        User effectedUser = null;
 
         switch (requestURI) {
 
             case FOLLOW_USER_URI:
                 String followed = request.getParameter("user");   //Get userName of user being followed
-                notificationMessage = "The user " + user.getUserName() + " has just followed " + followed;
+                followingUsersNotificationMessage = "The user " + user.getUserName() + " has just followed " + followed;
+
+                effectedUser = userRepo.findByUserName(followed);
+                effectedUserNotificationMessage = "The user " + user.getUserName() + " has just followed you!";
                 break;
 
             case LIKE_PAGE_URI:
                 Long id = Long.valueOf(request.getParameter("id")); //Get Id of page being liked
                 ConcreteWikiPage page = wikiRepo.findById(id);
-                notificationMessage = "The user " + user.getUserName() + " has just liked the page "  + page.getTitle();
+                followingUsersNotificationMessage = "The user " + user.getUserName() + " has just liked the page "  + page.getTitle();
+
+                effectedUser =  page.getAuthor();
+                effectedUserNotificationMessage =  "The user " + user.getUserName() + " has just liked your page "  + page.getTitle();
                 break;
 
             case CREATE_WIKI_PAGE_URI:
                 WikiPageWithAuthorAndContentProxy createdPage = (WikiPageWithAuthorAndContentProxy) response.getBody();
                 if (createdPage.getParentID().equals(ConcreteWikiPage.IS_ORIGINAL_ID)) {  //If new page created
-                    notificationMessage = "The user " + user.getUserName() + " has just created the page "  + createdPage.getTitle();
+                    followingUsersNotificationMessage = "The user " + user.getUserName() + " has just created the page "  + createdPage.getTitle();
                 } else {    //If page was edited
-                    notificationMessage = "The user " + user.getUserName() + " has just edited the page "  + createdPage.getTitle();
+                    followingUsersNotificationMessage = "The user " + user.getUserName() + " has just edited the page "  + createdPage.getTitle();
+
+                    ConcreteWikiPage parentPage = wikiRepo.findById(createdPage.getParentID());
+                    effectedUser = parentPage.getAuthor();
+                    effectedUserNotificationMessage = "The user " + user.getUserName() + " has just edited your page "  + createdPage.getTitle();
                 }
                 break;
         }
 
-        String finalNotificationMessage = notificationMessage;    //Need an "effectively" final variable for lambda expression
+        if (effectedUser != null && !user.equals(effectedUser)) {
+            effectedUser.addNotification(effectedUserNotificationMessage);
+            effectedUser = userRepo.save(effectedUser);
+            followingUsers.remove(effectedUser);    //ensure the effected user does not receive other notification
+        }
+
+        String finalNotificationMessage = followingUsersNotificationMessage;    //Need an "effectively" final variable for lambda expression
         followingUsers.forEach(user1 -> user1.addNotification(finalNotificationMessage));
         userRepo.save(followingUsers);
     }
