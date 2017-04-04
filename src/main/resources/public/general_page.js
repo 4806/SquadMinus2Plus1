@@ -60,6 +60,7 @@ generalPages.bottomIcon = { view:"label", label:'<img src="img/flame_blue.png" h
 generalPages.toolbar = {
   view:"toolbar", elements: [
     //Left
+    {width:5},
     {view:"label", label:'<img src="img/flame_white.png" width="50%" onclick="generalPages.handler.homeClick()" style="cursor: pointer;"/>', width:50, align:"left"},
     {view:"label", label:"<div onclick=\"generalPages.handler.homeClick()\" style=\"cursor: pointer;\">Social Wiki</div>", align:"left"},
     {view:"search", id:"searchbox", placeholder:"Search Pages", align:"right", width:200, on:{onSearchIconClick:generalPages.handler.searchClick, onKeyPress:generalPages.handler.searchEnterPressed}},
@@ -70,7 +71,8 @@ generalPages.toolbar = {
     {view:"button", id:"toolbaruserbutton", value:generalPages.getCookie("user"), align:"right", width:100, click:generalPages.handler.userClick},
     {view:"button", id:"toolbarlogin", value:"Login", align:"right", width:100, click:generalPages.handler.loginClick},
     {view:"button", id:"toolbarlogout", value:"Logout", align:"right", width:100, click:generalPages.handler.logoutClick},
-    {view:"button", id:"toolbarsignup", value:"Sign Up", align:"right", width:100, click:generalPages.handler.signupClick}
+    {view:"button", id:"toolbarsignup", value:"Sign Up", align:"right", width:100, click:generalPages.handler.signupClick},
+    {width:20}
   ]
 };
 

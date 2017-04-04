@@ -20,8 +20,8 @@ public class UserTest {
 
     @Before
     public void setUp() throws Exception {
-        user1 = new User(1L, "testUserName1", "testFirstName1", "testLastName1", "testEmail1", false, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(),new ArrayList<>());
-        user2 = new User(2L, "testUserName2", "testFirstName2", "testLastName2", "testEmail2", false, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(),new ArrayList<>());
+        user1 = new User(1L, "testUserName1", "testFirstName1", "testLastName1", "Test1@email.com", false, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(),new ArrayList<>());
+        user2 = new User(2L, "testUserName2", "testFirstName2", "testLastName2", "Test2@email.com", false, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(),new ArrayList<>());
         user1.setPassword("testPassword1");
         user2.setPassword("testPassword2");
         page1 = new ConcreteWikiPage("testTitle1", "testContent1", user1);
@@ -34,7 +34,7 @@ public class UserTest {
         assertEquals("Failure - userName for asSessionUser()", "testUserName1", sessionUser.getUserName());
         assertEquals("Failure - firstName for asSessionUser()", "testFirstName1", sessionUser.getFirstName());
         assertEquals("Failure - lastName for asSessionUser()", "testLastName1", sessionUser.getLastName());
-        assertEquals("Failure - email for asSessionUser()", "testEmail1", sessionUser.getEmail());
+        assertEquals("Failure - email for asSessionUser()", "Test1@email.com", sessionUser.getEmail());
         assertEquals("Failure - password for asSessionUser()", null, sessionUser.getPassword());
         assertFalse("Failure - isDeleted for asSessionUser()", sessionUser.isDeleted());
         assertEquals("Failure - likedPages for asSessionUser()", new ArrayList<ConcreteWikiPage>(), sessionUser.getLikedPages());
@@ -43,7 +43,7 @@ public class UserTest {
 
     @Test
     public void equals() throws Exception {
-        User testUser = new User(1L, "testUserName1", "testFirstName1", "testLastName1", "testEmail1", false, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(),new ArrayList<>());
+        User testUser = new User(1L, "testUserName1", "testFirstName1", "testLastName1", "Test1@email.com", false, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(),new ArrayList<>());
         assertTrue("Failure - User.equals()", testUser.equals(user1));
     }
 

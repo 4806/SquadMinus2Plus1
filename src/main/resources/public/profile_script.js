@@ -48,8 +48,6 @@ profilePage.hideAll = function() {
   $$("usersfollowinglist").hide();
   $$("followedusers").hide();
   $$("followlist").hide();
-  $$("followeduseractivity").hide();
-  $$("followactivitylist").hide();
   $$("deleteuserbutton").hide();
 };
 
@@ -301,15 +299,6 @@ profilePage.getContent = function() {
         },
         success:profilePage.handler.setUsersFollowing
     });
-
-    //Get following user activity
-    // webix.ajax().get("/followactivity?user=" + params.user, {
-    //     error:function(){
-    //       // $$("followeduseractivity").hide();
-    //       // $$("followactivitylist").hide();
-    //     },
-    //     success:profilePage.handler.setFollowingUserActivity
-    // });
 };
 
 profilePage.onReady = function() {
@@ -320,56 +309,99 @@ profilePage.onReady = function() {
           { height:20 },
           { cols:[
             { width:30 },
-            { rows:[
-              { view:"label",
-                id:"status",
-                align:"center",
-                label:profilePage.strings.errorLabel,
-                css:"label_error"
-              },
-              { view:"label",
-                id:"username",
-                label:"",
-                css:"label_big"
-              },
-              { view:"label",
-                id:"email",
-                label:"Email: ",
-                css:"label_medium"
-              },
-              { view:"label",
-                id:"first",
-                label:"First: ",
-                css:"label_medium"
-              },
-              { view:"label",
-                id:"last",
-                label:"Last: ",
-                css:"label_medium"
-              },
-              {
-                view:"button",
-                id:"followbutton",
-                value:"Follow",
-                inputWidth:150,
-                click:profilePage.handler.followButtonClick
-              },
-              {
-                view:"button",
-                id:"unfollowbutton",
-                value:"Unfollow",
-                inputWidth:150,
-                click:profilePage.handler.unfollowButtonClick
-              },
-              {
-                view:"button",
-                id:"deleteuserbutton",
-                value:"DELETE ACCOUNT",
-                inputWidth:150,
-                type:"danger",
-                click:profilePage.handler.deleteButtonClick
-              },
-            ]},
+            {
+              cols:[
+                { rows:[
+                  { view:"label",
+                    id:"status",
+                    align:"center",
+                    label:profilePage.strings.errorLabel,
+                    css:"label_error"
+                  },
+                  { view:"label",
+                    id:"username",
+                    label:"",
+                    css:"label_big"
+                  },
+                  { view:"label",
+                    id:"email",
+                    label:"Email: ",
+                    css:"label_medium"
+                  },
+                  { view:"label",
+                    id:"first",
+                    label:"First: ",
+                    css:"label_medium"
+                  },
+                  { view:"label",
+                    id:"last",
+                    label:"Last: ",
+                    css:"label_medium"
+                  },
+                  {
+                    view:"button",
+                    id:"followbutton",
+                    value:"Follow",
+                    inputWidth:150,
+                    click:profilePage.handler.followButtonClick
+                  },
+                  {
+                    view:"button",
+                    id:"unfollowbutton",
+                    value:"Unfollow",
+                    inputWidth:150,
+                    click:profilePage.handler.unfollowButtonClick
+                  },
+                  {
+                    view:"button",
+                    id:"deleteuserbutton",
+                    value:"DELETE ACCOUNT",
+                    inputWidth:150,
+                    type:"danger",
+                    click:profilePage.handler.deleteButtonClick
+                  },
+                ]},
+                { cols:[
+                  { width:15 },
+                  {
+                    rows:[
+                        {view:"template", id:"followedusers", template:profilePage.strings.followingLabel, type:"header", align:"left"},
+                        {
+                            view:"list",
+                            id:"followlist",
+                            align:"center",
+                            template:"#userName#",
+                            height:250,
+                            type:{
+                                height:38
+                            },
+                            on:{
+                                onItemClick:profilePage.handler.itemClickFollowedUser
+                            }
+                        }
+                    ]
+                  },
+                  { width:30 },
+                  {
+                    rows:[
+                        {view:"template", id:"usersfollowing", template:profilePage.strings.usersFollowingLabel, type:"header", align:"left"},
+                        {
+                            view:"list",
+                            id:"usersfollowinglist",
+                            align:"center",
+                            template:"#userName#",
+                            type:{
+                                height:38
+                            },
+                            on:{
+                                onItemClick:profilePage.handler.itemClickUserFollowing
+                            }
+                        }
+                    ]
+                  },
+                ]}
+              ]
+            },
             { width:30 }
           ]},
           { height:30 },
@@ -418,67 +450,7 @@ profilePage.onReady = function() {
                       }
                     ]
                   },
-                  { height:30 },
-                  {
-                    cols:[
-                      {
-                        rows:[
-                            {view:"template", id:"followedusers", template:profilePage.strings.followingLabel, type:"header", align:"left"},
-                            {
-                                view:"list",
-                                id:"followlist",
-                                align:"center",
-                                template:"#userName#",
-                                height:250,
-                                type:{
-                                    height:38
-                                },
-                                on:{
-                                    onItemClick:profilePage.handler.itemClickFollowedUser
-                                }
-                            }
-                        ]
-                      },
-                      { width:30 },
-                      {
-                        rows:[
-                            {view:"template", id:"usersfollowing", template:profilePage.strings.usersFollowingLabel, type:"header", align:"left"},
-                            {
-                                view:"list",
-                                id:"usersfollowinglist",
-                                align:"center",
-                                template:"#userName#",
-                                type:{
-                                    height:38
-                                },
-                                on:{
-                                    onItemClick:profilePage.handler.itemClickUserFollowing
-                                }
-                            }
-                        ]
-                      },
-                    ]
-                  }
-                ]
-              },
-              { width:30 },
-              {
-                autoheight:true,
-                rows:[
-                    {view:"template", id:"followeduseractivity", template:"Followed User Activity", type:"header", align:"left"},
-                    {
-                        view:"list",
-                        id:"followactivitylist",
-                        align:"center",
-                        template:"#title# <div> Created by #author# on #creationDate#</div>",
-                        maxHeight:500,
-                        type:{
-                            height:62
-                        },
-                        on:{
-                            onItemClick:profilePage.handler.itemClickCreated
-                        }
-                    }
+                  { height:30 }
                 ]
               },
               { width:30 }

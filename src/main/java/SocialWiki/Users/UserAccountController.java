@@ -4,13 +4,17 @@ import SocialWiki.Cookies.CookieManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.TransactionSystemException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.persistence.RollbackException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.transaction.Transactional;
+import javax.validation.ConstraintViolationException;
 import java.util.List;
 
 /**
@@ -93,16 +97,18 @@ public class UserAccountController {
         String email = request.getParameter("email");
         String pass = request.getParameter("pass");
 
-        // send an HTTP 422 response if any parameter is missing or empty
-        if (user == null || user.isEmpty()) {
+        String pattern = "^[a-zA-Z0-9]*$";
+
+        // send an HTTP 422 response if any parameter is missing, empty, does not match the pattern (except email)
+        if (user == null || user.isEmpty() || !user.matches(pattern)) {
             return ResponseEntity.unprocessableEntity().body(null);
-        } else if (first == null || first.isEmpty()) {
+        } else if (first == null || first.isEmpty() || !first.matches(pattern)) {
             return ResponseEntity.unprocessableEntity().body(null);
-        } else if (last == null || last.isEmpty()) {
+        } else if (last == null || last.isEmpty() || !last.matches(pattern)) {
             return ResponseEntity.unprocessableEntity().body(null);
         } else if (email == null || email.isEmpty()) {
             return ResponseEntity.unprocessableEntity().body(null);
-        } else if (pass == null || pass.isEmpty()) {
+        } else if (pass == null || pass.isEmpty() || !pass.matches(pattern)) {
             return ResponseEntity.unprocessableEntity().body(null);
         }
 
@@ -114,8 +120,14 @@ public class UserAccountController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
         }
 
+        User newUser;
+
         // create the new User and save it in the user repository
-        User newUser = userRepo.save(new User(user, first, last, email, pass));
+        try {
+            newUser = userRepo.save(new User(user, first, last, email, pass));
+        } catch (TransactionSystemException e) { // this exception will be thrown if the email does not validate
+            return ResponseEntity.unprocessableEntity().body(null);
+        }
 
         // create a new session for the new User
         session = request.getSession();
