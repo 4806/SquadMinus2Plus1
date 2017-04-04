@@ -1,6 +1,8 @@
 function generalPages(){}
 
 generalPages.handler = {};
+generalPages.strings = {};
+generalPages.strings.emptyNotificationList = "No new notifications.";
 
 generalPages.handler.homeClick = function() {
     location.href = "/";
@@ -64,7 +66,7 @@ generalPages.toolbar = {
 
     //Right
     {view:"button", id:"toolbarnewpage", value:"New Page", align:"right", width:100, click:generalPages.handler.addPageClick},
-    {view:"icon", id:"toolbarnotificationbutton", icon:"envelope", align:"right", popup:"notificationPopup"},
+    {view:"button", id:"toolbarnotificationbutton", value:"Mail", width:100, align:"right", popup:"notificationPopup"},
     {view:"button", id:"toolbaruserbutton", value:generalPages.getCookie("user"), align:"right", width:100, click:generalPages.handler.userClick},
     {view:"button", id:"toolbarlogin", value:"Login", align:"right", width:100, click:generalPages.handler.loginClick},
     {view:"button", id:"toolbarlogout", value:"Logout", align:"right", width:100, click:generalPages.handler.logoutClick},
@@ -72,14 +74,37 @@ generalPages.toolbar = {
   ]
 };
 
-generalPages.clearNotifications = function() {
+generalPages.clearUiNotifications = function() {
   $$("toolbarnotificationbutton").define("badge", 0);
   $$("toolbarnotificationbutton").refresh();
   $$("notificationList").clearAll();
   $$("notificationList").add({"content":"No new notifications."});
+  $$("notificationList").refresh();
+};
 
+generalPages.removeNotifications = function() {
   //Request notification clear
-  // webix.ajax().post("/removeAllUserNotifications", {});
+  webix.ajax().post("/removeAllUserNotifications", {
+    success:generalPages.clearUiNotifications
+  });
+};
+
+generalPages.setNotifications = function(data) {
+  if(data !== null && data !== "[]"){
+    realData = JSON.parse(data);
+    if(realData.length > 0){
+      $$("toolbarnotificationbutton").define("badge", realData.length);
+      $$("toolbarnotificationbutton").refresh();
+      $$("notificationList").clearAll();
+
+      for(var index in realData){
+        $$("notificationList").add({"content":realData[index]});
+      }
+
+      $$("notificationList").refresh();
+      $$("toolbarnotificationbutton").refresh();
+    }
+  }
 };
 
 generalPages.formatToolbar = function() {
@@ -102,35 +127,24 @@ generalPages.formatToolbar = function() {
       width:300,
       autoheight:true,
       on:{
-        onHide:generalPages.clearNotifications
+        onHide:generalPages.removeNotifications
       },
       body:{
         view:"list",
         id:"notificationList",
-    		data:[ {"content":"No new notifications."}],
+    		data:[ {"content":generalPages.strings.emptyNotificationList}],
     		datatype:"json",
         type:{
           height:62
         },
-    		template:"#content#"
+    		template:"#content#",
+        boarderless:true
     	}
     });
 
     // Set notifications
     webix.ajax().get("/getUserNotifications", {
-      success:function(data){
-        if(data !== null && data !== "[]"){
-          realData = JSON.parse(data);
-          if(realData.length > 0){
-            $$("toolbarnotificationbutton").define("badge", realData.length);
-            $$("toolbarnotificationbutton").refresh();
-            $$("notificationList").clearAll();
-            for(var index in realData){
-              $$("notificationList").add({"content":realData[index]});
-            }
-          }
-        }
-      }
+      success:generalPages.setNotifications
     });
   }
 };
