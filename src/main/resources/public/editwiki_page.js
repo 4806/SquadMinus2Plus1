@@ -108,7 +108,7 @@ editPage.onReady = function() {
           {
               view:"textarea",
               id:"rawtext",
-              height:600,
+              height:650,
               scroll:"xy",
               placeholder:"Enter Your Wiki Content Here!"
           },
@@ -116,11 +116,10 @@ editPage.onReady = function() {
               view:"template",
               template:"<p>Preview</p>",
               id:"preview",
-              height:600,
-              scroll:true,
+              autoheight:true,
               css:"page_content"
           },
-          { },
+          { height:60 },
           { margin:10,
               cols:[
                   { },
@@ -128,7 +127,7 @@ editPage.onReady = function() {
                   { view:"button", value:"Cancel", click:generalPages.handler.homeClick },
                   { }
           ]},
-          { },
+          { height:30 },
           generalPages.bottomIcon
       ]
   });
