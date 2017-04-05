@@ -213,7 +213,7 @@ viewPage.onReady = function() {
               view: "template",
               template: "<p></p>",
               id: "content",
-              scroll:true,
+              autoheight:true,
               css:"page_content"
           },
           { },
