@@ -3,6 +3,7 @@ function generalPages(){}
 generalPages.handler = {};
 generalPages.strings = {};
 generalPages.strings.emptyNotificationList = "No new notifications.";
+generalPages.notificationCount = 0;
 
 generalPages.handler.homeClick = function() {
     location.href = "/";
@@ -77,6 +78,7 @@ generalPages.toolbar = {
 };
 
 generalPages.clearUiNotifications = function() {
+  generalPages.notificationCount = 0;
   $$("toolbarnotificationbutton").define("badge", 0);
   $$("toolbarnotificationbutton").refresh();
   $$("notificationList").clearAll();
@@ -85,28 +87,39 @@ generalPages.clearUiNotifications = function() {
 };
 
 generalPages.removeNotifications = function() {
-  //Request notification clear
-  webix.ajax().post("/removeAllUserNotifications", {
-    success:generalPages.clearUiNotifications
-  });
+  //Request notification clear, if there are notifications to clear
+  if( generalPages.notificationCount > 0 ) {
+    webix.ajax().post("/removeAllUserNotifications", {
+      success:generalPages.clearUiNotifications
+    });
+  }
 };
 
 generalPages.setNotifications = function(data) {
   if(data !== null && data !== "[]"){
     realData = JSON.parse(data);
-    if(realData.length > 0){
-      $$("toolbarnotificationbutton").define("badge", realData.length);
-      $$("toolbarnotificationbutton").refresh();
-      $$("notificationList").clearAll();
 
+    // Set badge count
+    generalPages.notificationCount = realData.length;
+    $$("toolbarnotificationbutton").define("badge", generalPages.notificationCount);
+    $$("toolbarnotificationbutton").refresh();
+
+    // Set notification list
+    if(generalPages.notificationCount > 0){
+      $$("notificationList").clearAll();
       for(var index in realData){
         $$("notificationList").add({"content":realData[index]});
       }
-
       $$("notificationList").refresh();
       $$("toolbarnotificationbutton").refresh();
     }
   }
+};
+
+generalPages.requestNotifications = function() {
+  webix.ajax().get("/getUserNotifications", {
+    success:generalPages.setNotifications
+  });
 };
 
 generalPages.formatToolbar = function() {
@@ -145,8 +158,10 @@ generalPages.formatToolbar = function() {
     });
 
     // Set notifications
-    webix.ajax().get("/getUserNotifications", {
-      success:generalPages.setNotifications
-    });
+    generalPages.requestNotifications();
+
+    // Set an interval to update notifications every 5 seconds
+    setInterval(generalPages.requestNotifications, 5000);
+
   }
 };
